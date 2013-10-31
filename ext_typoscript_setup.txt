@@ -1,0 +1,54 @@
+# Module configuration
+module.tx_contentstage {
+	persistence {
+		storagePid = {$module.tx_contentstage.persistence.storagePid}
+	}
+	view {
+		templateRootPath = {$module.tx_contentstage.view.templateRootPath}
+		partialRootPath = {$module.tx_contentstage.view.partialRootPath}
+		layoutRootPath = {$module.tx_contentstage.view.layoutRootPath}
+	}
+}
+
+config.tx_extbase{
+    persistence{
+        classes{
+
+            Tx_Contentstage_Domain_Model_BackendUser {
+                mapping {
+                    tableName = be_users
+                    recordType >
+					columns {
+						lockToDomain.mapOnProperty = lockToDomain
+						realName.mapOnProperty = realName
+						userMods.mapOnProperty = userMods
+						disableIPlock.mapOnProperty = disableIPlock
+						TSconfig.mapOnProperty = tSconfig
+					}
+                }
+            }
+            
+            Tx_Contentstage_Domain_Model_BackendUserGroup {
+                mapping {
+                    tableName = be_groups
+                    recordType >
+					columns {
+						lockToDomain.mapOnProperty = lockToDomain
+						groupMods.mapOnProperty = groupMods
+						TSconfig.mapOnProperty = tSconfig
+					}
+                }
+            }
+            
+            Tx_Contentstage_Domain_Model_Review {
+                mapping {
+					columns {
+						crdate.mapOnProperty = created
+						cruser_id.mapOnProperty = creator
+					}
+                }
+            }
+            
+    	}
+    }
+}

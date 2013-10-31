@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<T3locallang>
+	<meta type="array">
+		<type>database</type>
+		<description>Language labels for database tables/fields belonging to extension 'contentstage'</description>
+	</meta>
+	<data type="array">
+		<languageKey index="default" type="array">
+			<label index="tx_contentstage_domain_model_review">Review</label>
+			<label index="tx_contentstage_domain_model_review.created">Created</label>
+			<label index="tx_contentstage_domain_model_review.page">Page</label>
+			<label index="tx_contentstage_domain_model_review.levels">Levels</label>
+			<label index="tx_contentstage_domain_model_review.required">Required</label>
+			<label index="tx_contentstage_domain_model_review.debug">Debug</label>
+			<label index="tx_contentstage_domain_model_review.reviewed">Reviewed</label>
+			<label index="tx_contentstage_domain_model_review.creator">Creator</label>
+			<label index="tx_contentstage_domain_model_review.changes">Changes</label>
+			<label index="tx_contentstage_domain_model_review.state">State</label>
+			<label index="tx_contentstage_domain_model_review.auto_push">Automatically push to remote after a successfull review</label>
+			
+			<label index="tx_contentstage_domain_model_reviewed">Reviewed</label>
+			<label index="tx_contentstage_domain_model_reviewed.reviewed">Reviewed</label>
+			<label index="tx_contentstage_domain_model_reviewed.ok">Ok</label>
+			<label index="tx_contentstage_domain_model_reviewed.reviewer">Reviewer</label>
+
+			<label index="tx_contentstage_domain_model_state">State</label>
+			<label index="tx_contentstage_domain_model_state.state">State</label>
+			<label index="tx_contentstage_domain_model_state.user">User</label>
+			
+			<label index="tx_contentstage_domain_model_state.state.fresh">New review record</label>
+			<label index="tx_contentstage_domain_model_state.state.reinitialized">Review record reinitialized</label>
+			<label index="tx_contentstage_domain_model_state.state.partial">Patrially reviewed (+1)</label>
+			<label index="tx_contentstage_domain_model_state.state.reviewed">Fully reviewed</label>
+			<label index="tx_contentstage_domain_model_state.state.pushed">Pushed to remote</label>
+			<label index="tx_contentstage_domain_model_state.state.rejected">Review rejected</label>
+			<label index="tx_contentstage_domain_model_state.state.deprecated">Review deprecated (changes since creation)</label>
+		</languageKey>
+		
+		<languageKey index="de" type="array">
+			<label index="tx_contentstage_domain_model_review">Review-Eintrag</label>
+			<label index="tx_contentstage_domain_model_review.created">Erstellt</label>
+			<label index="tx_contentstage_domain_model_review.page">Seite</label>
+			<label index="tx_contentstage_domain_model_review.levels">Baumtiefe</label>
+			<label index="tx_contentstage_domain_model_review.required">Anzahl benötigter Reviews</label>
+			<label index="tx_contentstage_domain_model_review.debug">Debug</label>
+			<label index="tx_contentstage_domain_model_review.reviewed">Anstehende/bereits erfolgte Reviews</label>
+			<label index="tx_contentstage_domain_model_review.creator">Ersteller</label>
+			<label index="tx_contentstage_domain_model_review.changes">Änderungen</label>
+			<label index="tx_contentstage_domain_model_review.state">Status</label>
+			<label index="tx_contentstage_domain_model_review.auto_push">Automatisch auf Zielserver pushen nach erfolgreichem Review</label>
+			
+			<label index="tx_contentstage_domain_model_reviewed">Reviewed</label>
+			<label index="tx_contentstage_domain_model_reviewed.reviewed">Datum des Reviews</label>
+			<label index="tx_contentstage_domain_model_reviewed.ok">Ok</label>
+			<label index="tx_contentstage_domain_model_reviewed.reviewer">Review-Person</label>
+
+			<label index="tx_contentstage_domain_model_state">Status</label>
+			<label index="tx_contentstage_domain_model_state.state">Status</label>
+			<label index="tx_contentstage_domain_model_state.user">Benutzer</label>
+			
+			<label index="tx_contentstage_domain_model_state.state.fresh">Neuer Review-Eintrag</label>
+			<label index="tx_contentstage_domain_model_state.state.reinitialized">Review-Eintrag wurde reinitializiert</label>
+			<label index="tx_contentstage_domain_model_state.state.partial">Teilweise reviewed (+1)</label>
+			<label index="tx_contentstage_domain_model_state.state.reviewed">Ganz reviewed</label>
+			<label index="tx_contentstage_domain_model_state.state.pushed">Aufs Zielsystem kopiert</label>
+			<label index="tx_contentstage_domain_model_state.state.rejected">Änderungen abgelehnt</label>
+			<label index="tx_contentstage_domain_model_state.state.deprecated">Review abgelaufen (es gab neuere Änderungen)</label>
+		</languageKey>
+	</data>
+</T3locallang>

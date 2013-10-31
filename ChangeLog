@@ -1,0 +1,241 @@
+2013-10-25 Dimitri König <dk@cabag.ch>
+	* version 0.5.2
+	* [FEATURE] Added hooks around pushing of files
+	* [FEATURE] Makes $this->log public -> accessable from other extensions
+
+2013-10-25 Nils Blattner <nb@cabag.ch>
+	* version 0.5.1
+	* [BUG] changed the way pushDependencies works so it still pushes mm-relations
+
+2013-10-24 Nils Blattner <nb@cabag.ch>
+	* version 0.5.0
+	* [FEATURE] added new pageTS option pushDependencies (default 1), if set to 0, dependencies will not be pushed
+
+2013-10-17 Nils Blattner <nb@cabag.ch>
+	* version 0.4.8
+	* [BUG] fixed an issue when pageTS had maximumDepth = -1 - issue #4068
+
+2013-10-17 Nils Blattner <nb@cabag.ch>
+	* version 0.4.7
+	* [BUG] added new sql field page to reviews and removed mapping of pid to page - issue #4066
+	* After DB update following SQL must be executed: UPDATE tx_contentstage_domain_model_review SET page = pid, pid = 0
+	* Removed Hook
+2013-10-21 Nils Blattner <nb@cabag.ch>
+	* version 0.4.9
+	* [FEATURE] added mails when a review is deprecated or pushed - issue #4157
+
+
+2013-10-17 Nils Blattner <nb@cabag.ch>
+	* version 0.4.6
+	* [FEATURE] added display for files differing - issue #4075
+	* [BUG] removed extra module (was test) - issue #4124
+
+2013-10-16 Nils Blattner <nb@cabag.ch>
+	* version 0.4.5
+	* [BUG] fixed an issue with finding the mountpoints for a user
+
+2013-10-15 Nils Blattner <nb@cabag.ch>
+	* version 0.4.4
+	* [FEATURE] added special file array that tracks differing files - issue #4075
+
+2013-10-14 Nils Blattner <nb@cabag.ch>
+	* version 0.4.3
+	* [FEATURE] added pageTS option to automatically review if user sets him/herself as reviewer
+	* [FEATURE] added pageTS option to send mail to the active user aswell and deactivated it by default
+
+2013-10-10 Nils Blattner <nb@cabag.ch>
+	* version 0.4.2
+	* [BUG] fixed an issue when empty emails are set in backend users
+
+2013-10-10 Nils Blattner <nb@cabag.ch>
+	* version 0.4.1
+	* [BUG] fixed issue with displaying softref changes
+	* [BUG #3995] fixed issue with ignoreFields
+	* [FEATURE #3995] added l10n_diffsource and l18n_diffsource to ignoreFields by default
+	* [FEATURE #3995] added display proc for date values
+
+2013-10-08 Nils Blattner <nb@cabag.ch>
+	* version 0.4.0
+	* [FEATURE #3927] softrefs are now resolved via refindex
+	* [FEATURE #3837] added save action icon and modified template a little
+	* [FEATURE #3829] added pageTS option review.defaultAutoPush
+	* [FEATURE #3836] changed some labels
+
+2013-10-04 Nils Blattner <nb@cabag.ch>
+	* version 0.3.9
+	* [BUG] explicitly select typo3-pagetree to be used as the navigation option for contentstaging
+
+2013-10-03 Nils Blattner <nb@cabag.ch>
+	* version 0.3.8
+	* [FEATURE] added all pageTS options to ext_localconf.php
+	* [FEATURE] added new pageTS option to force https in the side by side view
+
+2013-10-01 Nils Blattner <nb@cabag.ch>
+	* version 0.3.7
+	* [FEATURE] changed pageTS option reviewGroups to review.groups
+
+2013-09-30 Nils Blattner <nb@cabag.ch>
+	* version 0.3.6
+	* [BUG] fixed an issue with deprecation detection
+
+2013-09-27 Nils Blattner <nb@cabag.ch>
+	* version 0.3.5
+	* [FEATURE] implemented review process
+
+2013-09-20 Nils Blattner <nb@cabag.ch>
+	* version 0.3.4
+	* [FEATURE] implemented db mountpoint resolving
+
+2013-08-27 Nils Blattner <nb@cabag.ch>
+	* version 0.3.3
+	* [FEATURE] added option to the review record that would allow automatic push to remote after a successfull review
+
+2013-08-26 Nils Blattner <nb@cabag.ch>
+	* version 0.3.2
+	* [BUGFIX] fixed an issue, where a comma separated list of files/folders was treated as a single file
+
+2013-08-21 Nils Blattner <nb@cabag.ch>
+	* version 0.3.1
+	* [FEATURE] added review records (and associated), added domain model for be_users and be_groups
+
+2013-08-14 Nils Blattner <nb@cabag.ch>
+	* version 0.3.0
+	* [FEATURE] added configuration options for the recursion depth through pageTS (and by expansion userTS)
+	* [FEATURE] added support for file/folder comparison (only compares whether files/folders exist and if the md5 sum is different)
+
+2013-08-13 Nils Blattner <nb@cabag.ch>
+	* version 0.2.9
+	* added recursion depth to compare and push actions
+
+2013-08-13 Nils Blattner <nb@cabag.ch>
+	* version 0.2.8
+	* added several tables to not be diff'd (because they do not have pid's)
+
+2013-05-02 Dimitri König <dk@cabag.ch>
+	* version 0.2.7
+	* modified findCmd in Shell - fixed WIN bug
+
+2013-04-16 Dimitri König <dk@cabag.ch>
+	* version 0.2.6
+	* set clear cache call from file_get_contents to curl due to ssl
+	* fixed hash not found bug
+
+2013-04-15 Nils Blattner <nb@cabag.ch>
+	* version 0.2.5
+	* fixed a bug in the eID-script that would not properly clean up temporary hashes
+
+2013-04-12 Nils Blattner <nb@cabag.ch>
+	* version 0.2.4
+	* fixed a bug that dependencies are not properly staged
+
+2013-04-11 Dimitri König <dk@cabag.ch>
+	* version 0.2.3
+	* fixed some bugs in shell class
+
+2013-04-03 Nils Blattner <nb@cabag.ch>
+	* version 0.2.2
+	* fixed snapshots so that they actually consider the tables to be ignored
+
+2013-02-07 Nils Blattner <nb@cabag.ch>
+	* version 0.2.1
+	* added language labels for source/target missing
+
+2013-02-07 Nils Blattner <nb@cabag.ch>
+	* version 0.2.0
+	* separated snapshot and initialize into separate modules
+
+2013-02-05 Nils Blattner <nb@cabag.ch>
+	* version 0.1.9
+	* fixed a bug with the remote page tree
+	* separated initialize and snapshot functions to a different "admin"-module
+	* fixed an issue if a page did not exist remotely
+
+2013-02-05 Nils Blattner <nb@cabag.ch>
+	* version 0.1.8
+	* fixed an issue when the remote page tree does not exist
+	* now a snapshot of the current state is created before reverting to a given snapshot
+
+2013-01-30 Nils Blattner <nb@cabag.ch>
+	* version 0.1.7
+	* fixed an issue with clearcache "all" and domains
+
+2013-01-30 Nils Blattner <nb@cabag.ch>
+	* version 0.1.6
+	* fixed issue where inserts were not properly split up into packs of 100 queries
+	* removed usage of admin_get_tables
+	* fixed an issue where folders do not have a trailing slash
+	* implemented the possibility to enforce the whole cache to be cleared
+
+2013-01-29 Nils Blattner <nb@cabag.ch>
+	* version 0.1.5
+	* added dependency for cabag_extbase 0.5.5
+
+2013-01-04 Nils Blattner <nb@cabag.ch>
+	* version 0.1.4
+	* fixed some issues with shell on windows
+	* added TYPO3 4.7+ caching framework tables (cf_*) to auto ignore tables
+
+2013-01-02 Nils Blattner <nb@cabag.ch>
+	* version 0.1.3
+	* fixed some issues with fields (fallback in JS)
+	* fixed an issue, where the repository would attempt to find sys_log/_history records of files
+	* added german translations
+
+2012-12-27 Nils Blattner <nb@cabag.ch>
+	* version 0.1.2
+	* implemented the day after yesterday routine!
+	* implemented remote cache clearing
+	* changed extension icon
+
+2012-12-20 Nils Blattner <nb@cabag.ch>
+	* version 0.1.1
+	* implemented the day before tomorrow routine!
+	* implemented 2 column diff view
+	* implemented sys_log/sys_history migration
+	* implemented ignore tables/fields
+
+2012-12-13 Nils Blattner <nb@cabag.ch>
+	* version 0.1.0
+	* changes are rendered with jQuery templates now
+	* changed some visuals
+
+2012-12-11 Nils Blattner <nb@cabag.ch>
+	* version 0.0.9
+	* small code refactoring in Classes/Utility/Tca.php
+
+2012-12-10 Nils Blattner <nb@cabag.ch>
+	* version 0.0.8
+	* finished TCA parser
+	* implemented relation resolving
+	* implemented file push
+
+2012-12-07 Nils Blattner <nb@cabag.ch>
+	* version 0.0.7
+	* implemented part of the TCA parser
+	* moved all typoscript to ext_typoscript_*.txt
+	* implemented gzip compression for sql snapshots
+
+2012-12-06 Nils Blattner <nb@cabag.ch>
+	* version 0.0.6
+	* implemented snapshots
+	* implemented initialization
+
+2012-11-21 Nils Blattner <nb@cabag.ch>
+	* version 0.0.5
+	* implemented diff display
+
+2012-11-16 Nils Blattner <nb@cabag.ch>
+	* version 0.0.4
+	* fixed/implemented row diff'ing
+
+2012-11-15 Nils Blattner <nb@cabag.ch>
+	* version 0.0.3
+	* implemented table base row diff'ing
+
+2012-11-13 Nils Blattner <nb@cabag.ch>
+	* version 0.0.2
+	* implemented diff functionality
+
+2012-11-08 Nils Blattner <nb@cabag.ch>
+	* version 0.0.1
+	* initial release

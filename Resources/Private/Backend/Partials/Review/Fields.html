@@ -1,0 +1,85 @@
+<div class="tx_contentstaging_halftables">
+	<div class="typo3-dyntabmenu-divs tx_contentstage_halfleft">
+		<table class="typo3-usersettings">
+			<tbody>
+				<f:if condition="{reviewConfiguration.editCreate}">
+					<f:then>
+						<tr>
+							<td class="label">
+								<f:translate key="field.review.depth" />
+							</td>
+							<td class="value">
+								<f:form.select property="levels" options="{depthOptions}" value="{f:if(condition: '{review.uid}', then: '{review.levels}', else: '{depth}')}" />
+							</td>
+						</tr>
+						<f:render partial="Field/Check" arguments="{label: 'review.autoPush', field: 'autoPush'}" />
+					</f:then>
+					<f:else>
+						<f:render partial="Field/ReadOnly" arguments="{label: 'review.depth', value: review.levels}" />
+						<f:render partial="Field/ReadOnly" arguments="{label: 'review.autoPush', value: '{f:if(condition: review.autoPush, then: \'{f:translate(key: \\\'review.autoPush.1\\\')}\', else: \'{f:translate(key: \\\'review.autoPush.0\\\')}\')}'}" />
+					</f:else>
+				</f:if>
+				<f:for each="{review.reviewerIndices}" as="index">
+					<f:cycle values="{review.reviewed}" as="reviewed">
+						<tr>
+							<td class="label">
+								<f:translate key="review.title.reviewPerson" arguments="{0: index}" />
+							</td>
+							<td class="value">
+								<f:if condition="{reviewConfiguration.editCreate}">
+									<f:then>
+										<f:form.select name="reviewers[{reviewed.uid}]" value="{f:if(condition: '{index}{review.uid} == 1', then: '{activeBackendUser.uid}', else: '{reviewed.reviewer.uid}')}" options="{backendUsers}" optionLabelField="name" />
+										<span class="t3-icon contentstage-state contentstage-state-{reviewed.state}" title="{f:translate(key: 'field.review.state.{reviewed.state}')}">&nbsp;</span>
+									</f:then>
+									<f:else>
+										{reviewed.reviewer.name}
+										<span class="t3-icon contentstage-state contentstage-state-{reviewed.state}" title="{f:translate(key: 'field.review.state.{reviewed.state}')}">&nbsp;</span>
+									</f:else>
+								</f:if>
+							</td>
+						</tr>
+					</f:cycle>
+				</f:for>
+				<f:if condition="{reviewConfiguration.editCreate}">
+					<tr>
+						<td class="label"></td>
+						<td class="value">
+							<br />
+							<div>
+								<div class="submitContainer">
+									<f:form.submit value="{f:translate(key: 'review.{f:if(condition: \'{review.uid} > 0\', then: \'edit\', else: \'create\')}.submit')}" />
+									<span class="t3-icon contentstage-action contentstage-action-save" title="{f:translate(key: 'review.{f:if(condition: \'{review.uid} > 0\', then: \'edit\', else: \'create\')}.submit')}">&nbsp;</span>
+								</div>
+							</div>
+							<f:render partial="LightboxComment" />
+						</td>
+					</tr>
+				</f:if>
+			</tbody>
+		</table>
+	</div>
+	<f:if condition="{review.uid} > 0">
+		<div class="typo3-dyntabmenu-divs tx_contentstage_halfright">
+			<table class="typo3-usersettings">
+				<tbody>
+					<f:render partial="Field/ReadOnly" arguments="{label: 'review.created', value: '{f:format.date(date: review.created, format: \'d-m-Y H:i\')}'}" />
+					<f:render partial="Field/ReadOnly" arguments="{label: 'review.creator', value: review.creator.realName}" />
+					<f:render partial="Field/ReadOnly" arguments="{label: 'review.id', value: review.uid}" />
+					<f:render partial="Field/ReadOnly" arguments="{label: 'review.pageTitle', value: review.pageRecord.title}" />
+					<tr>
+						<td class="label">
+							<f:translate key="field.review.state" />
+						</td>
+						<td class="value">
+							<f:translate key="field.review.state.{review.state.state}" />
+							<span class="t3-icon contentstage-state contentstage-state-{review.state.state}" title="{f:translate(key: 'field.review.state.{review.state.state}')}">&nbsp;</span>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</f:if>
+	<div class="clearer"></div>
+</div>
+<f:form.hidden property="page" />
+<f:form.hidden property="required" />

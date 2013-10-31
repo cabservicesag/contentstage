@@ -1,0 +1,71 @@
+# cat=basic/cache/10; type=boolean; label= Enable caching of certain information?
+useCache = 0
+
+# cat=basic/cache/10; type=int+; label= The length to cache.
+cacheTime = 300
+
+# cat=basic/cache/10; type=boolean; label= Clear all caches in any case.
+clearAllCaches = 0
+
+# cat=basic/init/10; type=int+; label= The steps to increase the auto_increment.
+autoIncrementStep = 2000000
+
+# cat=basic/init/10; type=float; label= Assume that the full step is '1', then this is the threshold, after which an extra step is added. Example: Highest auto_increment is currently 4499999, step is 2000000. So the next lower step is at 4000000 and the next higher is at 6000000. Now with a threshold of 0.25, the numeric threshold is "last step + 0.25 * step" which is equal to "4000000 + 500000" or "4500000". Since 4499999 is lower, the next stepis 6000000. If the highest auto_increment were higher, say 4600000, then an extra step is added -> it goes to 8000000. So effectively this ensures, that there will be at least (1 - threshold) * step auto_increments left before there is a crash!
+autoIncrementThreshold = 0.25
+
+# cat=basic/tables/10; type=input; label= Comma separated list of tables that should not be diffed or synced! Any tables that do not have a uid/pid field should go here. The standard TYPO3-core caching/indexing/session etc. tables are not synced by default. sys_log and sys_history are always synced (no matter if you exclude them).
+tables.doNotSync = static_countries, static_country_zones, static_currencies, static_languages, static_territories, static_tsconfig_help, tx_devlog, tx_staticinfotables_hotlist, tx_l10nmgr_index, tx_libunzipped_filestorage, tx_realurl_errorlog, tx_realurl_chashcache, tx_realurl_pathcache, tx_realurl_uniqalias, tx_realurl_urldecodecache, tx_realurl_urlencodecache
+
+# cat=basic/tables/10; type=input; label= Comma separated list of tables that should not be included! The standard TYPO3-core caching/session tables are excluded by default already.
+tables.doNotSnapshot = 
+
+# cat=basic/db/10; type=input; label= Remote DB host.
+remote.db.host = localhost
+
+# cat=basic/db/10; type=input; label= Remote DB user.
+remote.db.user = user
+
+# cat=basic/db/10; type=input; label= Remote DB password.
+remote.db.password = password
+
+# cat=basic/db/10; type=input; label= Remote DB database.
+remote.db.database = database
+
+# cat=basic/db/10; type=int+; label= Remote DB port.
+remote.db.port = 3306
+
+# cat=basic/db/10; type=input; label= Remote absolute TYPO3 folder (must represent the remote PATH_site).
+remote.folder = 
+
+# cat=basic/logging/10; type=boolean; label= Enable file logging
+logging.file.enable = 1
+
+# cat=basic/logging/10; type=input; label= The path to the log. Can be absolute /file/path.log or relative to TYPO3 fileadmin/log/staging.log. PHP-strftime() placeholders may be used.
+logging.file.file = fileadmin/log/%Y%m%d-staging.log
+
+# cat=basic/logging/10; type=int+; label= The severity, only messages with severity higher than this are logged (100 -> all (even debug messages), 200 -> success notices, 300 -> warnings, 400 -> errors)
+logging.file.severity = 100
+
+# cat=basic/logging/10; type=boolean; label= Enable mail logging
+logging.mail.enable = 1
+
+# cat=basic/logging/10; type=input; label= Mails to send log to.
+logging.mail.emails = info@example.com
+
+# cat=basic/logging/10; type=input; label= The mail subject
+logging.mail.subject = [STAGING] Log
+
+# cat=basic/logging/10; type=input; label= Mail address to send the mails from.
+logging.mail.from = info@example.com
+
+# cat=basic/logging/10; type=input; label= Name to send the mails from.
+logging.mail.fromName = Staging Logger
+
+# cat=basic/logging/10; type=int+; label= The severity, only messages with severity higher than this are logged (100 -> all (even debug messages), 200 -> success notices, 300 -> warnings, 400 -> errors)
+logging.mail.severity = 100
+
+# cat=basic/logging/10; type=boolean; label= Enable devLog logging
+logging.devLog.enable = 1
+
+# cat=basic/logging/10; type=int+; label= The severity, only messages with severity higher than this are logged (100 -> all (even debug messages), 200 -> success notices, 300 -> warnings, 400 -> errors)
+logging.devLog.severity = 100

@@ -1,0 +1,23 @@
+<f:layout name="Default" />
+<f:section name="content">
+<h1><f:translate key="review.edit.title" /></h1>
+
+<f:flashMessages />
+
+<f:form method="POST" action="update" object="{review}" name="review">
+	<f:render partial="Review/Fields" arguments="{review: review}" />
+	<div class="typo3-dyntabmenu-divs">
+		<table class="typo3-usersettings">
+			<tbody>
+				<tr class="submit">
+					<td colspan="2">
+						<f:form.submit value="{f:translate(key: 'review.edit.submit')}" />
+					</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+</f:form>
+
+<div class="clear"></div>
+</f:section>

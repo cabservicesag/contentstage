@@ -1,0 +1,44 @@
+<f:layout name="Admin" />
+<f:section name="content">
+<h1><f:translate key="snapshot.title" /></h1>
+
+<f:flashMessages />
+
+<ul class="newSnapshots">
+	<li>
+		<f:link.action action="create" arguments="{type: 'local'}">
+			<f:translate key="snapshot.newLocal" />
+		</f:link.action>
+	</li>
+	<li>
+		<f:link.action action="create" arguments="{type: 'remote'}">
+			<f:translate key="snapshot.newRemote" />
+		</f:link.action>
+	</li>
+</ul>
+
+<ul class="snapshots">
+	<f:for each="{snapshots}" as="snapshot">
+		<li class="snapshot">
+			<h3>{snapshot.fileName} [{snapshot.size}]</h3>
+			<ul>
+				<li>
+					<f:link.action action="delete" arguments="{snapshot: snapshot.fileName}">
+						<f:translate key="snapshot.delete" />
+					</f:link.action>
+				</li>
+				<li>
+					<f:link.action action="revert" arguments="{snapshot: snapshot.fileName}">
+						<f:translate key="snapshot.revertLocal" />
+					</f:link.action>
+				</li>
+				<li>
+					<f:link.action action="revert" arguments="{snapshot: snapshot.fileName, type: 'remote'}">
+						<f:translate key="snapshot.revertRemote" />
+					</f:link.action>
+				</li>
+		</li>
+	</f:for>
+</ul>
+
+</f:section>

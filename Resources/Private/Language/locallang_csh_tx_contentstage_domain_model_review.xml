@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<T3locallang>
+	<meta type="array">
+		<description>Context Sensitive Help (CSH) for table tx_contentstage_domain_model_review</description>
+		<type>CSH</type>
+		<csh_table>tx_contentstage_domain_model_review</csh_table>
+	</meta>
+	<data type="array">
+	<languageKey index="default" type="array">
+	   
+			<label index="created.description">The time this record was created.</label>
+			<label index="page.description">The page to be reviewed.</label>
+			<label index="levels.description">The levels to be reviewed. -1 infinite, 0 just this page, 1 this page and children.</label>
+			<label index="required.description">The amount of reviews required.</label>
+			<label index="debug.description">Debugging information for old reviews.</label>
+			<label index="reviewed.description">The relation to the reviewers.</label>
+			<label index="creator.description">The creator of this review record.</label>
+			<label index="changes.description">The state changes.</label>
+			<label index="state.description">The last active state.</label>
+		</languageKey>
+	</data>
+</T3locallang>

@@ -1,0 +1,21 @@
+<f:translate key="mails.reviewCreated.intro" arguments="{0: activeBackendUser.name, 1: activeBackendUser.username}" />
+
+
+<f:if condition="{comment}"><f:translate key="mails.reviewCreated.comment" />
+{comment}
+
+
+</f:if><f:translate key="mails.compare" />: <f:uri.action action="compare" controller="Content" absolute="1" />
+<f:translate key="mails.view" />: <f:uri.action action="view" controller="Content" absolute="1" />
+
+<f:translate key="field.review.created" />: <f:format.date date="{review.created}" format="d-m-Y H:i" />
+<f:translate key="field.review.creator" />: {review.creator.name}
+<f:translate key="field.review.id" />: {review.uid}
+<f:translate key="field.review.pageTitle" />: {review.pageRecord.title} [{review.pageRecord.uid}]
+<f:translate key="field.review.depth" />: {review.levels}
+<f:translate key="field.review.autoPush" />: <f:if condition="{review.autoPush}"><f:then><f:translate key="review.autoPush.1" /></f:then><f:else><f:translate key="review.autoPush.0" /></f:else></f:if>
+
+<f:translate key="field.review.state" />: <f:translate key="field.review.state.{review.state.state}" />
+
+<f:for each="{review.reviewerIndices}" as="index"><f:cycle values="{review.reviewed}" as="reviewed"><f:translate key="review.title.reviewPerson" arguments="{0: index}" />: {reviewed.reviewer.name} [{reviewed.reviewer.username}]
+</f:cycle></f:for>
