@@ -691,7 +691,7 @@ class Tx_Contentstage_Controller_BaseController extends Tx_CabagExtbase_Controll
 	protected function assignReviews($reviews = null) {
 		if (!is_array($reviews) || !($reviews instanceof Traversable)) {
 			if ($this->activeBackendUser->isAdmin()) {
-				$reviews = $this->reviewRepository->findAll();
+				$reviews = $this->reviewRepository->findAllActive();
 			} else {
 				$mountpoints = $this->activeBackendUser->getDbMountpointsRecursive();
 				$pageUids = array();
@@ -699,7 +699,7 @@ class Tx_Contentstage_Controller_BaseController extends Tx_CabagExtbase_Controll
 				foreach ($mountpoints as $mountpoint) {
 					$pageUids = array_merge($pageUids, $this->localRepository->getPageTreeUids($mountpoint, -1));
 				}
-				$reviews = $this->reviewRepository->findByPage($pageUids);
+				$reviews = $this->reviewRepository->findActiveInPages($pageUids);
 			}
 		}
 		
@@ -838,6 +838,8 @@ class Tx_Contentstage_Controller_BaseController extends Tx_CabagExtbase_Controll
 		$mail->assign('activeReview', $this->review);
 		$mail->assign('localRootline', $this->localRepository->getRootline($this->page));
 		$mail->assign('remoteRootline', $this->remoteRepository->getRootline($this->page));
+		$mail->assign('localDomain', $this->localRepository->getDomain($this->page));
+		$mail->assign('remoteDomain', $this->remoteRepository->getDomain($this->page));
 		$mail->assign('comment', $this->request->hasArgument('comment') ? $this->request->getArgument('comment') : '');
 		
 		foreach ($attachments as $attachment) {

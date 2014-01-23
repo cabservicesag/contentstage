@@ -1,7 +1,14 @@
 <f:if condition="{rootline}">
 	<f:then>
 		<f:for each="{rootline}" as="node" reverse="1">
-			<span>{node.title} [{node.uid}] /</span>
+			<f:if condition="{node.url}">
+				<f:then>
+					<a href="{node.url}" target="_blank">{node.title} [{node.uid}] <span class="t3-icon t3-icon-actions t3-icon-actions-document t3-icon-document-view"> </span></a> /
+				</f:then>
+				<f:else>
+					<span>{node.title} [{node.uid}] /</span>
+				</f:else>
+			</f:if>
 		</f:for>
 	</f:then>
 	<f:else>

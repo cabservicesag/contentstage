@@ -265,6 +265,7 @@ class Tx_Contentstage_Domain_Repository_ContentRepository {
 	 * @return void
 	 */
 	public function setUseHttps($useHttps) {
+		$this->domainCache = array();
 		$this->useHttps = !empty($useHttps);
 	}
 	
@@ -608,30 +609,45 @@ class Tx_Contentstage_Domain_Repository_ContentRepository {
 	}
 	
 	/**
-	 * Returns the rootline to a given page.
+	 * Returns the rootline to a given pageUid.
 	 *
-	 * @param int $page The page uid to get the rootline for.
-	 * @return array The rootline, where the first item is the page and the last item is the root. Null if page not found or broken rootline!
+	 * @param int $pageUid The pageUid to get the rootline for.
+	 * @param boolean $withDomain Pages in rootline get an url
+	 * @return array The rootline, where the first item is the pageUid and the last item is the root. Null if pageUid not found or broken rootline!
 	 */
-	public function getRootline($page) {
+	public function getRootline($pageUid, $withDomain = FALSE) {
 		$index = &$this->getFullPageTree();
 		$rootline = array();
-		$page = intval($page);
+		$pageUid = intval($pageUid);
 		
-		while (isset($index[$page]) && $page > 0) {
-			$local = $index[$page];
+		while (isset($index[$pageUid]) && $pageUid > 0) {
+			$local = $index[$pageUid];
+			if ($withDomain) {
+				$local['url'] = $this->getPageUrl($pageUid);
+			}
 			unset($local['_children']);
-			$rootline[$page] = $local;
-			$page = intval($local['pid']);
+			$rootline[$pageUid] = $local;
+			$pageUid = intval($local['pid']);
 		}
 		
-		if (empty($rootline) || $page > 0) {
+		if (empty($rootline) || $pageUid > 0) {
 			// not found or broken rootline respectively
 			return array();
 		}
 		return $rootline;
 	}
-	
+
+	/**
+	 * Returns full url for given pageUid
+	 * 
+	 * @param integer $pageUid
+	 * @return string
+	 */
+	public function getPageUrl($pageUid) {
+		$domain = $this->getDomain($pageUid);
+		return $domain ? sprintf('%sindex.php?id=%d', $domain, $pageUid) : NULL;
+	}
+
 	/**
 	 * Returns the domain to a given page.
 	 *
