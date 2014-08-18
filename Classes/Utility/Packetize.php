@@ -118,12 +118,7 @@ class Tx_Contentstage_Utility_Packetize {
 			}
 		}
 		
-		// get mysql port
-		$mysqlPort = ini_get('mysql.default_port');
-		
-		if($mysqlPort == '') {
-			//$mysqlPort = 3306;
-		}
+		$login = Tx_Contentstage_Utility_Shell::getLocalDbInfo();
 		
 		// dump structure information
 		if(!empty($this->piVars['dbstructure'])){
@@ -135,10 +130,7 @@ class Tx_Contentstage_Utility_Packetize {
 				--no-data \
 				--no-create-db \
 				--skip-comments \
-				--port='.$mysqlPort.'\
-				--user='.TYPO3_db_username.' \
-				--password='.TYPO3_db_password.' \
-				--host='.TYPO3_db_host.' \
+				' . Tx_Contentstage_Utility_Shell::getMysqlLoginCredentials($login) . ' \
 				'.TYPO3_db.' \
 				'.implode(' ', $tables);
 				
@@ -181,10 +173,7 @@ class Tx_Contentstage_Utility_Packetize {
 				--no-create-info \
 				--complete-insert \
 				--skip-comments \
-				--port='.$mysqlPort.'\
-				--user='.TYPO3_db_username.' \
-				--password='.TYPO3_db_password.' \
-				--host='.TYPO3_db_host.' \
+				' . Tx_Contentstage_Utility_Shell::getMysqlLoginCredentials($login) . ' \
 				'.TYPO3_db.' \
 				'.implode(' ', $tables);
 			

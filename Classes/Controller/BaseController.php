@@ -666,20 +666,10 @@ class Tx_Contentstage_Controller_BaseController extends Tx_CabagExtbase_Controll
 	 * Returns the info needed to connect to the local database.
 	 *
 	 * @return array The login info for the local database.
+	 * @deprecated Mysql login credentials gets used at other locations also so this method was moved to be a utility method. Use the utility method directly.
 	 */
 	public function getLocalDbInfo() {
-		$info = array(
-			'user' => TYPO3_db_username,
-			'password' => TYPO3_db_password,
-			'host' => TYPO3_db_host,
-			'database' => TYPO3_db
-		);
-		
-		if ($portInfo = strstr($info['host'], ':')) {
-			$info['port'] = intval($portInfo);
-			$info['host'] = strstr($info['host'], ':', true);
-		}
-		return $info;
+		return Tx_Contentstage_Utility_Shell::getLocalDbInfo();
 	}
 	
 	/**
