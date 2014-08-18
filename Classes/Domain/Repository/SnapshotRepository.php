@@ -86,16 +86,11 @@ class Tx_Contentstage_Domain_Repository_SnapshotRepository {
 		
 		@file_put_contents(dirname($filename) . '/.htaccess', 'deny from all');
 		
-		$port = (intval($login['port']) > 0 ? intval($login['port']) : ini_get('mysql.default_port')) ?: 3306;
-		
 		$debug['command'] = $datadumpcmd = Tx_Contentstage_Utility_Shell::findCmd('mysqldump').' \
 			--quote-names \
 			--complete-insert \
 			--skip-comments \
-			--port=' . $port . '\
-			--user=' . $login['user'] . ' \
-			--password=' . $login['password'] . ' \
-			--host=' . $login['host'] . ' \
+			' . Tx_Contentstage_Utility_Shell::getMysqlLoginCredentials($login) . ' \
 			' . $login['database'] . ' \
 			'.implode(' ', $tables) . ' | ' . Tx_Contentstage_Utility_Shell::findCmd('gzip');
 		
@@ -128,13 +123,8 @@ class Tx_Contentstage_Domain_Repository_SnapshotRepository {
 			throw new Exception($filename, self::ERROR_NOFILE);
 		}
 		
-		$port = (intval($login['port']) > 0 ? intval($login['port']) : ini_get('mysql.default_port')) ?: 3306;
-		
 		$debug['command'] = $datadumpcmd = Tx_Contentstage_Utility_Shell::findCmd('cat') . ' ' . escapeshellarg($filename) . ' | ' . Tx_Contentstage_Utility_Shell::findCmd('gunzip') . ' | ' . Tx_Contentstage_Utility_Shell::findCmd('mysql').' \
-			--port=' . $port . '\
-			--user=' . $login['user'] . ' \
-			--password=' . $login['password'] . ' \
-			--host=' . $login['host'] . ' \
+			' . Tx_Contentstage_Utility_Shell::getMysqlLoginCredentials($login) . ' \
 			' . $login['database'];
 		
 		$dumpdata = t3lib_div::makeInstance('Tx_Contentstage_Utility_Shell');

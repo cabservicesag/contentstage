@@ -130,6 +130,39 @@ class Tx_Contentstage_Utility_Shell {
 
 		throw new Exception('Command not found '.$cmd);
 	}
+
+	/*
+	 * Generates a credentials string suitable for using in a call to a mysql utility program (mysql, mysqldump, mysqladmin, etc.)
+	 *
+	 * @param array $login An array containin the login credentials like returned from Tx_Contentstage_Controller_BaseController::getLocalDbInfo
+	 * @return string The login credentials as they can get used by mysql utility tools
+	 */
+	static function getMysqlLoginCredentials(array $login) {
+		$server = strpos($login['host'], ':') === 0 ? '--socket=' . substr($login['host'], 1) : '--host=' . $login['host'] . ' --port=' . $login['port'];
+		return '--user=' . $login['user'] . ' --password=' . $login['password'] . ' ' . $server;
+		
+	}
+
+	/**
+	 * Returns the info needed to connect to the local database.
+	 *
+	 * @return array The login info for the local database.
+	 */
+	static function getLocalDbInfo() {
+		$info = array(
+			'user' => TYPO3_db_username,
+			'password' => TYPO3_db_password,
+			'host' => TYPO3_db_host,
+			'database' => TYPO3_db
+		);
+		
+		if ((strpos($info['host'], ':') !== 0) && ($portInfo = strstr($info['host'], ':'))) {
+			$info['port'] = intval($portInfo);
+			$info['host'] = strstr($info['host'], ':', true);
+		}
+		return $info;
+	}
+
 }
 
 ?>
