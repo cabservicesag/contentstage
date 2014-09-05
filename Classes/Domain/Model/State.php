@@ -74,6 +74,7 @@ class Tx_Contentstage_Domain_Model_State extends Tx_Extbase_DomainObject_Abstrac
 		self::FRESH => array(
 			self::REINITIALIZED,
 			self::PARTIAL,
+			self::REVIEWED,
 			self::REJECTED,
 			self::DEPRECATED
 		),
@@ -200,4 +201,4 @@ class Tx_Contentstage_Domain_Model_State extends Tx_Extbase_DomainObject_Abstrac
 		return self::$next[$this->getState()];
 	}
 }
-?>
+
