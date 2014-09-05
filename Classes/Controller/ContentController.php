@@ -163,7 +163,7 @@ class Tx_Contentstage_Controller_ContentController extends Tx_Contentstage_Contr
 			);
 			$this->log->log($this->translate('info.push.snapshot', array($info['file'])), Tx_CabagExtbase_Utility_Logging::OK);
 			
-			$this->pushTables($this->page);
+			$this->pushTables($this->review->getPage());
 			$this->log->log($this->translate('info.push.done'), Tx_CabagExtbase_Utility_Logging::OK);
 			
 			$this->remoteRepository->clearCache($this->page, !!$this->extensionConfiguration['clearAllCaches']);
@@ -445,4 +445,4 @@ class Tx_Contentstage_Controller_ContentController extends Tx_Contentstage_Contr
 		}
 	}
 }
-?>
+
