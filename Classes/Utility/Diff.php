@@ -208,10 +208,10 @@ class Tx_Contentstage_Utility_Diff {
 	 */
 	public function &resources(Tx_Contentstage_Domain_Repository_Result &$resource1 = null, Tx_Contentstage_Domain_Repository_Result &$resource2 = null, array &$differences = array(), $keyField = 'uid', $pidField = 'pid') {
 		$differences = array('byPid' => array());
-		$r1 = $resource1->nextResolved();
-		$r2 = $resource2->nextResolved();
 		$table = $resource1->getTable();
 		$tableTCA = $this->tca->getProcessedTca($table);
+		$r1 = $resource1->nextResolved(array($tableTCA['__tstampField'] => 1));
+		$r2 = $resource2->nextResolved(array($tableTCA['__tstampField'] => 1));
 		$fromRepository = $resource1->getRepository();
 		$toRepository = $resource2->getRepository();
 		
