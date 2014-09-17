@@ -168,12 +168,13 @@ class Tx_Contentstage_Domain_Repository_Result {
 	/**
 	 * Returns the next row, with the relations resolved.
 	 *
+	 * @param array $skipResolve: Skip resolving for keys in this array (if value is true)
 	 * @see self::next()
 	 */
-	public function nextResolved() {
+	public function nextResolved($skipResolve = array()) {
 		if (($row = $this->next()) !== false) {
 			foreach ($this->tca as $field => &$config) {
-				if (substr($field, 0, 2) === '__' || !isset($row[$field])) {
+				if ($skipResolve[$field] || substr($field, 0, 2) === '__' || !isset($row[$field])) {
 					continue;
 				}
 				$row[$field] = $this->tcaObject->resolve($this->repository, $this->table, $field, $row[$field], $row);
