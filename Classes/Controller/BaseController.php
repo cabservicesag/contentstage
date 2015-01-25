@@ -262,6 +262,7 @@ class Tx_Contentstage_Controller_BaseController extends Tx_CabagExtbase_Controll
 			));
 		
 		if ($this->extensionConfiguration['logging.']['file.']['enable']) {
+			$this->extensionConfiguration['logging.']['file.']['file'] .= '-' . date('Ymd');
 			$this->log->addOutput($this->extensionName . 'File', 'file', $this->extensionConfiguration['logging.']['file.']);
 		}
 		if ($this->extensionConfiguration['logging.']['mail.']['enable']) {

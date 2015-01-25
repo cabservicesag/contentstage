@@ -1,3 +1,7 @@
+2013-05-02 Dimitri König <dk@cabag.ch>
+	* version 0.2.7
+	* modified findCmd in Shell - fixed WIN bug
+
 2013-04-16 Dimitri König <dk@cabag.ch>
 	* version 0.2.6
 	* set clear cache call from file_get_contents to curl due to ssl

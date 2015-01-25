@@ -101,6 +101,7 @@ class Tx_Contentstage_Utility_Shell {
 	
 	static function findCmd($cmd) {
 		$binFolders = array(
+			'',
 			'/usr/bin/',
 			'/usr/local/bin/',
 			'/bin/',
@@ -111,21 +112,22 @@ class Tx_Contentstage_Utility_Shell {
 		$extensions = array('');
 		
 		if (TYPO3_OS == 'WIN') {
-			$extensions[] = '.exe';
+			array_unshift($extensions, '.exe');
 		}
 		
 		foreach ($extensions as $extension) {
 			$cwd = false;
 			reset($binFolders);
-			do {
+			foreach ($binFolders as $cwd) {
 				$which = t3lib_div::makeInstance('Tx_Contentstage_Utility_Shell');
 				$which->exec('which ' . $cwd . $cmd . $extension, '');
 				$stdout = $which->getStdout();
 				if (strlen($stdout) > 0) {
 					return trim($stdout);
 				}
-			} while (list(,$cwd) = each($binFolders));
+			}
 		}
+
 		throw new Exception('Command not found '.$cmd);
 	}
 }
