@@ -1,3 +1,8 @@
+2014-12-08 Nils Blattner <nb@cabag.ch>
+	* version 0.8.1
+	* [BUG] fixed an issue when a TCE entry does not contain any columns data
+	* [6.2] only call t3lib_div::loadTCA() for pre 6.2 versions
+
 2014-10-21 Nils Blattner <nb@cabag.ch>
 	* version 0.8.0
 	* [FEATURE] allow the SSLVERSION to be specified by extension configuration while clearing the cache

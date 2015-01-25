@@ -265,15 +265,19 @@ class Tx_Contentstage_Utility_Tca implements t3lib_singleton {
 		}
 		
 		foreach ($GLOBALS['TCA'] as $table => &$tableData) {
-			$this->tca[$table] = $this->tca['__default'];
-			$this->tca[$table]['__name'] = $this->translate($tableData['ctrl']['title']);
-			$this->tca[$table]['__labelField'] = $tableData['ctrl']['label'];
-			$this->tca[$table]['__tstampField'] = $tableData['ctrl']['tstamp'];
-			$this->tca[$table]['__files'] = $this->tca[$table]['__folders'] = array();
-			
-			t3lib_div::loadTCA($table);
-			foreach ($tableData['columns'] as $field => &$fieldData) {
-				$this->processTcaField($table, $field, $fieldData['config'], $fieldData['label']);
+			if (is_array($tableData['columns'])) {
+				$this->tca[$table] = $this->tca['__default'];
+				$this->tca[$table]['__name'] = $this->translate($tableData['ctrl']['title']);
+				$this->tca[$table]['__labelField'] = $tableData['ctrl']['label'];
+				$this->tca[$table]['__tstampField'] = $tableData['ctrl']['tstamp'];
+				$this->tca[$table]['__files'] = $this->tca[$table]['__folders'] = array();
+				
+				if (version_compare(TYPO3_version, '6.2', '<')) {
+					t3lib_div::loadTCA($table);
+				}
+				foreach ($tableData['columns'] as $field => &$fieldData) {
+					$this->processTcaField($table, $field, $fieldData['config'], $fieldData['label']);
+				}
 			}
 		}
 		
