@@ -413,10 +413,10 @@ class Tx_Contentstage_Domain_Repository_ContentRepository {
 			$pids = $this->getPageTreeUids($root);
 			
 			if (empty($pids)) {
-				return null;
+				$whereParts = array('1 <> 1');
+			} else {
+				$whereParts = array('pid IN (' . implode(',', $pids) . ')');
 			}
-			
-			$whereParts = array('pid IN (' . implode(',', $pids) . ')');
 		}
 		if (!empty($where)) {
 			$whereParts[] = '(' . $where . ')';

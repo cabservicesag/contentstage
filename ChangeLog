@@ -1,4 +1,10 @@
 2013-02-05 Nils Blattner <nb@cabag.ch>
+	* version 0.1.9
+	* fixed a bug with the remote page tree
+	* separated initialize and snapshot functions to a different "admin"-module
+	* fixed an issue if a page did not exist remotely
+
+2013-02-05 Nils Blattner <nb@cabag.ch>
 	* version 0.1.8
 	* fixed an issue when the remote page tree does not exist
 	* now a snapshot of the current state is created before reverting to a given snapshot

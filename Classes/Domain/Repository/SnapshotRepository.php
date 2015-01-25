@@ -219,7 +219,7 @@ class Tx_Contentstage_Domain_Repository_SnapshotRepository {
 			}
 			closedir($handle);
 		}
-		ksort($files);
+		krsort($files);
 		return $files;
 	}
 	

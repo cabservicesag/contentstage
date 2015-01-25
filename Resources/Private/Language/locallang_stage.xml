@@ -6,9 +6,14 @@
 	</meta>
 	<data type="array">
 		<languageKey index="default" type="array">
-		<label index="mlang_tabs_tab">Content staging</label>
+			<label index="mlang_tabs_tab">Content staging</label>
 			<label index="mlang_labels_tabdescr">An module that allows to migrate partial content from one system to another.</label>
 			<label index="mlang_labels_tablabel">Content staging</label>
+		</languageKey>
+		<languageKey index="de" type="array">
+			<label index="mlang_tabs_tab">Inhalts-Staging</label>
+			<label index="mlang_labels_tabdescr">Ein Modul, dass es erlaubt gewisse Inhalte von einem System auf ein anderes zu migrieren.</label>
+			<label index="mlang_labels_tablabel">Inhalts-Staging</label>
 		</languageKey>
 	</data>
 </T3locallang>

@@ -48,6 +48,7 @@
 			<label index="info.compare.endFluid">Fluid rendering done.</label>
 			<label index="info.compare.noId">No page id selected, please select one.</label>
 			<label index="info.compare.startFluid">Starting fluid rendering.</label>
+			<label index="info.compare.badRootline">Rootline could not be resolved!</label>
 			<label index="info.init">Logging initialized.</label>
 			<label index="info.init.backup">Backup generated for initialization. [%1$s]</label>
 			<label index="info.init.dumped">Dump generated for initialization. [%1$s]</label>
@@ -62,7 +63,7 @@
 			<label index="info.push.table">Pushed table %1$s [%2$s row(s)].</label>
 			<label index="info.snapshot.done">Created snapshot file %1$s.</label>
 			<label index="info.snapshot.removed">Removed snapshot file %1$s.</label>
-			<label index="info.snapshot.reverted">Dump read into database. [%1$s]</label>
+			<label index="info.snapshot.reverted">Dump read into database [%2$s]. [%1$s]</label>
 			<label index="initialize.doIt">Initialize this system</label>
 			<label index="initialize.initialize.title">Initialize Systems</label>
 			<label index="language">en</label>
@@ -133,6 +134,7 @@
 			<label index="info.compare.endFluid">Fluid-Rendering erledigt.</label>
 			<label index="info.compare.noId">Keine Seiten-Id ausgewählt, bitte wählen Sie eine aus.</label>
 			<label index="info.compare.startFluid">Fluid-Rendering wird gestartet.</label>
+			<label index="info.compare.badRootline">Rootline konnte nicht generiert werden!</label>
 			<label index="info.init">Logging initialisiert.</label>
 			<label index="info.init.backup">Backup generiert für die Initialisierung. [%1$s]</label>
 			<label index="info.init.dumped">Dump generiert für die Initialisierung. [%1$s]</label>
@@ -147,7 +149,7 @@
 			<label index="info.push.table">Tabelle %1$s kopiert [%2$s Zeile(n)].</label>
 			<label index="info.snapshot.done">Snapshot-Datei erstellt %1$s.</label>
 			<label index="info.snapshot.removed">Snapshot-Datei gelöscht %1$s.</label>
-			<label index="info.snapshot.reverted">Dump in Datenbank eingelesen. [%1$s]</label>
+			<label index="info.snapshot.reverted">Dump in Datenbank [%2$s] eingelesen. [%1$s]</label>
 			<label index="initialize.doIt">Dieses System initialisieren</label>
 			<label index="initialize.initialize.title">Systeminitialisierung</label>
 			<label index="language">de</label>
