@@ -265,6 +265,7 @@ class Tx_Contentstage_Domain_Repository_ContentRepository {
 	 * @return void
 	 */
 	public function setUseHttps($useHttps) {
+		$this->domainCache = array();
 		$this->useHttps = !empty($useHttps);
 	}
 	
@@ -614,7 +615,7 @@ class Tx_Contentstage_Domain_Repository_ContentRepository {
 	 * @param boolean $withDomain Pages in rootline get an url
 	 * @return array The rootline, where the first item is the pageUid and the last item is the root. Null if pageUid not found or broken rootline!
 	 */
-	public function getRootline($pageUid, $withDomain = TRUE) {
+	public function getRootline($pageUid, $withDomain = FALSE) {
 		$index = &$this->getFullPageTree();
 		$rootline = array();
 		$pageUid = intval($pageUid);
@@ -664,7 +665,7 @@ class Tx_Contentstage_Domain_Repository_ContentRepository {
 			return $this->domainCache[$page];
 		}
 		
-		$rootline = $this->getRootline($page, FALSE);
+		$rootline = $this->getRootline($page);
 		
 		if (empty($rootline)) {
 			return null;

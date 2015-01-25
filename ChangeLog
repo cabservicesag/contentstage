@@ -1,3 +1,7 @@
+2013-12-04 Nils Blattner <nb@cabag.ch>
+	* version 0.5.5
+	* [BUG] fixed an issue, where the early call to create links (#4177) would cache wrong domains - fixed issue #4949
+
 2013-11-25 Nils Blattner <nb@cabag.ch>
 	* version 0.5.4
 	* [BUG] only display active reviews in the review list - issue #4533

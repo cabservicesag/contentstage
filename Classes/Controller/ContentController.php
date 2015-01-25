@@ -62,8 +62,8 @@ class Tx_Contentstage_Controller_ContentController extends Tx_Contentstage_Contr
 		
 		$this->doComparison();
 
-		$this->view->assign('localRootline', $this->localRepository->getRootline($this->page));
-		$this->view->assign('remoteRootline', $this->remoteRepository->getRootline($this->page));
+		$this->view->assign('localRootline', $this->localRepository->getRootline($this->page, true));
+		$this->view->assign('remoteRootline', $this->remoteRepository->getRootline($this->page, true));
 		$this->view->assign('depth', $this->localRepository->getDepth());
 		
 		$this->view->assign('pageTree', $this->localRepository->reducePageTree($this->pageTree[$this->page], $this->localRepository->getDepth()));
