@@ -9,9 +9,14 @@ $pageTS = <<<'EOD'
 tx_contentstage {
 	review = 0
 	review {
+		// the amount of backend users that are needed to review
 		required = 2
+		// if this is set, review records may be created
 		editCreate = 0
+		// if this is set, push may be used even when the review is not "reviewed"
 		mayPush = 0
+		// explizit list of backend groups that are supposed to review
+		groups = 0
 	}
 	
 	mails {

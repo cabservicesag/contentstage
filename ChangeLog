@@ -1,3 +1,7 @@
+2013-10-01 Nils Blattner <nb@cabag.ch>
+	* version 0.3.7
+	* [FEATURE] changed pageTS option reviewGroups to review.groups
+
 2013-09-30 Nils Blattner <nb@cabag.ch>
 	* version 0.3.6
 	* [BUG] fixed an issue with deprecation detection

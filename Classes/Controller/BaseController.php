@@ -705,7 +705,7 @@ class Tx_Contentstage_Controller_BaseController extends Tx_CabagExtbase_Controll
 		}
 		
 		$groupIndex = array();
-		foreach (t3lib_div::intExplode(',', $pageTS['reviewGroups'], true) as $groupUid) {
+		foreach (t3lib_div::intExplode(',', $this->reviewConfiguration['groups'], true) as $groupUid) {
 			$group = $this->backendUserGroupRepository->findByUid($groupUid);
 			if ($group !== null) {
 				$groupIndex[$group->getUid()] = $group;
