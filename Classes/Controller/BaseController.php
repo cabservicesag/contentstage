@@ -58,10 +58,18 @@ class Tx_Contentstage_Controller_BaseController extends Tx_CabagExtbase_Controll
 		'cf_cache_pages_tags' => true,
 		'cf_cache_pagesection' => true,
 		'cf_cache_pagesection_tags' => true,
+		'cf_cache_rootline' => true,
+		'cf_cache_rootline_tags' => true,
+		'cf_extbase_datamapfactory_datamap' => true,
+		'cf_extbase_datamapfactory_datamap_tags' => true,
 		'cf_extbase_object' => true,
 		'cf_extbase_object_tags' => true,
 		'cf_extbase_reflection' => true,
 		'cf_extbase_reflection_tags' => true,
+		'cf_extbase_typo3dbbackend_queries' => true,
+		'cf_extbase_typo3dbbackend_queries_tags' => true,
+		'cf_extbase_typo3dbbackend_tablecolumns' => true,
+		'cf_extbase_typo3dbbackend_tablecolumns_tags' => true,
 		'fe_session_data' => true,
 		'fe_sessions' => true,
 		'index_debug' => true,
@@ -126,10 +134,18 @@ class Tx_Contentstage_Controller_BaseController extends Tx_CabagExtbase_Controll
 		'cf_cache_pages_tags' => true,
 		'cf_cache_pagesection' => true,
 		'cf_cache_pagesection_tags' => true,
+		'cf_cache_rootline' => true,
+		'cf_cache_rootline_tags' => true,
+		'cf_extbase_datamapfactory_datamap' => true,
+		'cf_extbase_datamapfactory_datamap_tags' => true,
 		'cf_extbase_object' => true,
 		'cf_extbase_object_tags' => true,
 		'cf_extbase_reflection' => true,
 		'cf_extbase_reflection_tags' => true,
+		'cf_extbase_typo3dbbackend_queries' => true,
+		'cf_extbase_typo3dbbackend_queries_tags' => true,
+		'cf_extbase_typo3dbbackend_tablecolumns' => true,
+		'cf_extbase_typo3dbbackend_tablecolumns_tags' => true,
 		'fe_session_data' => true,
 		'fe_sessions' => true,
 		'tx_contentstage_domain_model_review' => true,
@@ -369,7 +385,10 @@ class Tx_Contentstage_Controller_BaseController extends Tx_CabagExtbase_Controll
 		}
 		
 		t3lib_cache::initializeCachingFramework();
-		t3lib_cache::initContentHashCache();
+		if (method_exists('t3lib_cache', 'initContentHashCache')) {
+			// not needed in 6.2 anymore
+			t3lib_cache::initContentHashCache();
+		}
 		$this->cache = $GLOBALS['typo3CacheManager']->getCache('cache_hash');
 		
 		$this->extensionConfiguration = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['contentstage']);
@@ -378,8 +397,7 @@ class Tx_Contentstage_Controller_BaseController extends Tx_CabagExtbase_Controll
 		
 		$this->localDB = $GLOBALS['TYPO3_DB'];
 		
-		$this->page = intval(t3lib_div::_GP('id'));
-		//t3lib_BEfunc::openPageTree($this->page, false);
+		$this->initializePage();
 		
 		$info = $this->extensionConfiguration['remote.']['db.'];
 		
@@ -408,6 +426,7 @@ class Tx_Contentstage_Controller_BaseController extends Tx_CabagExtbase_Controll
 			$this->cache,
 			'remoteRepository'
 		);
+	
 		$this->remoteRepository->setFolder($this->extensionConfiguration['remote.']['folder']);
 		$this->remoteRepository->setCurrentPage($this->page);
 		
@@ -427,6 +446,18 @@ class Tx_Contentstage_Controller_BaseController extends Tx_CabagExtbase_Controll
 				$this->hookObjectsArray[] = &t3lib_div::getUserObj($classRef);
 			}
 		}
+	}
+	
+	/**
+	 * Initialize the page.
+	 *
+	 * @return void
+	 * @see https://github.com/propheh/contentstage/pull/3
+	 */
+	protected function initializePage() {
+		$this->page = intval(t3lib_div::_GP('id'));
+		// TODO: fix it so the page tree opens at the correct page
+		//t3lib_BEfunc::openPageTree($this->page, false);
 	}
 	
 	/**
@@ -565,7 +596,7 @@ class Tx_Contentstage_Controller_BaseController extends Tx_CabagExtbase_Controll
 			}
 			
 			$pageTS = t3lib_befunc::getPagesTSconfig($id, $rootline);
-			$this->pageTS = Tx_Extbase_Utility_TypoScript::convertTypoScriptArrayToPlainArray($pageTS['tx_contentstage.']);
+			$this->pageTS = $this->convertTypoScriptArrayToPlainArray($pageTS['tx_contentstage.']);
 		}
 		
 		return $this->pageTS;
@@ -915,5 +946,23 @@ class Tx_Contentstage_Controller_BaseController extends Tx_CabagExtbase_Controll
 		}
 		return $ok;
 	}
+
+	/**
+	 * Removes all trailing dots recursively from TS settings array
+	 *
+	 * Extbase converts the "classical" TypoScript (with trailing dot) to a format without trailing dot,
+	 * to be more future-proof and not to have any conflicts with Fluid object accessor syntax.
+	 *
+	 * @param array $typoScriptArray The TypoScript array (e.g. array('foo' => 'TEXT', 'foo.' => array('bar' => 'baz')))
+	 * @return array e.g. array('foo' => array('_typoScriptNodeValue' => 'TEXT', 'bar' => 'baz'))
+	 * @api
+	 */
+	public function convertTypoScriptArrayToPlainArray(array $typoScriptArray) {
+		if (version_compare(TYPO3_version, '6.2', '>=')) {
+			$typoScriptService = $this->objectManager->get('\\TYPO3\\CMS\\Extbase\\Service\\TypoScriptService');
+			return $typoScriptService->convertTypoScriptArrayToPlainArray($typoScriptArray);
+		}
+		
+		return Tx_Extbase_Utility_TypoScript::convertTypoScriptArrayToPlainArray($typoScriptArray);
+	}
 }
-?>

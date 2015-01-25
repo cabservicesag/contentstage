@@ -600,4 +600,3 @@ class Tx_Contentstage_Domain_Model_Review extends Tx_Extbase_DomainObject_Abstra
 	}
 
 }
-?>

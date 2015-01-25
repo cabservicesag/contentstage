@@ -62,6 +62,13 @@ class Tx_Contentstage_Domain_Repository_Result {
 	protected $table = null;
 	
 	/**
+	 * The query.
+	 *
+	 * @var string
+	 */
+	protected $query = '';
+	
+	/**
 	 * The table config array for this table.
 	 *
 	 * @var array
@@ -136,6 +143,25 @@ class Tx_Contentstage_Domain_Repository_Result {
 	 */
 	public function getResource() {
 		return $this->resource;
+	}
+	
+	/**
+	 * Set the query.
+	 *
+	 * @param string $query The query.
+	 * @return array void.
+	 */
+	public function setQuery($query) {
+		$this->query = $query;
+	}
+	
+	/**
+	 * Get the query.
+	 *
+	 * @return string The query.
+	 */
+	public function getQuery() {
+		return $this->query;
 	}
 	
 	/**
@@ -329,4 +355,3 @@ class Tx_Contentstage_Domain_Repository_Result {
 		$this->db->sql_free_result($this->resource);
 	}
 }
-?>

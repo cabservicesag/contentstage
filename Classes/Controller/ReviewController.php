@@ -290,4 +290,3 @@ class Tx_Contentstage_Controller_ReviewController extends Tx_Contentstage_Contro
 		}
 	}
 }
-?>

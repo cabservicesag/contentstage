@@ -170,6 +170,4 @@ class Tx_Contentstage_Domain_Model_Reviewed extends Tx_Extbase_DomainObject_Abst
 		$this->setOk(false);
 		$this->setReviewed(null);
 	}
-
 }
-?>

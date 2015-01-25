@@ -33,4 +33,3 @@
 class Tx_Contentstage_Domain_Repository_BackendUserRepository extends Tx_Extbase_Persistence_Repository {
 
 }
-?>

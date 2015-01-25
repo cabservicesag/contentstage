@@ -68,12 +68,11 @@ class Tx_Contentstage_Utility_Federated implements t3lib_singleton {
 			
 			$createTable .= ' CONNECTION=\'mysql://' . $remoteLoginData['user'] . ':' . $remoteLoginData['password'] . '@' . $remoteLoginData['host'] . '/' . $remoteLoginData['database'] . '/' . $table . '\'';
 			
-			//$slaveRepository->_sql('DROP TABLE '.$table.';');
 			$slaveRepository->_sql('RENAME TABLE ' . $table . ' TO ' . $table . '_' . date('Ymd'), false);
-			$slaveRepository->_sql($createTable);		
+			$slaveRepository->_sql($createTable);	
+			$slaveRepository->_sql('DROP TABLE '. $table.'_' . date('Ymd') .';');
 			return true;
 		}
 		return false;
 	}
 }
-?>

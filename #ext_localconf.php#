@@ -89,8 +89,7 @@ tx_contentstage {
 		fileadmin {
 			user_upload {
 				__pageTS {
-					overrideDomainLocal = stage.example.com
-					overrideDomainRemote = prod.example.com
+					overrideDomainLocal = example.com
 				}
 			}
 		}

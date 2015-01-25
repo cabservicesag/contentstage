@@ -131,5 +131,3 @@ class Tx_Contentstage_Utility_Shell {
 		throw new Exception('Command not found '.$cmd);
 	}
 }
-
-?>

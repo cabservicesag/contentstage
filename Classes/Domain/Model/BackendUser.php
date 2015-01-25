@@ -605,4 +605,3 @@ class Tx_Contentstage_Domain_Model_BackendUser extends Tx_Contentstage_Domain_Mo
 	}
 
 }
-?>

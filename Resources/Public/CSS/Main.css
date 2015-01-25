@@ -149,6 +149,11 @@ a.pageNode.subHasChanges .contentstage-action-changessub {
 	display: none;
 }
 
+.differencesContainer ul.differences {
+	padding: 0;
+	list-style: none;
+}
+
 .differencesContainer li.page {
 	margin-bottom: 5px;
 }

@@ -33,4 +33,3 @@
 class Tx_Contentstage_Domain_Repository_ReviewedRepository extends Tx_Extbase_Persistence_Repository {
 
 }
-?>

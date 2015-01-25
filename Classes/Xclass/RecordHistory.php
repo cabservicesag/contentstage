@@ -100,4 +100,3 @@ class ux_recordHistory extends recordHistory {
 		return count($changeLog) > 0 ? $changeLog : 0;
 	}
 }
-?>

@@ -114,4 +114,3 @@ class Tx_Contentstage_Controller_SnapshotController extends Tx_Contentstage_Cont
 	}
 
 }
-?>

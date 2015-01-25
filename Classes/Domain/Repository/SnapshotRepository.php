@@ -269,4 +269,3 @@ class Tx_Contentstage_Domain_Repository_SnapshotRepository {
 		return $this->ignoreSnapshotTables;
 	}
 }
-?>

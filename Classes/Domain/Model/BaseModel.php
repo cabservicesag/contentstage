@@ -33,9 +33,9 @@
 class Tx_Contentstage_Domain_Model_BaseModel extends Tx_Extbase_DomainObject_AbstractEntity {
 	
 	/**
-	 * The cache.
+	 * The cache (6.2.4 extbase has problems with t3lib_cache_frontend_AbstractFrontend => object).
 	 *
-	 * @var t3lib_cache_frontend_AbstractFrontend The cache.
+	 * @var object
 	 * @transient
 	 */
 	protected static $cache = null;
@@ -59,7 +59,10 @@ class Tx_Contentstage_Domain_Model_BaseModel extends Tx_Extbase_DomainObject_Abs
 		if (TX_CONTENTSTAGE_USECACHE) {
 			if (self::$cache === null) {
 				t3lib_cache::initializeCachingFramework();
-				t3lib_cache::initContentHashCache();
+				if (method_exists('t3lib_cache', 'initContentHashCache')) {
+					// not needed in 6.2 anymore
+					t3lib_cache::initContentHashCache();
+				}
 				self::$cache = $GLOBALS['typo3CacheManager']->getCache('cache_hash');
 			}
 			if (TX_CONTENTSTAGE_USECACHE && self::$cache->has($identifier)) {
@@ -111,4 +114,3 @@ class Tx_Contentstage_Domain_Model_BaseModel extends Tx_Extbase_DomainObject_Abs
 		return $data;
 	}
 }
-?>

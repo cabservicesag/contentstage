@@ -69,6 +69,9 @@ class Tx_Contentstage_Domain_Model_State extends Tx_Extbase_DomainObject_Abstrac
 	
 	/**
 	 * The possible next states by state.
+	 *
+	 * @var array
+	 * @transient
 	 */
 	protected static $next = array(
 		self::FRESH => array(
@@ -200,4 +203,3 @@ class Tx_Contentstage_Domain_Model_State extends Tx_Extbase_DomainObject_Abstrac
 		return self::$next[$this->getState()];
 	}
 }
-?>

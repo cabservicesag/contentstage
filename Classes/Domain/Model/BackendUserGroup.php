@@ -554,4 +554,3 @@ class Tx_Contentstage_Domain_Model_BackendUserGroup extends Tx_Contentstage_Doma
 	}
 
 }
-?>

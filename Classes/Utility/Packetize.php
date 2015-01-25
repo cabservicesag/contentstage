@@ -279,5 +279,3 @@ class Tx_Contentstage_Utility_Packetize {
 		return $tables;
 	}
 }
-
-?>

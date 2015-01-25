@@ -61,5 +61,3 @@ class Tx_Contentstage_ViewHelpers_ReviewForViewHelper extends Tx_Fluid_ViewHelpe
 		return parent::render($each, $as, $key, $reverse, $iteration);
 	}
 }
-
-?>

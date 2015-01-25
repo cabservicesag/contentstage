@@ -216,7 +216,10 @@ class Tx_Contentstage_Domain_Repository_ContentRepository {
 	 * @param t3lib_cache_frontend_AbstractFrontend $cache The cache to use.
 	 * @param string $tag The local tag to use while caching.
 	 */
-	public function __construct(t3lib_db $db, Tx_CabagExtbase_Utility_Logging $log, t3lib_cache_frontend_AbstractFrontend $cache, $tag = 'ContentRepository') {
+	public function __construct(t3lib_db $db, Tx_CabagExtbase_Utility_Logging $log, $cache, $tag = 'ContentRepository') {
+		if (!($cache instanceof t3lib_cache_frontend_AbstractFrontend) && !($cache instanceof \TYPO3\CMS\Core\Cache\Frontend\VariableFrontend)) {
+			throw new Exception('Cache must be of type t3lib_cache_frontend_AbstractFrontend or \\TYPO3\\CMS\\Core\\Cache\\Frontend\\VariableFrontend, ' . get_class($cache) . ' given!', 1407143798);
+		}
 		$this->db = $db;
 		$this->log = $log;
 		$this->cache = $cache;
@@ -677,12 +680,13 @@ class Tx_Contentstage_Domain_Repository_ContentRepository {
 	 */
 	public function getDomain($page) {
 		$protocol = 'http' . ($this->getUseHttps() ? 's' : '') . '://';
-		
+
 		if (!empty($this->overrideDomain)) {
 			return $protocol . $this->overrideDomain . '/';
+			
 		}
-		
-		if (isset($this->domainCache[$page])) {
+
+		if (isset($this->domainCache[$page]) && ($this->domainCache[$page]) !== null) {
 			return $this->domainCache[$page];
 		}
 		
@@ -691,8 +695,8 @@ class Tx_Contentstage_Domain_Repository_ContentRepository {
 		if (empty($rootline)) {
 			return null;
 		}
-		
 		$pids = array();
+		
 		$orderParts = array();
 		foreach ($rootline as $p) {
 			$pid = intval($p['uid']);
@@ -702,6 +706,7 @@ class Tx_Contentstage_Domain_Repository_ContentRepository {
 			$pids[] = $pid;
 			$orderParts[] = '(pid = ' . $pid . ') DESC';
 		}
+		
 		$orderParts[] = 'sorting ASC';
 		$rows = $this->db->exec_SELECTgetRows(
 			'domainName',
@@ -713,7 +718,7 @@ class Tx_Contentstage_Domain_Repository_ContentRepository {
 		);
 		
 		$this->domainCache[$page] = count($rows) > 0 ? $protocol . $rows[0]['domainName'] . '/' : null;
-		
+				
 		return $this->domainCache[$page];
 	}
 	
@@ -769,6 +774,7 @@ class Tx_Contentstage_Domain_Repository_ContentRepository {
 		}
 		
 		$result->setResource($resource);
+		$result->setQuery($query);
 		return $result;
 	}
 	
@@ -779,7 +785,7 @@ class Tx_Contentstage_Domain_Repository_ContentRepository {
 	 * @param string $table The table to query (CAN ONLY BE A SINGLE TABLE!).
 	 * @param string $fields The fields to get (* by default).
 	 * @param string $where The where condition (empty by default).
-	 * @param string $groupBy Group the query (empty by default).
+	 * @param string $groupBy Group the query IMPORTANT: not used in this version.
 	 * @param string $orderBy Order to use on the query (uid ASC by default).
 	 * @param string $limit Limit the query.
 	 * @param string $idFields The ID fields of the table.
@@ -800,17 +806,50 @@ class Tx_Contentstage_Domain_Repository_ContentRepository {
 			$fields = t3lib_div::trimExplode(',', $fields, true);
 			$fieldNames = array_combine($fields, $fields);
 		}
+		
+		$idFieldsArray = t3lib_div::trimExplode(',', $idFields, true);
 
-		foreach (t3lib_div::trimExplode(',', $idFields, true) as $idField) {
+		foreach ($idFieldsArray as $idField) {
 			unset($fieldNames[$idField]);
 		}
+		
+		$idFieldsArray = $this->mapTableToFields($table, $idFieldsArray);
+		$idFields = implode(',', $idFieldsArray);
 
-		$fields = $idFields . ', MD5(CONCAT(' . implode(',', $fieldNames) . ')) AS hash';
+		$fields = $idFields . ', CONCAT_WS(\'///\', GROUP_CONCAT(sys_refindex.ref_table, \'///\', sys_refindex.ref_uid, \'///\', sys_refindex.ref_string SEPARATOR \'///\')' . (count($fieldNames) > 0 ? ',' : '') . implode(',', $this->mapTableToFields($table, $fieldNames)) . ') AS hash';
 
-		$result = $this->findInPageTree($root, $table, $fields, $where, $groupBy, $orderBy, $limit);
+		$uidField = current($idFieldsArray);
+		
+		$result = $this->findInPageTree(
+			$root,
+			$table . ' LEFT JOIN sys_refindex ON (sys_refindex.recuid = ' . $uidField . ' AND sys_refindex.tablename = ' . $this->db->fullQuoteStr($table, 'sys_refindex') . ')',
+			$fields,
+			$where,
+			$uidField,
+			$orderBy,
+			$limit
+		);
 
+		$result->setTable($table);
 		$result->setLateBindingFields($fieldNames);
 
+		return $result;
+	}
+	
+	/**
+	 * Maps the table name to the fields for use in SQL.
+	 *
+	 * @param string $table The table to map to the fields.
+	 * @param array $fields The field array.
+	 * @return array The fields with $table. before the name.
+	 */
+	protected function mapTableToFields($table, array $fields = array()) {
+		$result = array();
+		
+		foreach ($fields as $key =>  $field) {
+			$result[$key] = $table . '.' . $field;
+		}
+		
 		return $result;
 	}
 	
@@ -1098,6 +1137,21 @@ class Tx_Contentstage_Domain_Repository_ContentRepository {
 	}
 	
 	/**
+	 * Reset the caches of this repository. Needed when pushing to reset the remote page tree etc.
+	 *
+	 * @return void
+	 */
+	public function clearApplicationCaches() {
+		$this->fullPageTree = null;
+		$this->domainCache = array();
+		
+		$identifier = 'tx_contentstage_ContentRepository_getFullPageTree_' . $this->tag;
+		if (TX_CONTENTSTAGE_USECACHE && $this->cache->has($identifier)) {
+			$this->cache->remove($identifier);
+		}
+	}
+	
+	/**
 	 * Returns the internal t3lib_db object. Only for internal use!
 	 *
 	 * @return t3lib_db The db.
@@ -1210,4 +1264,3 @@ class Tx_Contentstage_Domain_Repository_ContentRepository {
 		return $this->tag;
 	}
 }
-?>

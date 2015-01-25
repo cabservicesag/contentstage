@@ -3,7 +3,8 @@
 /***************************************************************
  *  Copyright notice
  *
- *  (c) 2013 
+ *  (c) 2014 Lavinia Negru <ln@cabag.ch>, cab services ag
+ *  
  *  All rights reserved
  *
  *  This script is part of the TYPO3 project. The TYPO3 project is
@@ -24,12 +25,14 @@
  ***************************************************************/
 
 /**
- *
+ * 
  *
  * @package contentstage
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  *
  */
-class Tx_Contentstage_Domain_Repository_StateRepository extends Tx_Extbase_Persistence_Repository {
-
+class Tx_Contentstage_Utility_File implements t3lib_singleton {
+	
+	
+	
 }

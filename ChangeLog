@@ -1,3 +1,44 @@
+2014-09-11 Nils Blattner <nb@cabag.ch>
+	* version 0.7.7
+	* [6.2] fixed some issues with the review process in 6.2
+
+2014-09-05 Nils Blattner <nb@cabag.ch>
+	* version 0.7.6
+	* [FEATURE] moved the page initialization into its own function in the BaseController
+
+2014-09-05 Nils Blattner <nb@cabag.ch>
+	* version 0.7.5
+	* [FEATURE] the Result now also carries the underlying query
+	* [BUG] the comparison now also triggers the update of the refindex
+	* [BUG] fixed an issue in the hashed comparison when no sys_refindex was present (and it should have been)
+	* [TASK] set version requirement 4.5-6.2.99
+	* [TASK] removed closing ?> in all PHP files
+
+2014-08-07 Nils Blattner <nb@cabag.ch>
+	* version 0.7.4
+	* [6.2] added table cf_cache_rootline to compare ignore
+	* [6.2] added table cf_cache_rootline_tags to auto ignore
+	* [6.2] added table cf_extbase_datamapfactory_datamap to auto ignore
+	* [6.2] added table cf_extbase_datamapfactory_datamap_tags to auto ignore
+	* [6.2] added table cf_extbase_typo3dbbackend_queries to auto ignore
+	* [6.2] added table cf_extbase_typo3dbbackend_queries_tags to auto ignore
+	* [6.2] added table cf_extbase_typo3dbbackend_tablecolumns to auto ignore
+	* [6.2] added table cf_extbase_typo3dbbackend_tablecolumns_tags to auto ignore
+	* [FEATURE] now automatically ignores tables without TCA for comparison/pushing
+
+2014-08-07 Nils Blattner <nb@cabag.ch>
+	* version 0.7.3
+	* [6.2] fixed some issues with t3lib_cache::initContentHashCache() not needed in 6.2
+	* [6.2] added table cf_cache_rootline to auto ignore
+
+2014-06-06 Nils Blattner <nb@cabag.ch>
+	* version 0.7.2
+	* [BUG] fixed an issue with md5 checksum comparison where the hash would not be assembled properly
+
+2014-06-03 Lavinia Negru <ln@cabag.ch>
+	* version 0.7.1
+	* reset the domain/page tree cache to allow the values to be rebuilt for the pushed review mail issue #6845
+
 2014-06-02 Nils Blattner <nb@cabag.ch>
 	* version 0.7.0
 	* increased version to 0.7.0 to clarify which version is the newest

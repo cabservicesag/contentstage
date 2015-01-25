@@ -192,4 +192,3 @@ $clearCache->initialize();
 $clearCache->clear();
 $clearCache->display();
 die();
-?>

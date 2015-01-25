@@ -197,7 +197,10 @@ class Tx_Contentstage_Utility_Tca implements t3lib_singleton {
 	 */
 	protected function initializeCache() {
 		t3lib_cache::initializeCachingFramework();
-		t3lib_cache::initContentHashCache();
+		if (method_exists('t3lib_cache', 'initContentHashCache')) {
+			// not needed in 6.2 anymore
+			t3lib_cache::initContentHashCache();
+		}
 		$this->cache = $GLOBALS['typo3CacheManager']->getCache('cache_hash');
 	}
 	
@@ -551,6 +554,9 @@ class Tx_Contentstage_Utility_Tca implements t3lib_singleton {
 	 * @return string The string representation of the resolved field.
 	 */
 	public function resolve($repository, $table, $field, $value, &$row, &$originalRow) {
+		// ensure the refindex is up to date
+		$this->updateRefindex($repository, $table, $row['uid']);
+		
 		$config = &$this->getProcessedTca($table, $field);
 		switch ($config['type']) {
 			case self::RELATION_DIRECT:
@@ -674,7 +680,12 @@ class Tx_Contentstage_Utility_Tca implements t3lib_singleton {
 	 * Update refindex if necessary.
 	 */
 	protected function updateRefindex($repository, $table, $uid) {
-		if (isset($this->refindexUpdated[$table]) && isset($this->refindexUpdated[$table][$uid])) {
+		$tag = $repository->getTag();
+		if (
+			isset($this->refindexUpdated[$tag]) &&
+			isset($this->refindexUpdated[$tag][$table]) &&
+			isset($this->refindexUpdated[$tag][$table][$uid]))
+		{
 			return;
 		}
 		$identifier = 'tx_contentstage_updateRefindex_' . $repository->getTag() . '_' . $table . '_' . $uid;
@@ -688,7 +699,7 @@ class Tx_Contentstage_Utility_Tca implements t3lib_singleton {
 		$result = $refIndexObj->updateRefIndexTable($table, $uid);
 		$GLOBALS['TYPO3_DB'] = $db;
 		
-		$this->refindexUpdated[$table][$uid] = true;
+		$this->refindexUpdated[$tag][$table][$uid] = true;
 		if (TX_CONTENTSTAGE_USECACHE) {
 			$this->cache->set($identifier, true, array(), TX_CONTENTSTAGE_CACHETIME);
 		}
@@ -1050,5 +1061,3 @@ class Tx_Contentstage_Utility_Tca implements t3lib_singleton {
 		return Tx_Extbase_Utility_Localization::translate($lll, '');
 	}
 }
-?>
-                                   

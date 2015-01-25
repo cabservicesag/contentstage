@@ -73,6 +73,3 @@ class Tx_Contentstage_ViewHelpers_TcaLabelViewHelper extends Tx_Fluid_Core_ViewH
 		}
 	}
 }
-
-
-?>

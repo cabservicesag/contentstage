@@ -168,4 +168,3 @@ class Tx_Contentstage_Controller_InitializeController extends Tx_Contentstage_Co
 		}
 	}
 }
-?>

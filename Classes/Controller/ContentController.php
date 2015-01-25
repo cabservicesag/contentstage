@@ -173,6 +173,9 @@ class Tx_Contentstage_Controller_ContentController extends Tx_Contentstage_Contr
 			
 			if ($this->review !== null && $this->review->getUid() > 0 && $this->review->getLevels() <= $this->localRepository->getDepth()) {
 				$this->review->addChangeString($this->activeBackendUser, Tx_Contentstage_Domain_Model_State::PUSHED);
+				
+				// reset the domain/page tree cache to allow the values to be rebuilt
+				$this->remoteRepository->clearApplicationCaches();
 				$this->sendReviewMailAndLog('pushed', $this->review);
 			}
 		} catch (Exception $e) {
@@ -242,7 +245,11 @@ class Tx_Contentstage_Controller_ContentController extends Tx_Contentstage_Contr
 		$disableHashed = !!$pageTS['disableHashedCompare'];
 
 		foreach ($tables as $table => &$data) {
-			if (substr($table, -3) === '_mm' || $this->ignoreSyncTables[$table]) {
+			if (
+				substr($table, -3) === '_mm' || 
+				$this->ignoreSyncTables[$table] || 
+				!is_array($this->tca->getProcessedTca($table))
+			) {
 				continue;
 			}
 			$this->differences[$table] = array();
@@ -253,7 +260,6 @@ class Tx_Contentstage_Controller_ContentController extends Tx_Contentstage_Contr
 				$resource1 = $fromRepository->findInPageTreeHashed($root, $table);
 				$resource2 = $toRepository->findInPageTreeHashed($root, $table);
 			}
-
 			$this->diff->resources($resource2, $resource1, $this->differences[$table], 'uid', $table === 'pages' ? 'uid' : 'pid');
 			
 			$resource1->free();
@@ -282,7 +288,11 @@ class Tx_Contentstage_Controller_ContentController extends Tx_Contentstage_Contr
 	protected function _pushTables(Tx_Contentstage_Domain_Repository_ContentRepository $fromRepository, Tx_Contentstage_Domain_Repository_ContentRepository $toRepository, $root = 0) {
 		$tables = $fromRepository->getTables();
 		foreach ($tables as $table => &$data) {
-			if (substr($table, -3) === '_mm' || $this->ignoreSyncTables[$table]) {
+			if (
+				substr($table, -3) === '_mm' || 
+				$this->ignoreSyncTables[$table] || 
+				!is_array($this->tca->getProcessedTca($table))
+			) {
 				$this->log->log('ignored: ' . $table, Tx_CabagExtbase_Utility_Logging::INFORMATION);
 				continue;
 			}
@@ -454,4 +464,3 @@ class Tx_Contentstage_Controller_ContentController extends Tx_Contentstage_Contr
 		}
 	}
 }
-?>
