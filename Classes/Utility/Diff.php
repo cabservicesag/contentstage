@@ -237,6 +237,9 @@ class Tx_Contentstage_Utility_Diff {
 				$this->rows($r1, $r2, $differences, $keyField, $table);
 				
 				foreach (array('files', 'folders', 'softrefs') as $type) {
+					if (!is_array($tableTCA['__' . $type])) {
+						continue;
+					}
 					foreach ($tableTCA['__' . $type] as $field => $true) {
 						if (!isset($differences[$uid][$field])) {
 							// no difference, let's check the files

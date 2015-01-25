@@ -146,6 +146,12 @@ class Tx_Contentstage_Utility_Tca implements t3lib_singleton {
 		'l18n_diffsource' => array(
 			'label' => 'field.l18n_diffsource',
 		),
+		'l10n_parent' => array(
+			'label' => 'field.l18n_parent',
+		),
+		'l10n_diffsource' => array(
+			'label' => 'field.l18n_diffsource',
+		),
 		'_targetMissing' => array(
 			'label' => 'field._targetMissing',
 		),

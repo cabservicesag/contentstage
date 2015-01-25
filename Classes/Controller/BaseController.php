@@ -821,6 +821,10 @@ class Tx_Contentstage_Controller_BaseController extends Tx_CabagExtbase_Controll
 			$mail->addAttachment($attachment);
 		}
 		
+		if (is_array($recipients) && isset($recipients[''])) {
+			unset($recipients['']);
+		}
+		
 		$ok = $mail->sendMail(
 			$recipients,
 			$this->translate('mails.' . $key . '.subject'),

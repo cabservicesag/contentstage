@@ -67,17 +67,13 @@ class Tx_Contentstage_Controller_ReviewController extends Tx_Contentstage_Contro
 	 *
 	 * @param Tx_Contentstage_Domain_Model_Review $review
 	 * @param string $submitButton The submit text.
+	 * @param boolean $usedByCreate Whether this function is called from createAction.
 	 * @return void
 	 */
-	public function reviewedAction(Tx_Contentstage_Domain_Model_Review $review, $submitButton) {
-		$found = false;
-		foreach ($review->getReviewed() as $reviewed) {
-			if ($this->activeBackendUser->getUid() === $reviewed->getReviewer()->getUid()) {
-				$found = $reviewed;
-			}
-		}
+	public function reviewedAction(Tx_Contentstage_Domain_Model_Review $review, $submitButton, $usedByCreate = false) {
+		$found = $review->getActiveReviewed($this->activeBackendUser);
 		
-		if ($found === false) {
+		if ($found === null) {
 			$this->log->log($this->translate('info.review.notAssigned'), Tx_CabagExtbase_Utility_Logging::WARNING);
 		} else {
 			$ok = $submitButton === $this->translate('review.submit.ok');
@@ -87,7 +83,7 @@ class Tx_Contentstage_Controller_ReviewController extends Tx_Contentstage_Contro
 			$changed = $review->calculateState($this->activeBackendUser);
 			$this->log->log($this->translate('info.review.' . ($ok ? 'accepted' : 'rejected')), Tx_CabagExtbase_Utility_Logging::OK, Tx_Extbase_Reflection_ObjectAccess::getGettableProperties($review));
 			if ($changed) {
-				$ok = $this->sendMail('reviewChanged', $review->getRecipients(), array('review' => $review));
+				$ok = $this->sendMail('review' . ($usedByCreate ? 'Created' : 'Changed'), $review->getRecipients(!empty($this->reviewConfiguration['sendMailToCurrentUser'])), array('review' => $review));
 				if ($ok) {
 					$this->log->log($this->translate('info.review.mail.success'), Tx_CabagExtbase_Utility_Logging::OK);
 				} else {
@@ -123,7 +119,7 @@ class Tx_Contentstage_Controller_ReviewController extends Tx_Contentstage_Contro
 		
 		$this->log->log($this->translate('info.review.reinitialized'), Tx_CabagExtbase_Utility_Logging::OK, Tx_Extbase_Reflection_ObjectAccess::getGettableProperties($review));
 		if ($changed) {
-			$ok = $this->sendMail('reviewChanged', $review->getRecipients(), array('review' => $review));
+			$ok = $this->sendMail('reviewChanged', $review->getRecipients(!empty($this->reviewConfiguration['sendMailToCurrentUser'])), array('review' => $review));
 			if ($ok) {
 				$this->log->log($this->translate('info.review.mail.success'), Tx_CabagExtbase_Utility_Logging::OK);
 			} else {
@@ -182,7 +178,16 @@ class Tx_Contentstage_Controller_ReviewController extends Tx_Contentstage_Contro
 		$this->persistenceManager->persistAll();
 		$this->log->log($this->translate('review.create.success'), Tx_CabagExtbase_Utility_Logging::OK);
 		
-		$ok = $this->sendMail('reviewCreated', $review->getRecipients(), array('review' => $review));
+		if ($this->reviewConfiguration['autoReviewIfSelf']) {
+			$found = $review->getActiveReviewed($this->activeBackendUser);
+			
+			if ($found !== null) {
+				// the action will redirect to compare action and thus prevent the initial mail sent and only sends a "changed" mail
+				$this->reviewedAction($review, $this->translate('review.submit.ok'), true);
+			}
+		}
+		
+		$ok = $this->sendMail('reviewCreated', $review->getRecipients(!empty($this->reviewConfiguration['sendMailToCurrentUser'])), array('review' => $review));
 		if ($ok) {
 			$this->log->log($this->translate('info.review.mail.success'), Tx_CabagExtbase_Utility_Logging::OK);
 		} else {
@@ -220,7 +225,7 @@ class Tx_Contentstage_Controller_ReviewController extends Tx_Contentstage_Contro
 		
 		$this->reviewRepository->update($review);
 		
-		$ok = $this->sendMail('reviewChanged', $review->getRecipients(), array('review' => $review));
+		$ok = $this->sendMail('reviewChanged', $review->getRecipients(!empty($this->reviewConfiguration['sendMailToCurrentUser'])), array('review' => $review));
 		if ($ok) {
 			$this->log->log($this->translate('info.review.mail.success'), Tx_CabagExtbase_Utility_Logging::OK);
 		} else {

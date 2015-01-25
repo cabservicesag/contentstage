@@ -1,3 +1,12 @@
+2013-10-14 Nils Blattner <nb@cabag.ch>
+	* version 0.4.3
+	* [FEATURE] added pageTS option to automatically review if user sets him/herself as reviewer
+	* [FEATURE] added pageTS option to send mail to the active user aswell and deactivated it by default
+
+2013-10-10 Nils Blattner <nb@cabag.ch>
+	* version 0.4.2
+	* [BUG] fixed an issue when empty emails are set in backend users
+
 2013-10-10 Nils Blattner <nb@cabag.ch>
 	* version 0.4.1
 	* [BUG] fixed issue with displaying softref changes

@@ -303,17 +303,35 @@ class Tx_Contentstage_Domain_Model_Review extends Tx_Extbase_DomainObject_Abstra
 	public function setReviewed(Tx_Extbase_Persistence_ObjectStorage $reviewed) {
 		$this->reviewed = $reviewed;
 	}
+	
+	/**
+	 * Checks if the active backend user is part of the reviewers and returns the corresponding Reviewed entry.
+	 *
+	 * @param Tx_Contentstage_Domain_Model_BackendUser $backendUser Optional backend user to look for instead.
+	 * @return Tx_Contentstage_Domain_Model_Reviewed The reviewed record or null.
+	 */
+	public function getActiveReviewed(Tx_Contentstage_Domain_Model_BackendUser $backendUser = null) {
+		$uid = $backendUser === null ? intval($GLOBALS['BE_USER']->user['uid']) : $backendUser->getUid();
+		$found = null;
+		foreach ($this->getReviewed() as $reviewed) {
+			if ($uid === $reviewed->getReviewer()->getUid()) {
+				$found = $reviewed;
+			}
+		}
+		return $found;
+	}
 
 	/**
 	 * Returns the recipients
 	 *
+	 * @param boolean $includeActiveUser Returns the email/name for the active user aswell.
 	 * @return array The recipients for mails.
 	 */
-	public function getRecipients() {
+	public function getRecipients($includeActiveUser = false) {
 		$recipients = array();
 		
 		foreach ($this->getReviewed() as $reviewed) {
-			if ($reviewed->getReviewer() !== null) {
+			if ($reviewed->getReviewer() !== null && ($includeActiveUser || $reviewed->getReviewer()->getUid() !== intval($GLOBALS['BE_USER']->user['uid']))) {
 				$recipients[$reviewed->getReviewer()->getEmail()] = $reviewed->getReviewer()->getName();
 			}
 		}

@@ -13,6 +13,7 @@ tx_contentstage {
 		__all {
 			l18n_diffsource = 1
 			l10n_diffsource = 1
+			SYS_LASTCHANGED = 1
 		}
 	}
 	
@@ -39,6 +40,10 @@ tx_contentstage {
 		groups = 0
 		// default auto push to yes for new reviews
 		defaultAutoPush = 0
+		// automatically set to reviewed if a person sets him/herself as reviewer
+		autoReviewIfSelf = 1
+		// send mail to active user if found
+		sendMailToCurrentUser = 0
 	}
 	
 	mails {
