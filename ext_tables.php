@@ -29,16 +29,33 @@ if (TYPO3_MODE === 'BE') {
 	Tx_Extbase_Utility_Extension::registerModule(
 		$_EXTKEY,
 		'web',	 // Make module a submodule of 'web'
-		'stageAdmin',	// Submodule key
+		'stageSnapshots',	// Submodule key
 		'',						// Position
 		array(
 			'Snapshot' => 'list, create, delete, revert',
+		),
+		array(
+			'access' => 'user,group',
+			'icon'   => 'EXT:' . $_EXTKEY . '/ext_icon.gif',
+			'labels' => 'LLL:EXT:' . $_EXTKEY . '/Resources/Private/Language/locallang_stageSnapshots.xml',
+		)
+	);
+
+	/**
+	 * Registers a Backend Module
+	 */
+	Tx_Extbase_Utility_Extension::registerModule(
+		$_EXTKEY,
+		'web',	 // Make module a submodule of 'web'
+		'stageInit',	// Submodule key
+		'',						// Position
+		array(
 			'Initialize' => 'show, doInitialize',
 		),
 		array(
 			'access' => 'user,group',
 			'icon'   => 'EXT:' . $_EXTKEY . '/ext_icon.gif',
-			'labels' => 'LLL:EXT:' . $_EXTKEY . '/Resources/Private/Language/locallang_stageAdmin.xml',
+			'labels' => 'LLL:EXT:' . $_EXTKEY . '/Resources/Private/Language/locallang_stageInit.xml',
 		)
 	);
 

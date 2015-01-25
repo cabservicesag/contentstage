@@ -1,3 +1,7 @@
+2013-02-07 Nils Blattner <nb@cabag.ch>
+	* version 0.2.0
+	* separated snapshot and initialize into separate modules
+
 2013-02-05 Nils Blattner <nb@cabag.ch>
 	* version 0.1.9
 	* fixed a bug with the remote page tree

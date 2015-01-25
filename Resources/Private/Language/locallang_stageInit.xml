@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<T3locallang>
+	<meta type="array">
+		<type>module</type>
+		<description>Language labels for backend module Content staging belonging to extension 'contentstage'</description>
+	</meta>
+	<data type="array">
+		<languageKey index="default" type="array">
+			<label index="mlang_tabs_tab">Staging init</label>
+			<label index="mlang_labels_tabdescr">An module that allows to initialize the system for contentstage.</label>
+			<label index="mlang_labels_tablabel">Staging init</label>
+		</languageKey>
+		<languageKey index="de" type="array">
+			<label index="mlang_tabs_tab">Staging-Init</label>
+			<label index="mlang_labels_tabdescr">Ein Modul, dass es erlaubt das System für contentastage zu initizieren.</label>
+			<label index="mlang_labels_tablabel">Staging-Init</label>
+		</languageKey>
+	</data>
+</T3locallang>
