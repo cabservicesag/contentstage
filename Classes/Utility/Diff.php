@@ -214,6 +214,7 @@ class Tx_Contentstage_Utility_Diff {
 		$tableTCA = $this->tca->getProcessedTca($table);
 		$fromRepository = $resource1->getRepository();
 		$toRepository = $resource2->getRepository();
+		$lateBinding = $resource1->getLateBindingFields() !== false && $resource2->getLateBindingFields();
 		
 		while (true) {
 			if ($r1 === false && $r2 === false) {
@@ -226,15 +227,25 @@ class Tx_Contentstage_Utility_Diff {
 			$uid = min($uid1, $uid2);
 			
 			if ($uid1 < $uid2) {
+				$r1 = $resource1->currentResolvedWithLateBindings();
 				$differences[$uid]['_sourceMissing'] = $this->wrap($this->translate('diff.source.recordMissing', array($keyField, $uid)), true);
 				$r1Next = true;
 				$this->maximumTargetTstamp = max($this->maximumTargetTstamp, intval($r1[$tableTCA['__tstampField']]));
 			} else if ($uid2 < $uid1) {
+				$r2 = $resource2->currentResolvedWithLateBindings();
 				$differences[$uid]['_targetMissing'] = $this->wrap($this->translate('diff.target.recordMissing', array($keyField, $uid)));
 				$r2Next = true;
 				$this->maximumSourceTstamp = max($this->maximumSourceTstamp, intval($r2[$tableTCA['__tstampField']]));
 			} else {
-				$this->rows($r1, $r2, $differences, $keyField, $table);
+				$diffRows = !$lateBinding;
+				if ($lateBinding && $r1['hash'] !== $r2['hash']) {
+					$r1 = $resource1->currentResolvedWithLateBindings();
+					$r2 = $resource2->currentResolvedWithLateBindings();
+					$diffRows = true;
+				}
+				if ($diffRows) {
+					$this->rows($r1, $r2, $differences, $keyField, $table);
+				}
 				
 				foreach (array('files', 'folders', 'softrefs') as $type) {
 					if (!is_array($tableTCA['__' . $type])) {

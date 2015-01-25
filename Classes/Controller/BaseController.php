@@ -349,12 +349,12 @@ class Tx_Contentstage_Controller_BaseController extends Tx_CabagExtbase_Controll
 	/**
 	 * Injects the TCA utility object.
 	 *
-	 * @param Tx_Contentstage_Utility_Tca $diff The TCA utility object.
+	 * @param Tx_Contentstage_Utility_Tca $tca The TCA utility object.
 	 */
 	public function injectTca(Tx_Contentstage_Utility_Tca $tca = null) {
 		$this->tca = $tca;
 	}
-
+	
 	/**
 	 * Initialize the controller.
 	 *
@@ -436,8 +436,10 @@ class Tx_Contentstage_Controller_BaseController extends Tx_CabagExtbase_Controll
 	 */
 	protected function initializeIgnoreTables() {
 		$this->applyTablesToIndex($this->ignoreSyncTables, $this->extensionConfiguration['tables.']['doNotSync']);
+		$this->applyTablesToIndex($this->ignoreSyncTables, $this->extensionConfiguration['tables.']['toFederate']);
 		
 		$this->applyTablesToIndex($this->ignoreSnapshotTables, $this->extensionConfiguration['tables.']['doNotSnapshot']);
+		$this->applyTablesToIndex($this->ignoreSnapshotTables, $this->extensionConfiguration['tables.']['toFederate']);
 		
 		$pageTS = $this->getPageTS();
 		
@@ -605,12 +607,13 @@ class Tx_Contentstage_Controller_BaseController extends Tx_CabagExtbase_Controll
 	 *
 	 * @param array $tables The tables to filter.
 	 * @param array $ignoreTables The index of 'tablename' => true pairs to be ignored.
+	 * @param boolean $checkTCA Whether or not to check if the table exists in TCA.
 	 * @return array The $tables minus the $ignoreTables
 	 */
-	protected function filterTables(array $tables, array $ignoreTables) {
+	protected function filterTables(array $tables, array $ignoreTables, $checkTCA = false) {
 		$result = array();
 		foreach ($tables as $table) {
-			if (!isset($ignoreTables[$table]) || !$ignoreTables[$table]) {
+			if (!isset($ignoreTables[$table]) || !$ignoreTables[$table] && ($checkTCA === false || isset($GLOBALS['TCA'][$table]))) {
 				$result[] = $table;
 			}
 		}

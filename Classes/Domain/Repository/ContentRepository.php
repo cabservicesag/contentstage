@@ -169,11 +169,25 @@ class Tx_Contentstage_Domain_Repository_ContentRepository {
 	protected $objectManager;
 	
 	/**
+	 * The TCA utility object.
+	 *
+	 * @var Tx_Contentstage_Utility_Tca The TCA utility object.
+	 */
+	protected $tca = null;
+	
+	/**
 	 * The file messages found.
 	 *
 	 * @var array
 	 */
 	protected $fileMessages = array();
+
+	/**
+	 * A per call cache of field names.
+	 *
+	 * @var array
+	 */
+	protected $fieldNameCache = array();
 
 	/**
 	 * Injects the object manager
@@ -183,6 +197,15 @@ class Tx_Contentstage_Domain_Repository_ContentRepository {
 	 */
 	public function injectObjectManager(Tx_Extbase_Object_ObjectManagerInterface $objectManager) {
 		$this->objectManager = $objectManager;
+	}
+	
+	/**
+	 * Injects the TCA utility object.
+	 *
+	 * @param Tx_Contentstage_Utility_Tca $diff The TCA utility object.
+	 */
+	public function injectTca(Tx_Contentstage_Utility_Tca $tcaObject = null) {
+		$this->tcaObject = $tcaObject;
 	}
 	
 	/**
@@ -360,10 +383,8 @@ class Tx_Contentstage_Domain_Repository_ContentRepository {
 		$severity = Tx_CabagExtbase_Utility_Logging::INFORMATION;
 		if (!file_exists($fromFile['abs'])) {
 			$message = $this->translate('compare.fileSourceMissing', $fromFile);
-			$severity = Tx_CabagExtbase_Utility_Logging::WARNING;
 		} else if (!file_exists($toFile['abs'])) {
 			$message = $this->translate('compare.fileTargetMissing', $toFile);
-			$severity = Tx_CabagExtbase_Utility_Logging::WARNING;
 		} else {
 			if (filemtime($fromFile['abs']) !== filemtime($toFile['abs']) && md5_file($fromFile['abs']) !== md5_file($toFile['abs'])) {
 				$message = $this->translate('compare.filesDiffer', array_merge(array_values($fromFile), array_values($toFile)));
@@ -752,6 +773,48 @@ class Tx_Contentstage_Domain_Repository_ContentRepository {
 	}
 	
 	/**
+	 * Returns a repository result object for the given query, but only records from within the given pagetree. Actually only returns uid field and a hash for the rest of the fields.
+	 *
+	 * @param int $root The root page to start from.
+	 * @param string $table The table to query (CAN ONLY BE A SINGLE TABLE!).
+	 * @param string $fields The fields to get (* by default).
+	 * @param string $where The where condition (empty by default).
+	 * @param string $groupBy Group the query (empty by default).
+	 * @param string $orderBy Order to use on the query (uid ASC by default).
+	 * @param string $limit Limit the query.
+	 * @param string $idFields The ID fields of the table.
+	 * @return Tx_Contentstage_Domain_Repository_Result The result object.
+	 */
+	public function findInPageTreeHashed($root = 0, $table, $fields = '*', $where = '', $groupBy = '', $orderBy = 'uid ASC', $limit = '', $idFields = 'uid') {
+		$fieldNames = array();
+		if ($fields === '*' || $fields === $table . '.*') {
+			if (!isset($this->fieldNameCache[$table])) {
+				$this->fieldNameCache[$table] = array();
+				$columns = $this->_sql('SHOW COLUMNS FROM ' . $table);
+				foreach ($columns as $column) {
+					$this->fieldNameCache[$table][$column['Field']] = $column['Field'];
+				}
+			}
+			$fieldNames = $this->fieldNameCache[$table];
+		} else {
+			$fields = t3lib_div::trimExplode(',', $fields, true);
+			$fieldNames = array_combine($fields, $fields);
+		}
+
+		foreach (t3lib_div::trimExplode(',', $idFields, true) as $idField) {
+			unset($fieldNames[$idField]);
+		}
+
+		$fields = $idFields . ', MD5(CONCAT(' . implode(',', $fieldNames) . ')) AS hash';
+
+		$result = $this->findInPageTree($root, $table, $fields, $where, $groupBy, $orderBy, $limit);
+
+		$result->setLateBindingFields($fieldNames);
+
+		return $result;
+	}
+	
+	/**
 	 * Takes the resolved relations and finds the associated sys_log entries.
 	 *
 	 * @return Tx_Contentstage_Domain_Repository_Result The result object.
@@ -767,6 +830,36 @@ class Tx_Contentstage_Domain_Repository_ContentRepository {
 	 */
 	public function findResolvedSysHistory() {
 		return $this->findInPageTree(0, 'sys_history LEFT JOIN sys_log ON (sys_log.uid = sys_history.sys_log_uid)', 'sys_history.*', $this->_getSysLogWhere());
+	}
+	
+	/**
+	 * Returns a single record. If TCA exists for a given table, then enable delete columns are taken into account.
+	 *
+	 * @param string $table The table to look in.
+	 * @param int $uid The uid to get.
+	 * @param string $fields The fields to get, all by default.
+	 * @param boolean $ignoreEnable Wether or not to ignore enable field delete.
+	 * @return mixed The resulting row array or false.
+	 */
+	public function getRecord($table, $uid, $fields = '*', $ignoreEnable = false) {
+		$whereParts = array(
+			$table . '.uid = ' . intval($uid)
+		);
+		
+		$ctrl = $GLOBALS['TCA'][$table]['ctrl'];
+		if (is_array($ctrl)) {
+
+				// Delete field check:
+			if ($ctrl['delete']) {
+				$whereParts[] = $table . '.' . $ctrl['delete'] . '=0';
+			}
+		}
+		
+		return $this->db->exec_SELECTgetSingleRow(
+			$fields,
+			$table,
+			implode(' AND ', $whereParts)
+		);
 	}
 	
 	/**
@@ -1020,6 +1113,7 @@ class Tx_Contentstage_Domain_Repository_ContentRepository {
 	 * @param string $query The query.
 	 * @param mixed $result If set to false, no result is returned. If set to true, an array with the rows is returned. If set to a string, an associated array is returned, where the $row[$result] is used as the key.
 	 * @return array The assoc return array.
+	 * @internal
 	 */
 	public function _sql($query, $result = true) {
 		$resource = $this->db->sql_query($query);

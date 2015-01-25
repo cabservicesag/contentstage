@@ -1,3 +1,31 @@
+2014-06-02 Nils Blattner <nb@cabag.ch>
+	* version 0.7.0
+	* increased version to 0.7.0 to clarify which version is the newest
+	* [FEATURE] added md5 checksum optimization option that checks db-generated md5 sums before actually checking content
+
+2014-05-13 Lavinia Negru <ln@cabag.ch>
+	* version 0.5.9
+	* [FEATURE] added configuration option for tables to federate
+	* [FEATURE] implemented new module for federate tables 
+	* [FEATURE] integraded table federation in to the initialization process
+
+2014-04-14 Nils Blattner <nb@cabag.ch>
+	* version 0.5.8
+	* [FEATURE] changed missing file message from WARNING to INFORMATION, as it is a common thing when working with contentstaging
+	* [FEATURE] implemented table flexforms (templavoila)
+	* [BUG] fixed an issue when a group relation was present without MM-table (list of uids/table_uid directly in the field)
+
+2014-04-11 Nils Blattner <nb@cabag.ch>
+	* version 0.5.7
+	* [FEATURE] added basic flexform parsing
+	* [FEATURE] added check to make sure tables have TCA
+
+2014-03-20 Lavinia Negru <ln@cabag.ch>
+	* version 0.5.6
+	* [FEATURE] added configuration options to disable compression by snapshots
+	* [FEATURE] removed View-Icons in Rootline
+	* [FEATURE] changed Local rootline and Remote rootline text labels to local and remote base url
+
 2013-12-04 Nils Blattner <nb@cabag.ch>
 	* version 0.5.5
 	* [BUG] fixed an issue, where the early call to create links (#4177) would cache wrong domains - fixed issue #4949
@@ -38,7 +66,6 @@
 2013-10-21 Nils Blattner <nb@cabag.ch>
 	* version 0.4.9
 	* [FEATURE] added mails when a review is deprecated or pushed - issue #4157
-
 
 2013-10-17 Nils Blattner <nb@cabag.ch>
 	* version 0.4.6

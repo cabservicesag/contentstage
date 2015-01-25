@@ -102,19 +102,28 @@
 
 <h2><f:translate key="compare.sub.compare.title" /></h2>
 <div class="rootlineContainer">
-	<div class="rootline">
-		<strong>
-			<f:translate key="local.rootline" />
-		</strong>
-		<f:render partial="Rootline" arguments="{rootline: localRootline}" />
-	</div>
-	
-	<div class="rootline">
-		<strong>
-			<f:translate key="remote.rootline" />
-		</strong>
-		<f:render partial="Rootline" arguments="{rootline: remoteRootline}" />
-	</div>
+	<table>
+		<tr class="rootline">
+			<td>
+				<strong class="url">
+					<c:pregReplace from="#^https?://(.*?)/?$#" to="$1">{localDomain}</c:pregReplace>:
+				</strong>
+			</td>
+			<td>
+				<f:render partial="Rootline" arguments="{rootline: localRootline}" />
+			</td>
+		</tr>
+		<tr  class="rootline">
+			<td>
+				<strong class="url">
+					<c:pregReplace from="#^https?://(.*?)/?$#" to="$1">{remoteDomain}</c:pregReplace>:
+				</strong>
+			</td>
+			<td>
+				<f:render partial="Rootline" arguments="{rootline: remoteRootline}" />
+			</td>
+		</tr>
+	</table>
 </div>
 
 <div class="formContainer">

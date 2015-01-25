@@ -35,7 +35,7 @@ class Tx_Contentstage_Domain_Repository_SnapshotRepository {
 	/**
 	 * @const string strftime()-filename for the snapshot.
 	 */
-	const DUMPFILE = 'uploads/tx_contentstage/snapshots/%Y%m%d-%H%M%S_contentstage_snapshot_%type.sql.gz';
+	const DUMPFILE = 'uploads/tx_contentstage/snapshots/%Y%m%d-%H%M%S_contentstage_snapshot_%type.sql';
 	
 	/**
 	 * @const string Write error.
@@ -77,8 +77,11 @@ class Tx_Contentstage_Domain_Repository_SnapshotRepository {
 	 * @throws Exception
 	 */
 	public function create($tables, $login, $type = Tx_Contentstage_Domain_Repository_ContentRepository::TYPE_LOCAL) {
+		$this->extensionConfiguration = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['contentstage']);
+		$noCompression = $this->extensionConfiguration['compression.']['disable'];
+	
 		$debug = array();
-		$debug['file'] = $filename = PATH_site . strftime(str_replace(array('%type'), array($type), self::DUMPFILE));
+		$debug['file'] = $filename = PATH_site . strftime(str_replace(array('%type'), array($type), self::DUMPFILE)) . ($noCompression ? '' : '.gz');
 		
 		if (file_put_contents($filename, '') === false){
 			throw new Exception($filename, self::ERROR_WRITE);
@@ -88,7 +91,7 @@ class Tx_Contentstage_Domain_Repository_SnapshotRepository {
 		
 		$port = (intval($login['port']) > 0 ? intval($login['port']) : ini_get('mysql.default_port')) ?: 3306;
 		
-		$debug['command'] = $datadumpcmd = Tx_Contentstage_Utility_Shell::findCmd('mysqldump').' \
+		$datadumpcmd = Tx_Contentstage_Utility_Shell::findCmd('mysqldump').' \
 			--quote-names \
 			--complete-insert \
 			--skip-comments \
@@ -97,7 +100,12 @@ class Tx_Contentstage_Domain_Repository_SnapshotRepository {
 			--password=' . $login['password'] . ' \
 			--host=' . $login['host'] . ' \
 			' . $login['database'] . ' \
-			'.implode(' ', $tables) . ' | ' . Tx_Contentstage_Utility_Shell::findCmd('gzip');
+			'.implode(' ', $tables);
+		
+		if (!$noCompression) {
+			$datadumpcmd .= ' | ' . Tx_Contentstage_Utility_Shell::findCmd('gzip');
+		}
+		$debug['command'] = $datadumpcmd;
 		
 		$dumpdata = t3lib_div::makeInstance('Tx_Contentstage_Utility_Shell');
 		if (!$dumpdata->exec($datadumpcmd, PATH_site, $filename, 'a')){
@@ -130,7 +138,7 @@ class Tx_Contentstage_Domain_Repository_SnapshotRepository {
 		
 		$port = (intval($login['port']) > 0 ? intval($login['port']) : ini_get('mysql.default_port')) ?: 3306;
 		
-		$debug['command'] = $datadumpcmd = Tx_Contentstage_Utility_Shell::findCmd('cat') . ' ' . escapeshellarg($filename) . ' | ' . Tx_Contentstage_Utility_Shell::findCmd('gunzip') . ' | ' . Tx_Contentstage_Utility_Shell::findCmd('mysql').' \
+		$debug['command'] = $datadumpcmd = Tx_Contentstage_Utility_Shell::findCmd('cat') . ' ' . escapeshellarg($filename) . ' | ' . (strtolower(substr($filename, -3)) === '.gz' ? Tx_Contentstage_Utility_Shell::findCmd('gunzip') . ' | ' : '') . Tx_Contentstage_Utility_Shell::findCmd('mysql') . ' \
 			--port=' . $port . '\
 			--user=' . $login['user'] . ' \
 			--password=' . $login['password'] . ' \

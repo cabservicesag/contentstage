@@ -40,6 +40,9 @@
 			<label index="error.1356616554">Curl error: %1$s</label>
 			<label index="error.1380023686">Reviewer not found (%1$s)!</label>
 			<label index="error.1380023687">Reviewer supplied twice, but all must be different (%2$s [%1$s])!</label>
+			<label index="error.1399985904">Table does not exist in slave repository: %1$s</label>
+			<label index="error.1399985905">Table does not exist in master repository: %1$s</label>
+			<label index="error.1399985906">Table was not created: %1$s</label>
 			<label index="fatal.remoteFolder">The remote folder (%1$s) does not exist!</label>
 			<label index="field.crdate">Creation date</label>
 			<label index="field.cruser_id">Creation user</label>
@@ -47,6 +50,7 @@
 			<label index="field.l18n_diffsource">Translation difference</label>
 			<label index="field.l18n_parent">Translation parent record</label>
 			<label index="field.pid">Page id</label>
+			<label index="field.deleted">Record is deleted</label>
 			<label index="field.sorting">Sorting</label>
 			<label index="field.sys_language_uid">System language id</label>
 			<label index="field.t3_origuid">TYPO3 original id</label>
@@ -91,8 +95,12 @@
 			<label index="info.review.reinitialized">You reinitialized the review</label>
 			<label index="info.review.noPermission">You do not have permission to create or edit reviews on this page!</label>
 			<label index="info.review.deprecated">There was a change since the review was created!</label>
+			<label index="info.federated">Table '%1$s' was federated!</label>
+			<label index="info.alreadyFederated">Table '%1$s' was already federated!</label>
 			<label index="initialize.doIt">Initialize this system</label>
 			<label index="initialize.initialize.title">Initialize Systems</label>
+			<label index="federated.doIt">Federate Tables</label>
+			<label index="federated.federated.title">Federate Tables</label>
 			<label index="language">en</label>
 			
 			<label index="datetimeFormat.date">m/d/Y</label>
@@ -231,6 +239,9 @@
 			<label index="error.1356616554">Curl-Fehler: %1$s</label>
 			<label index="error.1380023686">Reviewer nicht gefunden (%1$s)!</label>
 			<label index="error.1380023687">Ein Reviewer wurde mehrmals angegeben, darf aber nur einmalig pro Review verwendet werden (%2$s [%1$s])!</label>
+			<label index="error.1399985904">Tabelle existiert nicht in der slave Datenbank: %1$s</label>
+			<label index="error.1399985905">Tabelle existiert nicht in der master Datenbank: %1$s</label>
+			<label index="error.1399985906">Tabelle wurde nicht erstellt: %1$s</label>
 			<label index="fatal.remoteFolder">Der entfernte Odner (%1$s) existiert nicht!</label>
 			<label index="field.crdate">Erstellungsdatum</label>
 			<label index="field.cruser_id">Ersteller</label>
@@ -238,6 +249,7 @@
 			<label index="field.l18n_diffsource">Unterschied der Sprachen</label>
 			<label index="field.l18n_parent">Sprach-Eltern</label>
 			<label index="field.pid">Seiten-Id</label>
+			<label index="field.deleted">Datensatz wurde gelöscht</label>
 			<label index="field.sorting">Sortierung</label>
 			<label index="field.sys_language_uid">Systemsprachen-Id</label>
 			<label index="field.t3_origuid">TYPO3 Original-Id</label>
@@ -282,8 +294,12 @@
 			<label index="info.review.reinitialized">Sie haben das Review reinitialisiert</label>
 			<label index="info.review.noPermission">Sie haben keine Berechtigung auf dieser Seite Reviews zu erstellen oder bearbeiten!</label>
 			<label index="info.review.deprecated">Es wurde etwas seit dem Erstellen des Reviews geändert!</label>
+			<label index="info.federated">Tabelle '%1$s' wurde federated!</label>
+			<label index="info.alreadyFederated">Tabelle '%1$s' war bereits federated!</label>
 			<label index="initialize.doIt">Dieses System initialisieren</label>
 			<label index="initialize.initialize.title">Systeminitialisierung</label>
+			<label index="federated.doIt">Tabellen Federate</label>
+			<label index="federated.federated.title">Tabellen Federate</label>
 			<label index="language">de</label>
 			
 			<label index="datetimeFormat.date">d.m.Y</label>

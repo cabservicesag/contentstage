@@ -61,7 +61,9 @@ class Tx_Contentstage_Controller_ContentController extends Tx_Contentstage_Contr
 		}
 		
 		$this->doComparison();
-
+		
+		$this->view->assign('localDomain', $this->localRepository->getDomain($this->page));
+		$this->view->assign('remoteDomain', $this->remoteRepository->getDomain($this->page));
 		$this->view->assign('localRootline', $this->localRepository->getRootline($this->page, true));
 		$this->view->assign('remoteRootline', $this->remoteRepository->getRootline($this->page, true));
 		$this->view->assign('depth', $this->localRepository->getDepth());
@@ -155,7 +157,7 @@ class Tx_Contentstage_Controller_ContentController extends Tx_Contentstage_Contr
 			$this->redirect('compare');
 		}
 		try {
-			$tables = $this->filterTables(array_keys($this->remoteRepository->getTables()), $this->ignoreSnapshotTables);
+			$tables = $this->filterTables(array_keys($this->remoteRepository->getTables()), $this->ignoreSnapshotTables, true);
 			$info = $this->snapshotRepository->create(
 				$tables,
 				$this->extensionConfiguration['remote.']['db.'],
@@ -236,15 +238,22 @@ class Tx_Contentstage_Controller_ContentController extends Tx_Contentstage_Contr
 	 */
 	protected function _compareTables(Tx_Contentstage_Domain_Repository_ContentRepository $fromRepository, Tx_Contentstage_Domain_Repository_ContentRepository $toRepository, $root = 0) {
 		$tables = $fromRepository->getTables();
-		
+		$pageTS = $this->getPageTS();
+		$disableHashed = !!$pageTS['disableHashedCompare'];
+
 		foreach ($tables as $table => &$data) {
 			if (substr($table, -3) === '_mm' || $this->ignoreSyncTables[$table]) {
 				continue;
 			}
 			$this->differences[$table] = array();
-			$resource1 = $fromRepository->findInPageTree($root, $table);
-			$resource2 = $toRepository->findInPageTree($root, $table);
-			
+			if ($disableHashed) {
+				$resource1 = $fromRepository->findInPageTree($root, $table);
+				$resource2 = $toRepository->findInPageTree($root, $table);
+			} else {
+				$resource1 = $fromRepository->findInPageTreeHashed($root, $table);
+				$resource2 = $toRepository->findInPageTreeHashed($root, $table);
+			}
+
 			$this->diff->resources($resource2, $resource1, $this->differences[$table], 'uid', $table === 'pages' ? 'uid' : 'pid');
 			
 			$resource1->free();

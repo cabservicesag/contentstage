@@ -17,7 +17,10 @@ autoIncrementThreshold = 0.25
 tables.doNotSync = static_countries, static_country_zones, static_currencies, static_languages, static_territories, static_tsconfig_help, tx_devlog, tx_staticinfotables_hotlist, tx_l10nmgr_index, tx_libunzipped_filestorage, tx_realurl_errorlog, tx_realurl_chashcache, tx_realurl_pathcache, tx_realurl_uniqalias, tx_realurl_urldecodecache, tx_realurl_urlencodecache
 
 # cat=basic/tables/10; type=input; label= Comma separated list of tables that should not be included! The standard TYPO3-core caching/session tables are excluded by default already.
-tables.doNotSnapshot = 
+tables.doNotSnapshot =
+
+# cat=basic/tables/10; type=input; label= Comma separated list of tables that should be federated!
+tables.toFederate = tt_address, fe_users
 
 # cat=basic/db/10; type=input; label= Remote DB host.
 remote.db.host = localhost
@@ -66,6 +69,9 @@ logging.mail.severity = 100
 
 # cat=basic/logging/10; type=boolean; label= Enable devLog logging
 logging.devLog.enable = 1
+
+# cat=basic/logging/10; type=boolean; label= Disable compression by snapshots
+compression.disable = 0
 
 # cat=basic/logging/10; type=int+; label= The severity, only messages with severity higher than this are logged (100 -> all (even debug messages), 200 -> success notices, 300 -> warnings, 400 -> errors)
 logging.devLog.severity = 100

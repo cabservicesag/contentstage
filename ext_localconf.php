@@ -9,6 +9,7 @@ $pageTS = <<<'EOD'
 tx_contentstage {
 	doNotSync =
 	doNotSnapshot =
+	toFederate =
 	doNotDisplay {
 		__all {
 			l18n_diffsource = 1
@@ -24,6 +25,9 @@ tx_contentstage {
 	defaultDepth = -1
 	minimumDepth = 0
 	maximumDepth = -1
+
+	// disable the feature that first uses md5 sums from the db
+	disableHashedCompare = 0
 	
 	useHttpsLocal = 0
 	useHttpsRemote = 0

@@ -43,6 +43,11 @@ class Tx_Contentstage_Domain_Repository_Result {
 	protected $resource = false;
 	
 	/**
+	 * @var false|array The fields to bind late.
+	 */
+	protected $lateBindingFields = false;
+	
+	/**
 	 * The internal t3lib_db.
 	 *
 	 * @var t3lib_db
@@ -74,6 +79,11 @@ class Tx_Contentstage_Domain_Repository_Result {
 	protected $countDone = false;
 	
 	/**
+	 * @var array The current row.
+	 */
+	protected $current = false;
+	
+	/**
 	 * The TCA utility object.
 	 *
 	 * @var Tx_Contentstage_Utility_Tca The TCA utility object.
@@ -93,7 +103,7 @@ class Tx_Contentstage_Domain_Repository_Result {
 	 * Set the repository.
 	 *
 	 * @param Tx_Contentstage_Domain_Repository_ContentRepository $repository The repository.
-	 * @return array A row.
+	 * @return array void.
 	 */
 	public function setRepository(Tx_Contentstage_Domain_Repository_ContentRepository $repository) {
 		$this->repository = $repository;
@@ -113,7 +123,7 @@ class Tx_Contentstage_Domain_Repository_Result {
 	 * Set the resource.
 	 *
 	 * @param resource $resource The resource.
-	 * @return array A row.
+	 * @return array void.
 	 */
 	public function setResource($resource) {
 		$this->resource = $resource;
@@ -126,6 +136,25 @@ class Tx_Contentstage_Domain_Repository_Result {
 	 */
 	public function getResource() {
 		return $this->resource;
+	}
+	
+	/**
+	 * Set the late binding fields.
+	 *
+	 * @param array $lateBindingFields The late binding fields.
+	 * @return void
+	 */
+	public function setLateBindingFields($lateBindingFields) {
+		$this->lateBindingFields = $lateBindingFields;
+	}
+	
+	/**
+	 * Get the late binding fields.
+	 *
+	 * @return false|array The late binding fields.
+	 */
+	public function getLateBindingFields() {
+		return $this->lateBindingFields;
 	}
 	
 	/**
@@ -154,7 +183,7 @@ class Tx_Contentstage_Domain_Repository_Result {
 	 * @return mixed The associative array or false.
 	 */
 	public function next() {
-		$row = $this->db->sql_fetch_assoc($this->resource);
+		$this->current = $row = $this->db->sql_fetch_assoc($this->resource);
 		
 		if ($row === false) {
 			$this->countDone = true;
@@ -166,20 +195,76 @@ class Tx_Contentstage_Domain_Repository_Result {
 	}
 	
 	/**
+	 * Returns the current row or false.
+	 *
+	 * @return mixed The associative array or false.
+	 */
+	public function current() {
+		return $this->current;
+	}
+	
+	/**
 	 * Returns the next row, with the relations resolved.
 	 *
 	 * @see self::next()
 	 */
 	public function nextResolved() {
 		if (($row = $this->next()) !== false) {
-			foreach ($this->tca as $field => &$config) {
-				if (substr($field, 0, 2) === '__' || !isset($row[$field])) {
-					continue;
-				}
-				$row[$field] = $this->tcaObject->resolve($this->repository, $this->table, $field, $row[$field], $row);
-			}
+			$row = $this->resolve($row, $this->lateBindingFields !== false);
 		}
 		
+		return $row;
+	}
+	
+	/**
+	 * Returns the current row or false with the late binding fields included.
+	 *
+	 * @return mixed The associative array or false.
+	 */
+	public function currentResolvedWithLateBindings() {
+		if ($this->lateBindingFields === false || $this->current === false || $this->current['__lateBindingsInitializied']) {
+			return $this->current;
+		}
+		$db = $this->repository->_getDb();
+		unset($this->current['hash']);
+
+		$where = array();
+		foreach ($this->current as $key => $value) {
+			$where[] = $key . '=' . $db->fullQuoteStr($value, $this->table);
+		}
+
+		$row = $db->exec_SELECTgetSingleRow(
+			implode(',', $this->lateBindingFields),
+			$this->table,
+			implode(' AND ', $where)
+		);
+
+		if (is_array($row) && count($row) > 0) {
+			foreach ($row as $key => $value) {
+				$this->current[$key] = $value;
+			}
+			$this->current = $this->resolve($this->current);
+		}
+		$this->current['__lateBindingsInitializied'] = true;
+
+		return $this->current;
+	}
+
+	/**
+	 * Resolves a raw db row with relations.
+	 *
+	 * @param array $row The row to enrich.
+	 * @param boolean $delayedBinding Whether there is a possibility of a field hash.
+	 * @return void The row is changed directly.
+	 */
+	protected function resolve(array $row, $delayedBinding = false) {
+		$originalRow = $row;
+		foreach ($this->tca as $field => &$config) {
+			if (substr($field, 0, 2) === '__' || !isset($row[$field]) || ($delayedBinding !== false && $field === 'hash')) {
+				continue;
+			}
+			$row[$field] = $this->tcaObject->resolve($this->repository, $this->table, $field, $row[$field], $row, $originalRow);
+		}
 		return $row;
 	}
 	
@@ -190,13 +275,14 @@ class Tx_Contentstage_Domain_Repository_Result {
 	 */
 	public function nextWithRelations() {
 		if (($row = $this->next()) !== false) {
+			$originalRow = $row;
 			$this->repository->setRelationSynced($this->table, $row['uid']);
 			if (is_array($this->tca)) {
 				foreach ($this->tca as $field => &$config) {
 					if (substr($field, 0, 2) === '__' || !isset($row[$field])) {
 						continue;
 					}
-					$this->repository->addRelations($this->tcaObject->resolveUids($this->repository, $this->table, $field, $row[$field], $row));
+					$this->repository->addRelations($this->tcaObject->resolveUids($this->repository, $this->table, $field, $row[$field], $row, $originalRow));
 				}
 			}
 		}

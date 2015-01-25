@@ -63,6 +63,16 @@ class Tx_Contentstage_Utility_Tca implements t3lib_singleton {
 	const DATETIME = 'datetime';
 	
 	/**
+	 * @const string A flexform field
+	 */
+	const FLEXFORM = 'flexform';
+	
+	/**
+	 * @const string A flexform field that gets the flexform configuration from a table (templavoila etc.).
+	 */
+	const FLEXFORM_TABLE = 'flexform_table';
+	
+	/**
 	 * @const string The locallang prefix for the current extension.
 	 */
 	const LLL_PREFIX = 'LLL:EXT:contentstage/Resources/Private/Language/locallang.xml:';
@@ -83,6 +93,9 @@ class Tx_Contentstage_Utility_Tca implements t3lib_singleton {
 	protected $defaultFields = array(
 		'pid' => array(
 			'label' => 'field.pid',
+		),
+		'deleted' => array(
+			'label' => 'field.deleted',
 		),
 		't3ver_oid' => array(
 			'label' => 'field.t3ver_oid',
@@ -309,6 +322,11 @@ class Tx_Contentstage_Utility_Tca implements t3lib_singleton {
 								'table' => $config['allowed'],
 								'mmTable' => $config['MM']
 							);
+						} else {
+							$processed = array(
+								'type' => self::RELATION_DIRECT,
+								'table' => current(t3lib_div::trimExplode(',', $config['allowed'], true))
+							);
 						}
 						break;
 						
@@ -378,6 +396,51 @@ class Tx_Contentstage_Utility_Tca implements t3lib_singleton {
 				
 				break;
 				
+			case 'flex':
+				$processed = array(
+					'type' => self::FLEXFORM,
+				);
+				
+				if (!empty($config['ds_pointerField'])) {
+					$processed['pointer'] = $config['ds_pointerField'];
+				}
+				
+				if (!empty($config['ds_tableField'])) {
+					$processed['type'] = self::FLEXFORM_TABLE;
+					
+					$tableField = t3lib_div::trimExplode(':', $config['ds_tableField'], true);
+					
+					$processed['table'] = $tableField[0];
+					$processed['field'] = $tableField[1];
+					
+					if (!empty($config['ds_pointerField_searchParent'])) {
+						$processed['parentPointer'] = $config['ds_pointerField_searchParent'];
+					}
+					
+					if (!empty($config['ds_pointerField_searchParent_subField'])) {
+						$processed['parentField'] = $config['ds_pointerField_searchParent_subField'];
+					}
+				} else {
+					if (is_array($config['ds']) && count($config['ds']) > 0) {
+						foreach ($config['ds'] as $key => $structure) {
+							if (substr($structure, 0, 5) === 'FILE:') {
+								$file = t3lib_div::getFileAbsFileName(substr($structure, 5));
+								if (file_exists($file)) {
+									$structure = file_get_contents($file);
+								} else {
+									$structure = '';
+								}	
+							}
+							$flexform = t3lib_div::xml2array($structure);
+							$flexformFields = $this->processFlexformData($table, $field . '/' . $key, $flexform);
+							
+							$processed['fields'][$key] = $flexformFields;
+						}
+					}
+				}
+				
+				break;
+				
 			default:
 				break;
 		}
@@ -390,6 +453,41 @@ class Tx_Contentstage_Utility_Tca implements t3lib_singleton {
 		}
 		
 		$this->tca[$table][$field] = $processed;
+	}
+	
+	/**
+	 * Process the flexform fields.
+	 *
+	 * @param string $table The table of the field.
+	 * @param string $field The field.
+	 * @param array $structure The flexform structure.
+	 * @return array The fields that were found.
+	 */
+	protected function processFlexformData($table, $field, &$structure) {
+		if (!is_array($structure)) {
+			return array();
+		}
+		
+		if (isset($structure['sheets'])) {
+			$sheets = $structure['sheets'];
+		} else {
+			$sheets = array(
+				'sDEF' => array(
+					'ROOT' => $structure['ROOT']
+				)
+			);
+		}
+		
+		$fields = array();
+		foreach ($sheets as $sheetKey => $sheet) {
+			foreach ($sheet['ROOT']['el'] as $elementKey => $element) {
+				$fieldKey = $field . '/' . $sheetKey . '/' . $elementKey;
+				$this->processTcaField($table, $fieldKey, $element['TCEforms']['config'], $element['TCEforms']['label']);
+				$fields[$fieldKey] = $fieldKey;
+			}
+		}
+		
+		return $fields;
 	}
 	
 	/**
@@ -449,9 +547,10 @@ class Tx_Contentstage_Utility_Tca implements t3lib_singleton {
 	 * @param string $field The field.
 	 * @param string $value The value in the db.
 	 * @param array $row The full row, used for the uid in it.
+	 * @param array $originalRow The full original db row.
 	 * @return string The string representation of the resolved field.
 	 */
-	public function resolve($repository, $table, $field, $value, &$row) {
+	public function resolve($repository, $table, $field, $value, &$row, &$originalRow) {
 		$config = &$this->getProcessedTca($table, $field);
 		switch ($config['type']) {
 			case self::RELATION_DIRECT:
@@ -464,6 +563,11 @@ class Tx_Contentstage_Utility_Tca implements t3lib_singleton {
 				
 			case self::RELATION_MM:
 				$value = $this->resolveMM($repository, $config, $row['uid']);
+				break;
+				
+			case self::FLEXFORM_TABLE:
+			case self::FLEXFORM:
+				$value = $this->resolveFlexform($repository, $config, $table, $field, $row, $originalRow);
 				break;
 				
 			case self::DATETIME:
@@ -489,9 +593,10 @@ class Tx_Contentstage_Utility_Tca implements t3lib_singleton {
 	 * @param string $field The field.
 	 * @param string $value The value in the db.
 	 * @param array $row The full row, used for the uid in it.
+	 * @param array $originalRow The full original db row.
 	 * @return array The table/uid or folder relations.
 	 */
-	public function &resolveUids($repository, $table, $field, $value, &$row) {
+	public function &resolveUids($repository, $table, $field, $value, &$row, &$originalRow) {
 		$config = &$this->getProcessedTca($table, $field);
 		$result = array();
 		switch ($config['type']) {
@@ -728,6 +833,182 @@ class Tx_Contentstage_Utility_Tca implements t3lib_singleton {
 	}
 	
 	/**
+	 * Resolves the direct relation for a given table/field/value pair.
+	 *
+	 * @param Tx_Contentstage_Domain_Repository_ContentRepository $repository The repository to get the data from.
+	 * @param array $config The config.
+	 * @param string $table The table of the current field.
+	 * @param string $field The current field.
+	 * @param array $row The original row. Used to write back the different flexform fields.
+	 * @param array $originalRow The full original db row.
+	 * @return string The string representation of the resolved field.
+	 */
+	protected function resolveFlexform(Tx_Contentstage_Domain_Repository_ContentRepository $repository, $config, $table, $field, &$row, &$originalRow) {
+		$parsed = t3lib_div::xml2array($row[$field]);
+		if (!is_array($parsed) || !is_array($parsed['data'])) {
+			return '';
+		}
+		
+		$dsKey = $this->resolveFlexformPointer($repository, $config, $table, $field, $originalRow);
+		
+		// loop the nested data
+		foreach ($parsed['data'] as $sheetKey => &$sheet) {
+			foreach ($sheet as $languageKey => &$fields) {
+				foreach ($fields as $fieldName => &$fieldData) {
+					foreach ($fieldData as $vLanguageKey => $value) {
+						// TODO: languages!
+						$flexformField = $field . '/' . $dsKey . '/' . $sheetKey . '/' . $fieldName;
+						
+						$row[$flexformField] = $this->resolve($repository, $table, $flexformField, $value, $row, $originalRow);
+					}
+				}
+			}
+		}
+		
+		unset($row[$field]);
+	}
+	
+	/**
+	 * Resolves the data structure key from a given pointer and the row, additionally parses configuration in time if necessary.
+	 *
+	 * @param Tx_Contentstage_Domain_Repository_ContentRepository $repository The repository to get the data from.
+	 * @param array $config The config.
+	 * @param string $table The table of the current field.
+	 * @param string $field The current field.
+	 * @param array $originalRow The full original db row.
+	 * @return string The data structure key.
+	 */
+	protected function resolveFlexformPointer(Tx_Contentstage_Domain_Repository_ContentRepository $repository, &$config, $table, $field, &$originalRow) {
+		$dsKey = 'default';
+		if ($config['type'] === self::FLEXFORM_TABLE) {
+			// find the right record first
+			$flexformRecord = false;
+			$recordId = intval($originalRow[$config['pointer']]);
+			
+			if ($recordId > 0) {
+				$flexformRecord = $repository->getRecord($config['table'], $recordId, $config['field']);
+			}
+			
+			if ($flexformRecord === false && !empty($config['parentPointer'])) {
+				$parentField = $config['parentField'] ?: $config['field'];
+				
+				$parentId = intval($originalRow[$config['parentPointer']]);
+				$recursionCheck = array($recordId => true);
+				
+				while (($parentRecord = $repository->getRecord($table, $parentId, $config['parentPointer'] . ',' . $parentField)) !== false) {
+					$recordId = intval($parentRecord[$parentField]);
+					if ($recordId > 0) {
+						$flexformRecord = $repository->getRecord($config['table'], $recordId, $config['field']);
+						if ($flexformRecord !== false) {
+							break;
+						}
+					}
+					$parentId = intval($parentRecord[$config['parentPointer']]);
+					
+					// recursion check (something seriously wrong)
+					if ($recursionCheck[$parentId]) {
+						break;
+					}
+					
+					$recursionCheck[$parentId] = true;
+				}
+			}
+			
+			if ($flexformRecord !== false) {
+				if (!$this->tca[$table][$field]['parsedRecords'][$recordId]) {
+					$structure = t3lib_div::xml2array($flexformRecord[$config['field']]);
+					$this->processFlexformData($table, $field . '/' . $recordId, $structure);
+					$this->tca[$table][$field]['parsedRecords'][$recordId] = true;
+				}
+				
+				$dsKey = $recordId;
+			}
+		} else if ($config['type'] === self::FLEXFORM && isset($config['pointer'])) {
+			$dsKey = $this->resolveFlexformPointerTraditional($config['pointer'], $config['fields'], $originalRow);
+		}
+		
+		return $dsKey;
+	}
+	
+	/**
+	 * Resolves the data structure key from a given pointer and the row.
+	 *
+	 * @param string $pointer The pointer fields, comma separated.
+	 * @param array $fields The array with the patterns as keys.
+	 * @param array $row The orinigal db row.
+	 * @return string The data structure key.
+	 */
+	protected function resolveFlexformPointerTraditional($pointer, &$fields, &$row) {
+		$values = t3lib_div::trimExplode(',', $pointer, true);
+		$dsKey = 'default';
+		
+		foreach ($values as &$value) {
+			$value = $row[$value];
+		}
+		
+		// find the correct pattern for the values of the current row
+		foreach ($fields as $pattern => &$ignore) {
+			$patternParts = t3lib_div::trimExplode(',', $pattern, true);
+			
+			$good = true;
+			for ($i = 0; $i < count($values); $i++) {
+				if (!isset($patternParts[$i]) || $patternParts[$i] === '') {
+					$patternParts[$i] = '*';
+				}
+				if ($patternParts[$i] !== '*' && $patternParts[$i] !== $values[$i]) {
+					$good = false;
+					break;
+				}
+			}
+			
+			if ($good === true) {
+				$dsKey = $pattern;
+				break;
+			}
+		}
+		
+		return $dsKey;
+	}
+	
+	/**
+	 * Resolves the flexform fields and returns the uids.
+	 * @todo Optimize for speed (6 foreach ...)
+	 *
+	 * @param array $config The config.
+	 * @param string $value The value in the db.
+	 * @return array The table/uids.
+	 */
+	protected function &resolveFlexformUids($config, &$value) {
+		$parsed = t3lib_div::xml2array($row[$field]);
+		if (!is_array($parsed) || !is_array($parsed['data'])) {
+			return '';
+		}
+		
+		$dsKey = $this->resolveFlexformPointer($repository, $config, $table, $field, $originalRow);
+		$result = array();
+		
+		// loop the nested data
+		foreach ($parsed['data'] as $sheetKey => &$sheet) {
+			foreach ($sheet as $languageKey => &$fields) {
+				foreach ($fields as $fieldName => &$fieldData) {
+					foreach ($fieldData as $vLanguageKey => $value) {
+						// TODO: languages!
+						$flexformField = $field . '/' . $dsKey . '/' . $sheetKey . '/' . $fieldName;
+						
+						foreach ($this->resolveUids($repository, $table, $flexformField, $value, $row, $originalRow) as $relationTable => $uids) {
+							foreach ($uids as $uid => $ignore) {
+								$result[$relationTable][$uid] = $uid;
+							}
+						}
+					}
+				}
+			}
+		}
+		
+		return $result;
+	}
+	
+	/**
 	 * Resolves the table => array of uids array.
 	 *
 	 * @param Tx_Contentstage_Domain_Repository_ContentRepository $repository The repository to get the data from.
@@ -741,7 +1022,7 @@ class Tx_Contentstage_Utility_Tca implements t3lib_singleton {
 				continue;
 			}
 			
-			$labelField = $this->getLabelField($table);
+			$labelField = $this->getLabelField($table) ?: 'uid';
 			$resource = $repository->findInPageTree(
 				0,
 				$table,
@@ -770,3 +1051,4 @@ class Tx_Contentstage_Utility_Tca implements t3lib_singleton {
 	}
 }
 ?>
+                                   

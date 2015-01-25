@@ -61,6 +61,22 @@ class Tx_Contentstage_Controller_InitializeController extends Tx_Contentstage_Co
 	 * @var array The type to read from.
 	 */
 	protected $fromType;
+	
+	/**
+	 * The Federated utility object.
+	 *
+	 * @var Tx_Contentstage_Utility_Federated The Federated utility object.
+	 */
+	protected $federatedUtility = null;
+	
+	/**
+	 * Injects the Federated utility object.
+	 *
+	 * @param Tx_Contentstage_Utility_Federated $federatedUtility The Federated utility object.
+	 */
+	public function injectFederated(Tx_Contentstage_Utility_Federated $federatedUtility = null) {
+		$this->federatedUtility = $federatedUtility;
+	}
 
 	/**
 	 * action initalize
@@ -111,6 +127,14 @@ class Tx_Contentstage_Controller_InitializeController extends Tx_Contentstage_Co
 			$this->log->log($this->translate('info.init.reverted', array($revertInfo['file'])), Tx_CabagExtbase_Utility_Logging::OK);
 			
 			$raiseInfo = $this->snapshotRepository->raiseAutoIncrement($this->toRepository, $step, $threshold);
+			
+			// integrated convert to federated here
+			$info = $this->extensionConfiguration['remote.']['db.'];
+			foreach (t3lib_div::trimExplode(',', $this->extensionConfiguration['tables.']['toFederate'], true) as $table) {
+				$result = $this->federatedUtility->convertTables($this->localRepository, $this->remoteRepository, $table, $info);
+				$this->log->log($this->translate('info.' . ($result ? 'federated' : 'alreadyFederated'), array($table)), Tx_CabagExtbase_Utility_Logging::OK);
+			}
+			
 			
 			$this->log->log($this->translate('info.init.raised', array($raiseInfo['newAutoIncrement'])), Tx_CabagExtbase_Utility_Logging::OK);
 		} catch (Exception $e) {
