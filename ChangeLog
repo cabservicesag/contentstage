@@ -1,4 +1,8 @@
 2013-02-07 Nils Blattner <nb@cabag.ch>
+	* version 0.2.1
+	* added language labels for source/target missing
+
+2013-02-07 Nils Blattner <nb@cabag.ch>
 	* version 0.2.0
 	* separated snapshot and initialize into separate modules
 

@@ -44,6 +44,8 @@
 			<label index="field.t3ver_tstamp">TYPO3 version last modified time</label>
 			<label index="field.t3ver_wsid">TYPO3 version workspace id</label>
 			<label index="field.tstamp">Last modified</label>
+			<label index="field._targetMissing">Record missing at target</label>
+			<label index="field._sourceMissing">Record missing at source</label>
 			<label index="info.compare.done">Compare done</label>
 			<label index="info.compare.endFluid">Fluid rendering done.</label>
 			<label index="info.compare.noId">No page id selected, please select one.</label>
@@ -94,15 +96,15 @@
 		<languageKey index="de" type="array">
 			<label index="changes">Änderungen!</label>
 			<label index="content.compare.title">Lokales und entferntes System vergleichen</label>
-			<label index="copy.fileMissing">Datei fehlt bei Quelle: %1$s.</label>
+			<label index="copy.fileMissing">Datei fehlt bei der Quelle: %1$s.</label>
 			<label index="copy.targetFolder">Konnte Zielordner nicht erstellen: %1$s.</label>
-			<label index="diff.source.fieldMissing">Feld fehlt in Quelle [%1$s].</label>
-			<label index="diff.source.recordMissing">Datensatz fehlt in Quelle [%1$s=%2$s].</label>
-			<label index="diff.target.fieldMissing">Feld fehlt in Ziel [%1$s].</label>
-			<label index="diff.target.recordMissing">Datensatz fehlt in Ziel [%1$s=%2$s].</label>
+			<label index="diff.source.fieldMissing">Feld fehlt bei der Quelle [%1$s].</label>
+			<label index="diff.source.recordMissing">Datensatz fehlt bei der Quelle [%1$s=%2$s].</label>
+			<label index="diff.target.fieldMissing">Feld fehlt beim Ziel [%1$s].</label>
+			<label index="diff.target.recordMissing">Datensatz fehlt beim Ziel [%1$s=%2$s].</label>
 			<label index="error.1354723058">Fehler während dem Generieren des Snapshots - Datei kann nicht geschrieben werden: %1$s</label>
-			<label index="error.1354723059">Fehler während dem Generieren des Snapshots -  - Dump nicht erfolgreich: %1$s</label>
-			<label index="error.1354723060">Fehler während dem Zurückspielen des Snapshots -  - Dump-Datei existiert nicht: %1$s</label>
+			<label index="error.1354723059">Fehler während dem Generieren des Snapshots - Dump nicht erfolgreich: %1$s</label>
+			<label index="error.1354723060">Fehler während dem Zurückspielen des Snapshots - Dump-Datei existiert nicht: %1$s</label>
 			<label index="error.1354723061">Fehler während dem Zurückspielen des Snapshots - Dump konnte nicht in die Datenbank gelesen werden: %1$s</label>
 			<label index="error.1354790965">Fehler während dem Ändern der Tabelle: %1$s</label>
 			<label index="error.1354799704">Fehler während dem Einfügen der Daten: %1$s</label>
@@ -130,6 +132,8 @@
 			<label index="field.t3ver_tstamp">TYPO3 Version Zuletzt geändert</label>
 			<label index="field.t3ver_wsid">TYPO3 Version Workspace-Id</label>
 			<label index="field.tstamp">Zuletzt verändert</label>
+			<label index="field._targetMissing">Datensatz fehlt beim Ziel</label>
+			<label index="field._sourceMissing">Datensatz fehlt bei der Quelle</label>
 			<label index="info.compare.done">Vergleich erledigt</label>
 			<label index="info.compare.endFluid">Fluid-Rendering erledigt.</label>
 			<label index="info.compare.noId">Keine Seiten-Id ausgewählt, bitte wählen Sie eine aus.</label>

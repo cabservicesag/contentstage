@@ -90,6 +90,8 @@ class Tx_Contentstage_Utility_Tca implements t3lib_singleton {
 		'sys_language_uid' => 'field.sys_language_uid',
 		'l18n_parent' => 'field.l18n_parent',
 		'l18n_diffsource' => 'field.l18n_diffsource',
+		'_targetMissing' => 'field._targetMissing',
+		'_sourceMissing' => 'field._sourceMissing',
 	);
 	
 	/**
