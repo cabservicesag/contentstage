@@ -62,6 +62,11 @@ if (TYPO3_MODE === 'BE') {
 			'navigationComponentId' => 'typo3-pagetree',
 		)
 	);
+	
+	/**
+	 * History/undo xclass to show publish of reviews.
+	 */
+	//require_once(t3lib_extMgm::extPath('contentstage', 'Classes/Xclass/RecordHistory.php'));
 }
 
 t3lib_extMgm::addStaticFile($_EXTKEY, 'Configuration/TypoScript', 'Content staging');

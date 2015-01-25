@@ -209,10 +209,20 @@ class Tx_Contentstage_Controller_ReviewController extends Tx_Contentstage_Contro
 		}
 		
 		$this->reviewRepository->update($review);
+		$this->persistenceManager->persistAll();
+		$this->log->log($this->translate('review.update.success'), Tx_CabagExtbase_Utility_Logging::OK);
+		
+		if ($this->reviewConfiguration['autoReviewIfSelf']) {
+			$found = $review->getActiveReviewed($this->activeBackendUser);
+			
+			if ($found !== null && $found->getState() === Tx_Contentstage_Domain_Model_State::FRESH) {
+				// the action will redirect to compare action and thus prevent the initial mail sent and only sends a "changed" mail
+				$this->reviewedAction($review, $this->translate('review.submit.ok'), true);
+			}
+		}
 		
 		$this->sendReviewMailAndLog('changed', $review);
 		
-		$this->log->log($this->translate('review.update.success'), Tx_CabagExtbase_Utility_Logging::OK);
 		$this->redirect('compare', 'Content');
 	}
 

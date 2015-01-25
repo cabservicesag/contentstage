@@ -42,7 +42,7 @@ class Tx_Contentstage_Domain_Repository_ReviewRepository extends Tx_Extbase_Pers
 	/**
 	 * Returns the currently active review record.
 	 *
-	 * @param int $page The page th use for the review record.
+	 * @param int $page The page to use for the review record.
 	 * @return Tx_Contentstage_Domain_Model_Review The active review.
 	 */
 	public function findActive($page) {
@@ -59,6 +59,38 @@ class Tx_Contentstage_Domain_Repository_ReviewRepository extends Tx_Extbase_Pers
 			))
 			->setLimit(1);
 		return $query->execute()->getFirst();
+	}
+
+	/**
+	 * Returns all reviews that are still active.
+	 *
+	 * @return array The active reviews.
+	 */
+	public function findAllActive() {
+		$query = $this->createQuery();
+		
+		$query->matching(
+				$query->logicalNot($query->equals('state.state', Tx_Contentstage_Domain_Model_State::PUSHED))
+			);
+		return $query->execute();
+	}
+
+	/**
+	 * Returns the currently active review recordsin given pages.
+	 *
+	 * @param array $page The pages to get the review records from.
+	 * @return array The active reviews.
+	 */
+	public function findActiveInPages($page) {
+		$query = $this->createQuery();
+		
+		$query->matching(
+				$query->logicalAnd(
+					$query->equals('page', $page),
+					$query->logicalNot($query->equals('state.state', Tx_Contentstage_Domain_Model_State::PUSHED))
+				)
+			);
+		return $query->execute();
 	}
 }
 ?>

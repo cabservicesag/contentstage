@@ -1,3 +1,13 @@
+2013-11-25 Nils Blattner <nb@cabag.ch>
+	* version 0.5.4
+	* [BUG] only display active reviews in the review list - issue #4533
+	* [FEATURE] assigned local and remote domain to the mail views - issue #4566
+	* [BUG] changed it so that changing the review users will still recognize the active user and, if auto-review is set, automatically review the changes - #4538
+
+2013-11-21 Dimitri König <dk@cabag.ch>
+	* version 0.5.3
+	* [FEATURE] Rootline pages are linked if possible (#4177)
+
 2013-10-25 Dimitri König <dk@cabag.ch>
 	* version 0.5.2
 	* [FEATURE] Added hooks around pushing of files
@@ -20,6 +30,7 @@
 	* [BUG] added new sql field page to reviews and removed mapping of pid to page - issue #4066
 	* After DB update following SQL must be executed: UPDATE tx_contentstage_domain_model_review SET page = pid, pid = 0
 	* Removed Hook
+
 2013-10-21 Nils Blattner <nb@cabag.ch>
 	* version 0.4.9
 	* [FEATURE] added mails when a review is deprecated or pushed - issue #4157
