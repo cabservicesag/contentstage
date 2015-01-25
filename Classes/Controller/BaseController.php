@@ -455,7 +455,7 @@ class Tx_Contentstage_Controller_BaseController extends Tx_CabagExtbase_Controll
 		
 		$range = array(
 			is_numeric($pageTS['minimumDepth']) ? intval($pageTS['minimumDepth']) : 0,
-			is_numeric($pageTS['maximumDepth']) ? intval($pageTS['maximumDepth']) : PHP_INT_MAX
+			is_numeric($pageTS['maximumDepth']) ? (intval($pageTS['maximumDepth']) === -1 ? PHP_INT_MAX : intval($pageTS['maximumDepth'])) : PHP_INT_MAX
 		);
 		$this->maximumDepth = max(0, max($range));
 		$this->minimumDepth = max($this->maximumDepth === PHP_INT_MAX ? -1 : 0, min($range));
