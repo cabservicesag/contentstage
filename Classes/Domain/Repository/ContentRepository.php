@@ -913,5 +913,14 @@ class Tx_Contentstage_Domain_Repository_ContentRepository {
 	public function getDepth() {
 		return $this->depth;
 	}
+	
+	/**
+	 * Get the tag.
+	 *
+	 * @return string The tag.
+	 */
+	public function getTag() {
+		return $this->tag;
+	}
 }
 ?>

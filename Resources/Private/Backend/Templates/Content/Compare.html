@@ -36,15 +36,6 @@
 			<div class="sliderContent">
 				<c:form renderArgumentsAsHidden="1" class="reviewForm iLightbox" method="POST" action="{f:if(condition: '{activeReview.uid} > 0', then: 'update', else: 'create')}" controller="Review" object="{activeReview}" name="review">
 					<f:render partial="Review/Fields" arguments="{review: activeReview, activeBackendUser: activeBackendUser, backendUsers: backendUsers, depthOptions: depthOptions, depth: depth, reviewConfiguration: reviewConfiguration}" />
-					<f:if condition="{reviewConfiguration.editCreate}">
-						<div>
-							<div class="submitContainer">
-								<f:form.submit value="{f:translate(key: 'review.{f:if(condition: \'{activeReview.uid} > 0\', then: \'edit\', else: \'create\')}.submit')}" />
-								<span class="t3-icon contentstage-action contentstage-action-accept" title="{f:translate(key: 'review.{f:if(condition: \'{activeReview.uid} > 0\', then: \'edit\', else: \'create\')}.submit')}">&nbsp;</span>
-							</div>
-						</div>
-						<f:render partial="LightboxComment" />
-					</f:if>
 				</c:form>
 			</div>
 		</div>

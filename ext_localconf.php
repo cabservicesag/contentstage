@@ -30,8 +30,10 @@ tx_contentstage {
 		editCreate = 0
 		// if this is set, push may be used even when the review is not "reviewed"
 		mayPush = 0
-		// explizit list of backend groups that are supposed to review
+		// explicit list of backend groups that are supposed to review
 		groups = 0
+		// default auto push to yes for new reviews
+		defaultAutoPush = 0
 	}
 	
 	mails {

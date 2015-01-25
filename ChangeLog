@@ -1,3 +1,10 @@
+2013-10-08 Nils Blattner <nb@cabag.ch>
+	* version 0.4.0
+	* [FEATURE #3927] softrefs are now resolved via refindex
+	* [FEATURE #3837] added save action icon and modified template a little
+	* [FEATURE #3829] added pageTS option review.defaultAutoPush
+	* [FEATURE #3836] changed some labels
+
 2013-10-04 Nils Blattner <nb@cabag.ch>
 	* version 0.3.9
 	* [BUG] explicitly select typo3-pagetree to be used as the navigation option for contentstaging

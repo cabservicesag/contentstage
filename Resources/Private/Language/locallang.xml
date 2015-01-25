@@ -346,7 +346,7 @@
 			<label index="field.review.id">Review-ID</label>
 			<label index="field.review.pageTitle">Seitentitel</label>
 			<label index="field.review.depth">Baumtiefe</label>
-			<label index="field.review.autoPush">Automatisch nach dem Review aufs Zielsystem kopieren</label>
+			<label index="field.review.autoPush">Automatisch publizieren</label>
 			<label index="field.review.state">Momentaner Review-Status</label>
 			<label index="field.review.state.fresh">Neuer Review-Eintrag</label>
 			<label index="field.review.state.reinitialized">Review-Eintrag wurde reinitializiert</label>

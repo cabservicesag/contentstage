@@ -40,6 +40,21 @@
 						</tr>
 					</f:cycle>
 				</f:for>
+				<f:if condition="{reviewConfiguration.editCreate}">
+					<tr>
+						<td class="label"></td>
+						<td class="value">
+							<br />
+							<div>
+								<div class="submitContainer">
+									<f:form.submit value="{f:translate(key: 'review.{f:if(condition: \'{review.uid} > 0\', then: \'edit\', else: \'create\')}.submit')}" />
+									<span class="t3-icon contentstage-action contentstage-action-save" title="{f:translate(key: 'review.{f:if(condition: \'{review.uid} > 0\', then: \'edit\', else: \'create\')}.submit')}">&nbsp;</span>
+								</div>
+							</div>
+							<f:render partial="LightboxComment" />
+						</td>
+					</tr>
+				</f:if>
 			</tbody>
 		</table>
 	</div>

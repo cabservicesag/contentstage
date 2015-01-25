@@ -68,6 +68,11 @@ class Tx_Contentstage_Utility_Tca implements t3lib_singleton {
 	protected $tca = false;
 	
 	/**
+	 * @var array The array with table/uids that were already updated this run.
+	 */
+	protected $refindexUpdated = array();
+	
+	/**
 	 * @var array The default fields that no TCA exists for (tstamp, crdate etc.).
 	 */
 	protected $defaultFields = array(
@@ -297,6 +302,11 @@ class Tx_Contentstage_Utility_Tca implements t3lib_singleton {
 		}
 		
 		$processed['__name'] = $this->translate($label);
+		
+		if (!empty($config['softref'])) {
+			$processed['softref'] = $config['softref'];
+		}
+		
 		$this->tca[$table][$field] = $processed;
 	}
 	
@@ -430,7 +440,57 @@ class Tx_Contentstage_Utility_Tca implements t3lib_singleton {
 				break;
 		}
 		
+		$this->resolveSoftRefUids($repository, $table, $field, $row, $result);
+		
 		return $result;
+	}
+	
+	/**
+	 * Update refindex if necessary and apply the sys_refindex items for the given field.
+	 */
+	protected function resolveSoftRefUids($repository, $table, $field, &$row, &$result) {
+		$this->updateRefindex($repository, $table, $row['uid']);
+		
+		// escape alias
+		$e = function($value) use ($repository) {
+			return $repository->_getDb()->fullQuoteStr($value);
+		};
+		
+		$query = 'SELECT * FROM sys_refindex WHERE table = ' . $e($table) . ' AND field = ' . $e($field) . ' AND recuid = ' . intval($row['uid']) . ' AND deleted = 0';
+		
+		foreach ($repository->_sql() as $row) {
+			if (substr($row['ref_table'], 0, 1) === '_') {
+				if ($row['ref_table'] === '_FILE') {
+					$result['__FILE'][$row['ref_string']] = true;
+				}
+			} else {
+				$result[$row['ref_table']][$row['ref_uid']] = true;
+			}
+		}
+	}
+	
+	/**
+	 * Update refindex if necessary.
+	 */
+	protected function updateRefindex($repository, $table, $uid) {
+		if (isset($this->refindexUpdated[$table]) && isset($this->refindexUpdated[$table][$uid])) {
+			return;
+		}
+		$identifier = 'tx_contentstage_updateRefindex_' . $repository->getTag() . '_' . $table . '_' . $uid;
+		if (TX_CONTENTSTAGE_USECACHE && $this->cache->has($identifier)) {
+			return;
+		}
+		
+		$db = $GLOBALS['TYPO3_DB'];
+		$GLOBALS['TYPO3_DB'] = $repository->_getDb();
+		$refIndexObj = t3lib_div::makeInstance('t3lib_refindex');
+		$result = $refIndexObj->updateRefIndexTable($table, $uid);
+		$GLOBALS['TYPO3_DB'] = $db;
+		
+		$this->refindexUpdated[$table][$uid] = true;
+		if (TX_CONTENTSTAGE_USECACHE) {
+			$this->cache->set($identifier, true, array(), TX_CONTENTSTAGE_CACHETIME);
+		}
 	}
 	
 	/**

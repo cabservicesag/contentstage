@@ -280,6 +280,10 @@ span.badRootline {
 	background-position: 0 -112px;
 }
 
+.tx_contentstage span.contentstage-action-save {
+	background-position: 0 -128px;
+}
+
 .tx_contentstage input.accept {
 	background-image: url(../Icons/accept.png);
 }

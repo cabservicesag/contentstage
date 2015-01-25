@@ -518,6 +518,7 @@ class Tx_Contentstage_Controller_BaseController extends Tx_CabagExtbase_Controll
 			$this->review->setPage($this->page);
 			$this->review->setLevels($this->localRepository->getDepth());
 			$this->review->setRequired($this->reviewConfiguration['required']);
+			$this->review->setAutoPush(!empty($this->reviewConfiguration['defaultAutoPush']));
 		}
 	}
 	
