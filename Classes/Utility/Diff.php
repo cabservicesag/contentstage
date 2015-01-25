@@ -236,13 +236,21 @@ class Tx_Contentstage_Utility_Diff {
 			} else {
 				$this->rows($r1, $r2, $differences, $keyField, $table);
 				
-				foreach (array('files', 'folders') as $type) {
+				foreach (array('files', 'folders', 'softrefs') as $type) {
 					foreach ($tableTCA['__' . $type] as $field => $true) {
 						if (!isset($differences[$uid][$field])) {
 							// no difference, let's check the files
-							$folder = $tableTCA[$field]['folder'];
-							$function = 'compare' . ucfirst($type);
-							$singleValues = t3lib_div::trimExplode(',', $r1[$field], true);
+							if ($type === 'softrefs') {
+								$folder = '';
+								$function = 'compareFiles';
+								$values = array();
+								$this->tca->resolveSoftRefUids($fromRepository, $table, $field, $r1, $values);
+								$singleValues = is_array($values['__FILE']) ? array_keys($values['__FILE']) : array();
+							} else {
+								$folder = $tableTCA[$field]['folder'];
+								$function = 'compare' . ucfirst($type);
+								$singleValues = t3lib_div::trimExplode(',', $r1[$field], true);
+							}
 							
 							foreach ($singleValues as $value) {
 								$message = $toRepository->$function(

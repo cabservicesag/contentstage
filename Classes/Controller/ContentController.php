@@ -214,7 +214,7 @@ class Tx_Contentstage_Controller_ContentController extends Tx_Contentstage_Contr
 			
 			$this->log->log($this->translate('info.compare.done'), Tx_CabagExtbase_Utility_Logging::INFORMATION, $localTree[$this->page]);
 		} catch (Exception $e) {
-			$this->log->log($this->translate('error.' . $e->getCode(), array($e->getMessage())) ?: $e->getMessage(), Tx_CabagExtbase_Utility_Logging::ERROR);
+			$this->log->log($this->translate('error.' . $e->getCode(), array($e->getMessage())) ?: $e->getMessage(), Tx_CabagExtbase_Utility_Logging::ERROR, $e->getTraceAsString());
 		}
 	}
 

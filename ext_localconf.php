@@ -9,7 +9,12 @@ $pageTS = <<<'EOD'
 tx_contentstage {
 	doNotSync =
 	doNotSnapshot =
-	doNotDisplay =
+	doNotDisplay {
+		__all {
+			l18n_diffsource = 1
+			l10n_diffsource = 1
+		}
+	}
 	
 	depthOptions = 0,1,2,3,4,5,6,7,8,9,-1
 	defaultDepth = -1

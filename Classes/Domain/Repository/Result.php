@@ -173,7 +173,7 @@ class Tx_Contentstage_Domain_Repository_Result {
 	public function nextResolved() {
 		if (($row = $this->next()) !== false) {
 			foreach ($this->tca as $field => &$config) {
-				if (substr($field, 0, 2) === '__') {
+				if (substr($field, 0, 2) === '__' || !isset($row[$field])) {
 					continue;
 				}
 				$row[$field] = $this->tcaObject->resolve($this->repository, $this->table, $field, $row[$field], $row);
@@ -193,7 +193,7 @@ class Tx_Contentstage_Domain_Repository_Result {
 			$this->repository->setRelationSynced($this->table, $row['uid']);
 			if (is_array($this->tca)) {
 				foreach ($this->tca as $field => &$config) {
-					if (substr($field, 0, 2) === '__') {
+					if (substr($field, 0, 2) === '__' || !isset($row[$field])) {
 						continue;
 					}
 					$this->repository->addRelations($this->tcaObject->resolveUids($this->repository, $this->table, $field, $row[$field], $row));

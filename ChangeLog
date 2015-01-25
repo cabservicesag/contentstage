@@ -1,3 +1,10 @@
+2013-10-10 Nils Blattner <nb@cabag.ch>
+	* version 0.4.1
+	* [BUG] fixed issue with displaying softref changes
+	* [BUG #3995] fixed issue with ignoreFields
+	* [FEATURE #3995] added l10n_diffsource and l18n_diffsource to ignoreFields by default
+	* [FEATURE #3995] added display proc for date values
+
 2013-10-08 Nils Blattner <nb@cabag.ch>
 	* version 0.4.0
 	* [FEATURE #3927] softrefs are now resolved via refindex

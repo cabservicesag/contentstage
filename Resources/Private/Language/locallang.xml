@@ -93,6 +93,12 @@
 			<label index="initialize.doIt">Initialize this system</label>
 			<label index="initialize.initialize.title">Initialize Systems</label>
 			<label index="language">en</label>
+			
+			<label index="datetimeFormat.date">m/d/Y</label>
+			<label index="datetimeFormat.datetime">m/d/Y H:i:s</label>
+			<label index="datetimeFormat.time">H:i</label>
+			<label index="datetimeFormat.timesec">H:i:s</label>
+			
 			<label index="local.rootline">Local rootline: </label>
 			<label index="module.compare">Compare</label>
 			<label index="module.initialize">Initialize</label>
@@ -273,6 +279,12 @@
 			<label index="initialize.doIt">Dieses System initialisieren</label>
 			<label index="initialize.initialize.title">Systeminitialisierung</label>
 			<label index="language">de</label>
+			
+			<label index="datetimeFormat.date">d.m.Y</label>
+			<label index="datetimeFormat.datetime">d.m.Y H:i:s</label>
+			<label index="datetimeFormat.time">H:i</label>
+			<label index="datetimeFormat.timesec">H:i:s</label>
+			
 			<label index="local.rootline">Lokale Rootline: </label>
 			<label index="module.compare">Vergleichen</label>
 			<label index="module.initialize">Initialisieren</label>

@@ -58,6 +58,11 @@ class Tx_Contentstage_Utility_Tca implements t3lib_singleton {
 	const RELATION_MM = 'mm';
 	
 	/**
+	 * @const string A datetime field
+	 */
+	const DATETIME = 'datetime';
+	
+	/**
 	 * @const string The locallang prefix for the current extension.
 	 */
 	const LLL_PREFIX = 'LLL:EXT:contentstage/Resources/Private/Language/locallang.xml:';
@@ -76,28 +81,83 @@ class Tx_Contentstage_Utility_Tca implements t3lib_singleton {
 	 * @var array The default fields that no TCA exists for (tstamp, crdate etc.).
 	 */
 	protected $defaultFields = array(
-		'pid' => 'field.pid',
-		't3ver_oid' => 'field.t3ver_oid',
-		't3ver_id' => 'field.t3ver_id',
-		't3ver_wsid' => 'field.t3ver_wsid',
-		't3ver_label' => 'field.t3ver_label',
-		't3ver_state' => 'field.t3ver_state',
-		't3ver_stage' => 'field.t3ver_stage',
-		't3ver_count' => 'field.t3ver_count',
-		't3ver_tstamp' => 'field.t3ver_tstamp',
-		't3ver_move_id' => 'field.t3ver_move_id',
-		't3_origuid' => 'field.t3_origuid',
-		'tstamp' => 'field.tstamp',
-		'crdate' => 'field.crdate',
-		'cruser_id' => 'field.cruser_id',
-		'hidden' => 'field.hidden',
-		'sorting' => 'field.sorting',
-		'sys_language_uid' => 'field.sys_language_uid',
-		'l18n_parent' => 'field.l18n_parent',
-		'l18n_diffsource' => 'field.l18n_diffsource',
-		'_targetMissing' => 'field._targetMissing',
-		'_sourceMissing' => 'field._sourceMissing',
+		'pid' => array(
+			'label' => 'field.pid',
+		),
+		't3ver_oid' => array(
+			'label' => 'field.t3ver_oid',
+		),
+		't3ver_id' => array(
+			'label' => 'field.t3ver_id',
+		),
+		't3ver_wsid' => array(
+			'label' => 'field.t3ver_wsid',
+		),
+		't3ver_label' => array(
+			'label' => 'field.t3ver_label',
+		),
+		't3ver_state' => array(
+			'label' => 'field.t3ver_state',
+		),
+		't3ver_stage' => array(
+			'label' => 'field.t3ver_stage',
+		),
+		't3ver_count' => array(
+			'label' => 'field.t3ver_count',
+		),
+		't3ver_tstamp' => array(
+			'label' => 'field.t3ver_tstamp',
+		),
+		't3ver_move_id' => array(
+			'label' => 'field.t3ver_move_id',
+		),
+		't3_origuid' => array(
+			'label' => 'field.t3_origuid',
+		),
+		'tstamp' => array(
+			'label' => 'field.tstamp',
+			'config' => array(
+				'type' => 'input',
+				'eval' => 'datetime',
+			),
+		),
+		'crdate' => array(
+			'label' => 'field.crdate',
+			'config' => array(
+				'type' => 'input',
+				'eval' => 'datetime',
+			),
+		),
+		'cruser_id' => array(
+			'label' => 'field.cruser_id',
+		),
+		'hidden' => array(
+			'label' => 'field.hidden',
+		),
+		'sorting' => array(
+			'label' => 'field.sorting',
+		),
+		'sys_language_uid' => array(
+			'label' => 'field.sys_language_uid',
+		),
+		'l18n_parent' => array(
+			'label' => 'field.l18n_parent',
+		),
+		'l18n_diffsource' => array(
+			'label' => 'field.l18n_diffsource',
+		),
+		'_targetMissing' => array(
+			'label' => 'field._targetMissing',
+		),
+		'_sourceMissing' => array(
+			'label' => 'field._sourceMissing',
+		),
 	);
+	
+	/**
+	 * @var array The different datetime formats.
+	 */
+	protected $datetimeFormat = array();
 	
 	/**
 	 * @var array The fields that should not be displayed. Array of table. => array of field. => 0/1.
@@ -166,6 +226,10 @@ class Tx_Contentstage_Utility_Tca implements t3lib_singleton {
 		}
 		$this->initializeCache();
 		
+		foreach (array('date', 'datetime', 'time', 'timesec') as $key) {
+			$this->datetimeFormat[$key] = $this->translate(self::LLL_PREFIX . 'datetimeFormat.' . $key);
+		}
+		
 		$language = $this->translate(self::LLL_PREFIX . 'language');
 		$identifier = 'tx_contentstage_Tca_' . $language;
 		if (TX_CONTENTSTAGE_USECACHE && $this->cache->has($identifier)) {
@@ -174,15 +238,12 @@ class Tx_Contentstage_Utility_Tca implements t3lib_singleton {
 		}
 		
 		$this->tca = array();
-		$defaultFields = array();
-		foreach ($this->defaultFields as $field => &$label) {
-			$defaultFields[$field] = array(
-				'__name' => $this->translate(self::LLL_PREFIX . $label)
-			);
+		foreach ($this->defaultFields as $field => &$fieldData) {
+			$this->processTcaField('__default', $field, $fieldData['config'], self::LLL_PREFIX . $fieldData['label']);
 		}
 		
 		foreach ($GLOBALS['TCA'] as $table => &$tableData) {
-			$this->tca[$table] = $defaultFields;
+			$this->tca[$table] = $this->tca['__default'];
 			$this->tca[$table]['__name'] = $this->translate($tableData['ctrl']['title']);
 			$this->tca[$table]['__labelField'] = $tableData['ctrl']['label'];
 			$this->tca[$table]['__tstampField'] = $tableData['ctrl']['tstamp'];
@@ -297,6 +358,20 @@ class Tx_Contentstage_Utility_Tca implements t3lib_singleton {
 				}
 				break;
 				
+			case 'input':
+				$eval = $config['eval'] ?: '';
+				foreach (t3lib_div::trimExplode(',', $eval, true) as $evalKey) {
+					if (isset($this->datetimeFormat[$evalKey])) {
+						$processed = array(
+							'type' => self::DATETIME,
+							'format' => $this->datetimeFormat[$evalKey]
+						);
+						break;
+					}
+				}
+				
+				break;
+				
 			default:
 				break;
 		}
@@ -305,6 +380,7 @@ class Tx_Contentstage_Utility_Tca implements t3lib_singleton {
 		
 		if (!empty($config['softref'])) {
 			$processed['softref'] = $config['softref'];
+			$this->tca[$table]['__softrefs'][$field] = true;
 		}
 		
 		$this->tca[$table][$field] = $processed;
@@ -352,8 +428,7 @@ class Tx_Contentstage_Utility_Tca implements t3lib_singleton {
 	 * @return boolean true if it should be visible, false otherwise.
 	 */
 	public function isVisibleField($table, $field) {
-		$_table = $table . '.';
-		if (isset($this->ignoreFields['__all.'][$field]) && !empty($this->ignoreFields['__all.'][$field])) {
+		if (isset($this->ignoreFields['__all'][$field]) && !empty($this->ignoreFields['__all'][$field])) {
 			return false;
 		}
 		
@@ -383,6 +458,10 @@ class Tx_Contentstage_Utility_Tca implements t3lib_singleton {
 				
 			case self::RELATION_MM:
 				$value = $this->resolveMM($repository, $config, $row['uid']);
+				break;
+				
+			case self::DATETIME:
+				$value = date($config['format'], intval($value));
 				break;
 				
 			default:
@@ -447,24 +526,35 @@ class Tx_Contentstage_Utility_Tca implements t3lib_singleton {
 	
 	/**
 	 * Update refindex if necessary and apply the sys_refindex items for the given field.
+	 *
+	 * @param Tx_Contentstage_Domain_Repository_ContentRepository $repository The repository to get the data from.
+	 * @param string $table The table.
+	 * @param string $field The field. null may be supplied, which causes all field's softrefs to be resolved.
+	 * @param string $value The value in the db.
+	 * @param array $row The full row, used for the uid in it.
+	 * @param array $result The array to write the results to.
+	 * @return void
 	 */
-	protected function resolveSoftRefUids($repository, $table, $field, &$row, &$result) {
+	public function resolveSoftRefUids($repository, $table, $field, &$row, &$result) {
 		$this->updateRefindex($repository, $table, $row['uid']);
 		
 		// escape alias
 		$e = function($value) use ($repository) {
-			return $repository->_getDb()->fullQuoteStr($value);
+			return $repository->_getDb()->fullQuoteStr($value, 'sys_refindex');
 		};
 		
-		$query = 'SELECT * FROM sys_refindex WHERE table = ' . $e($table) . ' AND field = ' . $e($field) . ' AND recuid = ' . intval($row['uid']) . ' AND deleted = 0';
+		$query = 'SELECT * FROM sys_refindex WHERE tablename = ' . $e($table) . ' AND recuid = ' . intval($row['uid']) . ' AND deleted = 0';
+		if (is_string($field)) {
+			$query .= ' AND field = ' . $e($field);
+		}
 		
-		foreach ($repository->_sql() as $row) {
-			if (substr($row['ref_table'], 0, 1) === '_') {
-				if ($row['ref_table'] === '_FILE') {
-					$result['__FILE'][$row['ref_string']] = true;
+		foreach ($repository->_sql($query) as $refindexRow) {
+			if (substr($refindexRow['ref_table'], 0, 1) === '_') {
+				if ($refindexRow['ref_table'] === '_FILE') {
+					$result['__FILE'][$refindexRow['ref_string']] = true;
 				}
 			} else {
-				$result[$row['ref_table']][$row['ref_uid']] = true;
+				$result[$refindexRow['ref_table']][$refindexRow['ref_uid']] = true;
 			}
 		}
 	}

@@ -122,6 +122,13 @@ class Tx_Contentstage_Domain_Repository_ContentRepository {
 	protected $cache = null;
 	
 	/**
+	 * The cached full page tree.
+	 *
+	 * @var array
+	 */
+	protected $fullPageTree = null;
+	
+	/**
 	 * The logging object.
 	 *
 	 * @var Tx_CabagExtbase_Utility_Logging The logging object.
@@ -357,9 +364,14 @@ class Tx_Contentstage_Domain_Repository_ContentRepository {
 	 * @return array An array of the root pages with all subpages given with the key '_children' recursively.
 	 */
 	public function &getFullPageTree() {
+		if ($this->fullPageTree !== null) {
+			return $this->fullPageTree;
+		}
+		
 		$identifier = 'tx_contentstage_ContentRepository_getFullPageTree_' . $this->tag;
 		if (TX_CONTENTSTAGE_USECACHE && $this->cache->has($identifier)) {
-			return $this->cache->get($identifier);
+			$this->fullPageTree = $this->cache->get($identifier);
+			return $this->fullPageTree;
 		}
 		$this->log->log($this->translate('pageTree.rebuild', array($this->tag)), Tx_CabagExtbase_Utility_Logging::INFORMATION);
 		
@@ -392,6 +404,7 @@ class Tx_Contentstage_Domain_Repository_ContentRepository {
 		if (TX_CONTENTSTAGE_USECACHE) {
 			$this->cache->set($identifier, $index, array(), TX_CONTENTSTAGE_CACHETIME);
 		}
+		$this->fullPageTree = &$index;
 		$this->log->log($this->translate('pageTree.rebuilt', array($this->tag)), Tx_CabagExtbase_Utility_Logging::INFORMATION);
 		return $index;
 	}
