@@ -37,7 +37,7 @@ class Tx_Contentstage_Eid_ClearCache {
 	 * @const string The cache table to write to. Might have to be changed for future versions.
 	 * @see Tx_Contentstage_Domain_Repository_ContentRepository::CACHE_TABLE
 	 */
-	const CACHE_TABLE = 'cachingframework_cache_hash';
+	const CACHE_TABLES = 'cachingframework_cache_hash,cf_cache_hash';
 	
 	/**
 	 * @var string The md5 hash for the call.
@@ -81,10 +81,26 @@ class Tx_Contentstage_Eid_ClearCache {
 			return;
 		}
 		
+		$table = false;
+		foreach (t3lib_div::trimExplode(',', self::CACHE_TABLES, true) as $possibleTable) {
+			$res = $GLOBALS['TYPO3_DB']->sql_query('SHOW TABLES LIKE \'' . $possibleTable . '\'');
+			if ($GLOBALS['TYPO3_DB']->sql_num_rows($res) > 0) {
+				$table = $possibleTable;
+				break;
+			}
+		}
+		
+		if (!$table) {
+			$this->errors[] = array(
+				'ident' => 'noTable',
+				'message' => 'No caching table found!'
+			);
+			return;
+		}
 		$rows = $GLOBALS['TYPO3_DB']->exec_SELECTgetRows(
 			'*',
-			self::CACHE_TABLE,
-			'crdate > ' . (time() - 10) . ' AND identifier = ' . $GLOBALS['TYPO3_DB']->fullQuoteStr($this->hash, self::CACHE_TABLE),
+			$table,
+			'crdate > ' . (time() - 10) . ' AND identifier = ' . $GLOBALS['TYPO3_DB']->fullQuoteStr($this->hash, $table),
 			'',
 			'crdate DESC',
 			1
@@ -99,10 +115,29 @@ class Tx_Contentstage_Eid_ClearCache {
 		}
 		
 		$row = current($rows);
+		$content = unserialize($row['content']);
 		
-		$tsfe = t3lib_div::makeInstance('tslib_fe', $GLOBALS['TYPO3_CONF_VARS'], 0, 0);
-		
-		$tsfe->clearPageCacheContent_pidList(unserialize($row['content']));
+		try {
+			if ($content === 'ALL') {
+				// fake tcemain
+				$tceMain = t3lib_div::makeInstance('t3lib_TCEmain');
+				$tceMain->BE_USER = new stdClass();
+				$tceMain->BE_USER->user = array('username' => 'tx_contentstage_eId');
+				$tceMain->BE_USER->writelog = function () {};
+				$tceMain->admin = true;
+				
+				$tceMain->clear_cacheCmd('all');
+			} else {
+				$tsfe = t3lib_div::makeInstance('tslib_fe', $GLOBALS['TYPO3_CONF_VARS'], 0, 0);
+				
+				$tsfe->clearPageCacheContent_pidList($content);
+			}
+		} catch (Exception $e) {
+			$this->errors[] = array(
+				'ident' => 'exception',
+				'message' => $e->getMessage()
+			);
+		}
 		
 		$GLOBALS['TYPO3_DB']->exec_DELETEquery(
 			self::CACHE_TABLE,

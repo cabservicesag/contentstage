@@ -27,7 +27,7 @@ $EM_CONF[$_EXTKEY] = array (
 	'modify_tables' => '',
 	'clearCacheOnLoad' => 0,
 	'lockType' => '',
-	'version' => '0.1.4',
+	'version' => '0.1.6',
 	'constraints' => 
 	array (
 		'depends' => 
@@ -35,6 +35,7 @@ $EM_CONF[$_EXTKEY] = array (
 			'extbase' => '1.3',
 			'fluid' => '1.3',
 			'typo3' => '4.5-0.0.0',
+			'cabag_extbase' => '0.5.5',
 		),
 		'conflicts' => 
 		array (

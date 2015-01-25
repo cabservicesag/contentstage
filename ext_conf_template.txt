@@ -4,10 +4,13 @@ useCache = 0
 # cat=basic/cache/10; type=int+; label= The length to cache.
 cacheTime = 300
 
-# cat=basic/cache/10; type=int+; label= The steps to increase the auto_increment.
+# cat=basic/cache/10; type=boolean; label= Clear all caches in any case.
+clearAllCaches = 0
+
+# cat=basic/init/10; type=int+; label= The steps to increase the auto_increment.
 autoIncrementStep = 2000000
 
-# cat=basic/cache/10; type=float; label= Assume that the full step is '1', then this is the threshold, after which an extra step is added. Example: Highest auto_increment is currently 4499999, step is 2000000. So the next lower step is at 4000000 and the next higher is at 6000000. Now with a threshold of 0.25, the numeric threshold is "last step + 0.25 * step" which is equal to "4000000 + 500000" or "4500000". Since 4499999 is lower, the next stepis 6000000. If the highest auto_increment were higher, say 4600000, then an extra step is added -> it goes to 8000000. So effectively this ensures, that there will be at least (1 - threshold) * step auto_increments left before there is a crash!
+# cat=basic/init/10; type=float; label= Assume that the full step is '1', then this is the threshold, after which an extra step is added. Example: Highest auto_increment is currently 4499999, step is 2000000. So the next lower step is at 4000000 and the next higher is at 6000000. Now with a threshold of 0.25, the numeric threshold is "last step + 0.25 * step" which is equal to "4000000 + 500000" or "4500000". Since 4499999 is lower, the next stepis 6000000. If the highest auto_increment were higher, say 4600000, then an extra step is added -> it goes to 8000000. So effectively this ensures, that there will be at least (1 - threshold) * step auto_increments left before there is a crash!
 autoIncrementThreshold = 0.25
 
 # cat=basic/tables/10; type=input; label= Comma separated list of tables that should not be diffed or synced! Any tables that do not have a uid/pid field should go here. The standard TYPO3-core caching/indexing/session etc. tables are not synced by default. sys_log and sys_history are always synced (no matter if you exclude them).

@@ -1,3 +1,14 @@
+2013-01-30 Nils Blattner <nb@cabag.ch>
+	* version 0.1.6
+	* fixed issue where inserts were not properly split up into packs of 100 queries
+	* removed usage of admin_get_tables
+	* fixed an issue where folders do not have a trailing slash
+	* implemented the possibility to enforce the whole cache to be cleared
+
+2013-01-29 Nils Blattner <nb@cabag.ch>
+	* version 0.1.5
+	* added dependency for cabag_extbase 0.5.5
+
 2013-01-04 Nils Blattner <nb@cabag.ch>
 	* version 0.1.4
 	* fixed some issues with shell on windows

@@ -132,7 +132,6 @@ class Tx_Contentstage_Controller_ContentController extends Tx_Contentstage_Contr
 	 * @return void
 	 */
 	public function pushAction() {
-		ini_set('memory_limit', '1G');
 		$id = intval(t3lib_div::_GP('id'));
 		
 		try {
@@ -146,7 +145,7 @@ class Tx_Contentstage_Controller_ContentController extends Tx_Contentstage_Contr
 			$this->pushTables($id);
 			$this->log->log($this->translate('info.push.done'), Tx_CabagExtbase_Utility_Logging::OK);
 			
-			$this->remoteRepository->clearCache($id);
+			$this->remoteRepository->clearCache($this->extensionConfiguration['clearAllCaches'] ? 'ALL' : $id);
 			$this->log->log($this->translate('info.push.clearCache'), Tx_CabagExtbase_Utility_Logging::OK);
 		} catch (Exception $e) {
 			$this->log->log($this->translate('error.' . $e->getCode(), array($e->getMessage())) ?: $e->getMessage(), Tx_CabagExtbase_Utility_Logging::ERROR);
@@ -212,9 +211,9 @@ class Tx_Contentstage_Controller_ContentController extends Tx_Contentstage_Contr
 	 */
 	protected function _pushTables(Tx_Contentstage_Domain_Repository_ContentRepository $fromRepository, Tx_Contentstage_Domain_Repository_ContentRepository $toRepository, $root = 0) {
 		$tables = $fromRepository->getTables();
-		
 		foreach ($tables as $table => &$data) {
 			if (substr($table, -3) === '_mm' || $this->ignoreSyncTables[$table]) {
+				$this->log->log('ignored: ' . $table, Tx_CabagExtbase_Utility_Logging::INFORMATION);
 				continue;
 			}
 			
@@ -252,7 +251,7 @@ class Tx_Contentstage_Controller_ContentController extends Tx_Contentstage_Contr
 				
 				if (substr($table, -3) === '_mm') {
 					$localUids = implode(',', array_keys($data));
-					$toRepository->_sql('DELETE FROM ' . $table . ' WHERE uid_local IN (' . $localUids . ')', true);
+					$toRepository->_sql('DELETE FROM ' . $table . ' WHERE uid_local IN (' . $localUids . ')', false);
 					$where = 'uid_local IN (' . $localUids . ')';
 				} else {
 					$where = 'uid IN (' . implode(',', array_keys($data)) . ')';

@@ -214,7 +214,7 @@ class Tx_Contentstage_Utility_Tca implements t3lib_singleton {
 					case 'file_reference':
 						$processed = array(
 							'type' => self::FILE,
-							'folder' => $config['uploadfolder'] . ''
+							'folder' => preg_replace('#[/\\\\]?$#', '/', $config['uploadfolder'])
 						);
 						break;
 					
@@ -245,7 +245,7 @@ class Tx_Contentstage_Utility_Tca implements t3lib_singleton {
 					if (!empty($config['fileFolder'])) {
 						$processed = array(
 							'type' => self::FILE,
-							'folder' => $config['fileFolder']
+							'folder' => preg_replace('#[/\\\\]$#', '/', $config['fileFolder'])
 						);
 						break;
 					}

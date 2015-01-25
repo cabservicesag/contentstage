@@ -36,7 +36,7 @@ class Tx_Contentstage_Domain_Repository_ContentRepository {
 	 * @const string The cache table to write to. Might have to be changed for future versions.
 	 * @see Tx_Contentstage_Eid_ClearCache::CACHE_TABLE
 	 */
-	const CACHE_TABLE = 'cachingframework_cache_hash';
+	const CACHE_TABLES = 'cachingframework_cache_hash,cf_cache_hash';
 	
 	/**
 	 * @const string Type local.
@@ -101,6 +101,13 @@ class Tx_Contentstage_Domain_Repository_ContentRepository {
 	protected $tag = '';
 	
 	/**
+	 * The selected database.
+	 *
+	 * @var string
+	 */
+	protected $database = '';
+	
+	/**
 	 * The cache.
 	 *
 	 * @var t3lib_cache_frontend_AbstractFrontend The cache.
@@ -142,6 +149,10 @@ class Tx_Contentstage_Domain_Repository_ContentRepository {
 		$this->log = $log;
 		$this->cache = $cache;
 		$this->tag = $tag;
+		$res = $db->sql_query('SELECT DATABASE();');
+		if (($row = $db->sql_fetch_row($res)) !== false) {
+			$this->database = current($row);
+		}
 	}
 	
 	/**
@@ -377,7 +388,7 @@ class Tx_Contentstage_Domain_Repository_ContentRepository {
 	 * @return array An array of tableName => SHOW TABLE STATUS row pairs.
 	 */
 	public function getTables() {
-		return $this->db->admin_get_tables();
+		return $this->_sql('SHOW TABLE STATUS FROM `' . $this->database . '`', 'Name');
 	}
 	
 	/**
@@ -411,11 +422,12 @@ class Tx_Contentstage_Domain_Repository_ContentRepository {
 			$whereParts[] = '(' . $where . ')';
 		}
 		
-		$resource = $this->db->exec_SELECTquery($fields, $table, implode(' AND ', $whereParts), $groupBy, $orderBy, $limit);
+		$query = $this->db->SELECTquery($fields, $table, implode(' AND ', $whereParts), $groupBy, $orderBy, $limit);
 		
 		// this slows the process down imensely!
-		//$query = $this->db->SELECTquery($fields, $table, implode(' AND ', $whereParts), $groupBy, $orderBy, $limit);
 		//$this->log->log($query, Tx_CabagExtbase_Utility_Logging::INFORMATION);
+		
+		$resource = $this->db->sql_query($query);
 		
 		if (!$resource || $this->db->sql_error()) {
 			throw new Exception($this->db->sql_error() . ' [Query: ' . $this->db->SELECTquery($fields, $table, implode(' AND ', $whereParts), $groupBy, $orderBy, $limit) . ']', self::ERROR_GET);
@@ -459,6 +471,10 @@ class Tx_Contentstage_Domain_Repository_ContentRepository {
 			}
 		}
 		
+		if (count($whereParts) === 0) {
+			return '1 = 0';
+		}
+		
 		return implode(' OR ', $whereParts);
 	}
 	
@@ -493,6 +509,7 @@ class Tx_Contentstage_Domain_Repository_ContentRepository {
 				$this->_insert($table, $buffer, $fields, $updateTerm);
 				$buffer = array();
 			}
+			$c++;
 		}
 		// if no row was looped, fields/updateTerm are not set, but that does not matter
 		$this->_insert($table, $buffer, $fields, $updateTerm);
@@ -608,48 +625,49 @@ class Tx_Contentstage_Domain_Repository_ContentRepository {
 	 * Clears the cache for the given root.
 	 * Note: There must be a sys_domain record in the given rootline! (This does not work for root = 0!).
 	 *
-	 * @param int $root The root to clear from.
+	 * @param mixed $root Either the root uid to clear from or "ALL".
 	 * @return void
 	 * @throws Exception
 	 */
 	public function clearCache($root) {
-		$pids = $this->getPageTreeUids($root);
-		$domain = $this->getDomain($root);
-		
-		if (empty($pids) || $domain === null) {
-			// do nothing
-			return;
+		if ($root === 'ALL') {
+			$content = 'ALL';
+		} else {
+			$pids = $this->getPageTreeUids($root);
+			$domain = $this->getDomain($root);
+			
+			if (empty($pids) || $domain === null) {
+				// do nothing
+				return;
+			}
+			$content = implode(',', $pids);
 		}
 		
 		$hash = t3lib_div::getRandomHexString(32);
 		$fields = array(
 			'identifier' => $hash,
 			'crdate' => time(),
-			'content' => serialize(implode(',', $pids)),
+			'content' => serialize($content),
 			'lifetime' => 10
 		);
 		
-		$this->db->exec_INSERTquery(self::CACHE_TABLE, $fields);
+		foreach (t3lib_div::trimExplode(',', self::CACHE_TABLES, true) as $table) {
+			$res = $this->db->sql_query('SHOW TABLES LIKE \'' . $table . '\'');
+			if ($this->db->sql_num_rows($res) > 0) {
+				break;
+			}
+		}
+		$this->db->exec_INSERTquery($table, $fields);
 		
 		$url = 'http://' . $domain . '/index.php?eID=tx_contentstage&hash=' . $hash;
 		$response = file_get_contents($url);
-		/* $ch = curl_init($url);
-		curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE); 
-		$response = curl_exec($ch);
 		
-		if ($response === false) {
-        	throw new Exception('Could not reach ' . $url, 1356616554);
-		}
-		if (($error = curl_error($ch)) !== '') {
-        	throw new Exception($error . ' [' . $url . ']', 1356616553);
-		}
-		$headerSize = curl_getinfo($ch, CURLINFO_HEADER_SIZE); */
         $result = substr($response, $headerSize);
         $data = json_decode($result);
         
         if (empty($data->success)) {
-        	$errors = array_map(function ($value) { return $value->message; }, $data['errors']);
-        	throw new Exception('[' . $url . ']' . implode(PHP_EOL, $errors), 1356616552);
+        	$errors = array_map(function ($value) { return $value->message; }, $data->errors);
+        	throw new Exception('[' . $url . '] ' . implode(', ', $errors), 1356616552);
         }
 	}
 	
@@ -667,23 +685,30 @@ class Tx_Contentstage_Domain_Repository_ContentRepository {
 	 * Directly execute a query on the db and return the result.
 	 *
 	 * @param string $query The query.
-	 * @param boolean $noResult Ignore the result. Default false.
+	 * @param mixed $result If set to false, no result is returned. If set to true, an array with the rows is returned. If set to a string, an associated array is returned, where the $row[$result] is used as the key.
 	 * @return array The assoc return array.
 	 */
-	public function _sql($query, $noResult = false) {
+	public function _sql($query, $result = true) {
 		$resource = $this->db->sql_query($query);
 		
-		if ($noResult) {
+		if ($result === false) {
 			$this->db->sql_free_result($resource);
 			return;
 		}
 		
-		$result = array();
-		while (($row = $this->db->sql_fetch_assoc($resource)) !== false) {
-			$result[] = $row;
+		$output = array();
+		if ($result === true) {
+			while (($row = $this->db->sql_fetch_assoc($resource)) !== false) {
+				$output[] = $row;
+			}
+		} else {
+			$result = (string)$result;
+			while (($row = $this->db->sql_fetch_assoc($resource)) !== false) {
+				$output[$row[$result]] = $row;
+			}
 		}
 		$this->db->sql_free_result($resource);
-		return $result;
+		return $output;
 	}
 	
 	/**
