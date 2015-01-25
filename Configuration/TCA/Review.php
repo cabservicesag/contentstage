@@ -6,10 +6,10 @@ if (!defined ('TYPO3_MODE')) {
 $TCA['tx_contentstage_domain_model_review'] = array(
 	'ctrl' => $TCA['tx_contentstage_domain_model_review']['ctrl'],
 	'interface' => array(
-		'showRecordFieldList' => 'sys_language_uid, l10n_parent, l10n_diffsource, hidden, crdate, pid, levels, required, debug, reviewed, cruser_id, changes, state, auto_push',
+		'showRecordFieldList' => 'sys_language_uid, l10n_parent, l10n_diffsource, hidden, crdate, page, levels, required, debug, reviewed, cruser_id, changes, state, auto_push',
 	),
 	'types' => array(
-		'1' => array('showitem' => 'sys_language_uid;;;;1-1-1, l10n_parent, l10n_diffsource, hidden;;1, crdate, pid, levels, auto_push, required, debug, reviewed, cruser_id, changes, state,--div--;LLL:EXT:cms/locallang_ttc.xml:tabs.access,starttime, endtime'),
+		'1' => array('showitem' => 'sys_language_uid;;;;1-1-1, l10n_parent, l10n_diffsource, hidden;;1, crdate, page, levels, auto_push, required, debug, reviewed, cruser_id, changes, state,--div--;LLL:EXT:cms/locallang_ttc.xml:tabs.access,starttime, endtime'),
 	),
 	'palettes' => array(
 		'1' => array('showitem' => ''),
@@ -105,7 +105,7 @@ $TCA['tx_contentstage_domain_model_review'] = array(
 				'default' => time()
 			),
 		),
-		'pid' => array(
+		'page' => array(
 			'exclude' => 0,
 			'readOnly' => true,
 			'label' => 'LLL:EXT:contentstage/Resources/Private/Language/locallang_db.xml:tx_contentstage_domain_model_review.page',

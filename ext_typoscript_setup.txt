@@ -44,7 +44,6 @@ config.tx_extbase{
                 mapping {
 					columns {
 						crdate.mapOnProperty = created
-						pid.mapOnProperty = page
 						cruser_id.mapOnProperty = creator
 					}
                 }

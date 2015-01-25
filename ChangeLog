@@ -1,4 +1,10 @@
 2013-10-17 Nils Blattner <nb@cabag.ch>
+	* version 0.4.7
+	* [BUG] added new sql field page to reviews and removed mapping of pid to page - issue #4066
+	* After DB update following SQL must be executed: UPDATE tx_contentstage_domain_model_review SET page = pid, pid = 0
+	* Removed Hook
+
+2013-10-17 Nils Blattner <nb@cabag.ch>
 	* version 0.4.6
 	* [FEATURE] added display for files differing - issue #4075
 	* [BUG] removed extra module (was test) - issue #4124

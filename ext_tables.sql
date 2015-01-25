@@ -13,6 +13,7 @@ CREATE TABLE tx_contentstage_domain_model_review (
 	changes int(11) unsigned DEFAULT '0' NOT NULL,
 	state int(11) unsigned DEFAULT '0',
 	auto_push tinyint(4) unsigned DEFAULT '0' NOT NULL,
+	page int(11) DEFAULT '0' NOT NULL,
 
 	tstamp int(11) unsigned DEFAULT '0' NOT NULL,
 	crdate int(11) unsigned DEFAULT '0' NOT NULL,
@@ -39,6 +40,7 @@ CREATE TABLE tx_contentstage_domain_model_review (
 
 	PRIMARY KEY (uid),
 	KEY parent (pid),
+	KEY page (page),
 	KEY t3ver_oid (t3ver_oid,t3ver_wsid),
 	KEY language (l10n_parent,sys_language_uid)
 
