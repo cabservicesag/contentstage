@@ -80,7 +80,7 @@ class Tx_Contentstage_Controller_ContentController extends Tx_Contentstage_Contr
 		} catch (Exception $e) {
 			$this->log->log($this->translate('error.' . $e->getCode(), array($e->getMessage())) ?: $e->getMessage(), Tx_CabagExtbase_Utility_Logging::ERROR);
 		}
-		
+
 		$this->view->assign('localRootline', $this->localRepository->getRootline($id));
 		$this->view->assign('remoteRootline', $this->remoteRepository->getRootline($id));
 		

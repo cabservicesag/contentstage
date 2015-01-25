@@ -107,12 +107,12 @@ class Tx_Contentstage_Eid_ClearCache {
 		$rows = $GLOBALS['TYPO3_DB']->exec_SELECTgetRows(
 			'*',
 			$table,
-			($table === 'cf_cache_hash' ? 'expires < ' : '(crdate + lifetime) < ') . time() . ' AND identifier = ' . $GLOBALS['TYPO3_DB']->fullQuoteStr($this->hash, $table),
+			($table === 'cf_cache_hash' ? 'expires > ' : '(crdate + lifetime) > ') . time() . ' AND identifier = ' . $GLOBALS['TYPO3_DB']->fullQuoteStr($this->hash, $table),
 			'',
 			$expires . ' DESC',
 			1
 		);
-		
+
 		if (count($rows) === 0) {
 			$this->errors[] = array(
 				'ident' => 'noHash',

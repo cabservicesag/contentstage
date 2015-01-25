@@ -649,8 +649,8 @@ class Tx_Contentstage_Domain_Repository_ContentRepository {
 			'identifier' => $hash,
 			'crdate' => time(),
 			'content' => serialize($content),
-			'lifetime' => 10,
-			'expires' => time + 10
+			'lifetime' => 120,
+			'expires' => time() + 120
 		);
 		
 		foreach (t3lib_div::trimExplode(',', self::CACHE_TABLES, true) as $table) {
@@ -673,12 +673,17 @@ class Tx_Contentstage_Domain_Repository_ContentRepository {
         	throw new Exception($sqlError, 1356616552);
         }
 		
-		$url = 'http://' . $domain . '/index.php?eID=tx_contentstage&hash=' . $hash;
-		$response = file_get_contents($url);
-		
-        $result = substr($response, $headerSize);
+		$url = (t3lib_div::getIndpEnv('TYPO3_SSL') ? 'https://' : 'http://') . $domain . '/index.php?eID=tx_contentstage&hash=' . $hash;
+		$ch = curl_init($url);
+		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
+		curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);                                                                     
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
+		curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 5);
+		curl_setopt($ch, CURLOPT_SSLVERSION, 3);
+
+		$result = curl_exec($ch);
         $data = json_decode($result);
-        
+
         if (empty($data->success)) {
         	$errors = array_map(function ($value) { return $value->message; }, $data->errors);
         	throw new Exception('[' . $url . '] ' . implode(', ', $errors), 1356616552);

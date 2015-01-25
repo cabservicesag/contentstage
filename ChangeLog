@@ -1,3 +1,8 @@
+2013-04-16 Dimitri König <dk@cabag.ch>
+	* version 0.2.6
+	* set clear cache call from file_get_contents to curl due to ssl
+	* fixed hash not found bug
+
 2013-04-15 Nils Blattner <nb@cabag.ch>
 	* version 0.2.5
 	* fixed a bug in the eID-script that would not properly clean up temporary hashes
