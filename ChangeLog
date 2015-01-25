@@ -1,3 +1,27 @@
+2013-09-30 Nils Blattner <nb@cabag.ch>
+	* version 0.3.6
+	* [BUG] fixed an issue with deprecation detection
+
+2013-09-27 Nils Blattner <nb@cabag.ch>
+	* version 0.3.5
+	* [FEATURE] implemented review process
+
+2013-09-20 Nils Blattner <nb@cabag.ch>
+	* version 0.3.4
+	* [FEATURE] implemented db mountpoint resolving
+
+2013-08-27 Nils Blattner <nb@cabag.ch>
+	* version 0.3.3
+	* [FEATURE] added option to the review record that would allow automatic push to remote after a successfull review
+
+2013-08-26 Nils Blattner <nb@cabag.ch>
+	* version 0.3.2
+	* [BUGFIX] fixed an issue, where a comma separated list of files/folders was treated as a single file
+
+2013-08-21 Nils Blattner <nb@cabag.ch>
+	* version 0.3.1
+	* [FEATURE] added review records (and associated), added domain model for be_users and be_groups
+
 2013-08-14 Nils Blattner <nb@cabag.ch>
 	* version 0.3.0
 	* [FEATURE] added configuration options for the recursion depth through pageTS (and by expansion userTS)

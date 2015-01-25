@@ -41,6 +41,20 @@ class Tx_Contentstage_Utility_Diff {
 	protected $tca = null;
 	
 	/**
+	 * The maximum tstamp at the source.
+	 *
+	 * @var int
+	 */
+	protected $maximumSourceTstamp = 0;
+	
+	/**
+	 * The maximum tstamp at the target.
+	 *
+	 * @var int
+	 */
+	protected $maximumTargetTstamp = 0;
+	
+	/**
 	 * Injects the TCA utility object.
 	 *
 	 * @param Tx_Contentstage_Utility_Tca $diff The TCA utility object.
@@ -67,8 +81,8 @@ class Tx_Contentstage_Utility_Diff {
 	/**
 	 * Diff's two rows (must be an array of key => value pairs and _children => array of children items).
 	 *
-	 * @param array $tree1 The source tree.
-	 * @param array $tree2 The target tree.
+	 * @param array $tree1 The original (target) tree.
+	 * @param array $tree2 The changed (source) tree.
 	 * @param array $differences The difference array, passed this way for recursions etc.
 	 * @param string $keyField The key field of each row (usually uid).
 	 * @param string $table The table to perform the diff for. Is only used to hide certain fields. Defaults to pages.
@@ -80,6 +94,10 @@ class Tx_Contentstage_Utility_Diff {
 		$tree2Keys = $this->getKeyIndex($tree2, $table);
 		
 		$uid = intval($tree1[$keyField]);
+		
+		$tableTCA = $this->tca->getProcessedTca($table);
+		$this->maximumTargetTstamp = max($this->maximumTargetTstamp, intval($tree1[$tableTCA['__tstampField']]));
+		$this->maximumSourceTstamp = max($this->maximumSourceTstamp, intval($tree2[$tableTCA['__tstampField']]));
 		
 		if (!isset($differences[$uid])) {
 			$differences[$uid] = array();
@@ -119,8 +137,8 @@ class Tx_Contentstage_Utility_Diff {
 	/**
 	 * Diff's two rows recursively (must be an array of key => value pairs and _children => array of children items).
 	 *
-	 * @param array $tree1 The source tree.
-	 * @param array $tree2 The target tree.
+	 * @param array $tree1 The original (target) tree.
+	 * @param array $tree2 The changed (source) tree.
 	 * @param array $differences The difference array, passed this way for recursions etc.
 	 * @param string $keyField The key field of each row (usually uid).
 	 * @param string $table The table to perform the diff for. Is only used to hide certain fields. Defaults to pages.
@@ -141,8 +159,8 @@ class Tx_Contentstage_Utility_Diff {
 	/**
 	 * Diff's two arrays of rows (must be an array of array of key => value pairs and _children => array of children items).
 	 *
-	 * @param array $children1 The source children.
-	 * @param array $children2 The target children.
+	 * @param array $children1 The original (target) children.
+	 * @param array $children2 The changed (source) children.
 	 * @param array $differences The difference array, passed this way for recursions etc.
 	 * @param string $keyField The key field of each row (usually uid).
 	 * @param string $table The table to perform the diff for. Is only used to hide certain fields. Defaults to pages.
@@ -181,8 +199,8 @@ class Tx_Contentstage_Utility_Diff {
 	/**
 	 * Diff's two repository resources. IMPORTANT: This function assumes that there is a total order over the key field and that they are sorted by the keyfield ascending! Basically it assumes that the key field is an integer aswell!
 	 *
-	 * @param Tx_Contentstage_Domain_Repository_Result $resource1 The source resource.
-	 * @param Tx_Contentstage_Domain_Repository_Result $resource2 The target resource.
+	 * @param Tx_Contentstage_Domain_Repository_Result $resource1 The original (target) resource.
+	 * @param Tx_Contentstage_Domain_Repository_Result $resource2 The changed (source) resource.
 	 * @param array $differences The difference array, passed this way for recursions etc.
 	 * @param string $keyField The key field of each row (usually uid).
 	 * @param string $table The table to perform the diff for. Is only used to hide certain fields. Defaults to pages.
@@ -210,9 +228,11 @@ class Tx_Contentstage_Utility_Diff {
 			if ($uid1 < $uid2) {
 				$differences[$uid]['_sourceMissing'] = $this->wrap($this->translate('diff.source.recordMissing', array($keyField, $uid)), true);
 				$r1Next = true;
+				$this->maximumTargetTstamp = max($this->maximumTargetTstamp, intval($r1[$tableTCA['__tstampField']]));
 			} else if ($uid2 < $uid1) {
 				$differences[$uid]['_targetMissing'] = $this->wrap($this->translate('diff.target.recordMissing', array($keyField, $uid)));
 				$r2Next = true;
+				$this->maximumSourceTstamp = max($this->maximumSourceTstamp, intval($r2[$tableTCA['__tstampField']]));
 			} else {
 				$this->rows($r1, $r2, $differences, $keyField, $table);
 				
@@ -222,12 +242,16 @@ class Tx_Contentstage_Utility_Diff {
 							// no difference, let's check the files
 							$folder = $tableTCA[$field]['folder'];
 							$function = 'compare' . ucfirst($type);
-							$message = $toRepository->$function(
-								$fromRepository->getFileHandle($folder . $r1[$field]),
-								$toRepository->getFileHandle($folder . $r1[$field])
-							);
-							if ($message !== false) {
-								$differences[$uid][$field] = $this->wrap($message);
+							$singleValues = t3lib_div::trimExplode(',', $r1[$field], true);
+							
+							foreach ($singleValues as $value) {
+								$message = $toRepository->$function(
+									$fromRepository->getFileHandle($folder . $value),
+									$toRepository->getFileHandle($folder . $value)
+								);
+								if ($message !== false) {
+									$differences[$uid][$field] .= $this->wrap($message);
+								}
 							}
 						}
 					}
@@ -292,6 +316,34 @@ class Tx_Contentstage_Utility_Diff {
 	 */
 	public function translate($key, $arguments = null) {
 		return Tx_Extbase_Utility_Localization::translate($key, 'Contentstage', $arguments);
+	}
+	
+	/**
+	 * Reset the maximum tstamps.
+	 *
+	 * @return void
+	 */
+	public function resetMaximumTstamps() {
+		$this->maximumSourceTstamp = 0;
+		$this->maximumTargetTstamp = 0;
+	}
+	
+	/**
+	 * Returns the maximum source tstamp.
+	 *
+	 * @return int The maximum source tstamp.
+	 */
+	public function getMaximumSourceTstamp() {
+		return $this->maximumSourceTstamp;
+	}
+	
+	/**
+	 * Returns the maximum target tstamp.
+	 *
+	 * @return int The maximum target tstamp.
+	 */
+	public function getMaximumTargetTstamp() {
+		return $this->maximumTargetTstamp;
 	}
 }
 ?>

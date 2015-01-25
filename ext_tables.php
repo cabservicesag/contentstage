@@ -15,6 +15,7 @@ if (TYPO3_MODE === 'BE') {
 		'',						// Position
 		array(
 			'Content' => 'compare, view, push',
+			'Review' => 'list, reviewed, reinitialize, new, create, edit, update, delete',
 		),
 		array(
 			'access' => 'user,group',
@@ -62,5 +63,101 @@ if (TYPO3_MODE === 'BE') {
 }
 
 t3lib_extMgm::addStaticFile($_EXTKEY, 'Configuration/TypoScript', 'Content staging');
+
+t3lib_extMgm::addLLrefForTCAdescr('tx_contentstage_domain_model_review', 'EXT:contentstage/Resources/Private/Language/locallang_csh_tx_contentstage_domain_model_review.xml');
+t3lib_extMgm::allowTableOnStandardPages('tx_contentstage_domain_model_review');
+$TCA['tx_contentstage_domain_model_review'] = array(
+	'ctrl' => array(
+		'hideTable' => 1,
+		'title'	=> 'LLL:EXT:contentstage/Resources/Private/Language/locallang_db.xml:tx_contentstage_domain_model_review',
+		'label' => 'crdate',
+		'label_alt' => 'pid,levels',
+		'label_alt_force' => 1,
+		'tstamp' => 'tstamp',
+		'crdate' => 'crdate',
+		'cruser_id' => 'cruser_id',
+		'dividers2tabs' => TRUE,
+		'sortby' => 'crdate',
+		'versioningWS' => 2,
+		'versioning_followPages' => TRUE,
+		'origUid' => 't3_origuid',
+		'languageField' => 'sys_language_uid',
+		'transOrigPointerField' => 'l10n_parent',
+		'transOrigDiffSourceField' => 'l10n_diffsource',
+		'delete' => 'deleted',
+		'enablecolumns' => array(
+			'disabled' => 'hidden',
+			'starttime' => 'starttime',
+			'endtime' => 'endtime',
+		),
+		'searchFields' => 'created,page,levels,required,debug,reviewed,creator,changes,state,',
+		'dynamicConfigFile' => t3lib_extMgm::extPath($_EXTKEY) . 'Configuration/TCA/Review.php',
+		'iconfile' => t3lib_extMgm::extRelPath($_EXTKEY) . 'Resources/Public/Icons/tx_contentstage_domain_model_review.gif'
+	),
+);
+
+t3lib_extMgm::addLLrefForTCAdescr('tx_contentstage_domain_model_reviewed', 'EXT:contentstage/Resources/Private/Language/locallang_csh_tx_contentstage_domain_model_reviewed.xml');
+t3lib_extMgm::allowTableOnStandardPages('tx_contentstage_domain_model_reviewed');
+$TCA['tx_contentstage_domain_model_reviewed'] = array(
+	'ctrl' => array(
+		'hideTable' => 1,
+		'title'	=> 'LLL:EXT:contentstage/Resources/Private/Language/locallang_db.xml:tx_contentstage_domain_model_reviewed',
+		'label' => 'reviewed',
+		'label_alt' => 'reviewer,ok',
+		'label_alt_force' => 1,
+		'tstamp' => 'tstamp',
+		'crdate' => 'crdate',
+		'cruser_id' => 'cruser_id',
+		'dividers2tabs' => TRUE,
+		'sortby' => 'sorting',
+		'versioningWS' => 2,
+		'versioning_followPages' => TRUE,
+		'origUid' => 't3_origuid',
+		'languageField' => 'sys_language_uid',
+		'transOrigPointerField' => 'l10n_parent',
+		'transOrigDiffSourceField' => 'l10n_diffsource',
+		'delete' => 'deleted',
+		'enablecolumns' => array(
+			'disabled' => 'hidden',
+			'starttime' => 'starttime',
+			'endtime' => 'endtime',
+		),
+		'searchFields' => 'reviewed,ok,reviewer,',
+		'dynamicConfigFile' => t3lib_extMgm::extPath($_EXTKEY) . 'Configuration/TCA/Reviewed.php',
+		'iconfile' => t3lib_extMgm::extRelPath($_EXTKEY) . 'Resources/Public/Icons/tx_contentstage_domain_model_reviewed.gif'
+	),
+);
+
+t3lib_extMgm::addLLrefForTCAdescr('tx_contentstage_domain_model_state', 'EXT:contentstage/Resources/Private/Language/locallang_csh_tx_contentstage_domain_model_state.xml');
+t3lib_extMgm::allowTableOnStandardPages('tx_contentstage_domain_model_state');
+$TCA['tx_contentstage_domain_model_state'] = array(
+	'ctrl' => array(
+		'hideTable' => 1,
+		'title'	=> 'LLL:EXT:contentstage/Resources/Private/Language/locallang_db.xml:tx_contentstage_domain_model_state',
+		'label' => 'state',
+		'label_alt' => 'crdate',
+		'label_alt_force' => 1,
+		'tstamp' => 'tstamp',
+		'crdate' => 'crdate',
+		'cruser_id' => 'cruser_id',
+		'dividers2tabs' => TRUE,
+		'sortby' => 'crdate',
+		'versioningWS' => 2,
+		'versioning_followPages' => TRUE,
+		'origUid' => 't3_origuid',
+		'languageField' => 'sys_language_uid',
+		'transOrigPointerField' => 'l10n_parent',
+		'transOrigDiffSourceField' => 'l10n_diffsource',
+		'delete' => 'deleted',
+		'enablecolumns' => array(
+			'disabled' => 'hidden',
+			'starttime' => 'starttime',
+			'endtime' => 'endtime',
+		),
+		'searchFields' => 'state,user,',
+		'dynamicConfigFile' => t3lib_extMgm::extPath($_EXTKEY) . 'Configuration/TCA/State.php',
+		'iconfile' => t3lib_extMgm::extRelPath($_EXTKEY) . 'Resources/Public/Icons/tx_contentstage_domain_model_state.gif'
+	),
+);
 
 ?>

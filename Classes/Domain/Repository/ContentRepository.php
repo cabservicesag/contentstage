@@ -402,7 +402,7 @@ class Tx_Contentstage_Domain_Repository_ContentRepository {
 	 * @param int $root The page id to start from.
 	 * @return array The array with the pids.
 	 */
-	public function getPageTreeUids($root = 0) {
+	public function getPageTreeUids($root = 0, $depth = false) {
 		$root = intval($root);
 		$tree = &$this->getFullPageTree();
 		
@@ -411,7 +411,7 @@ class Tx_Contentstage_Domain_Repository_ContentRepository {
 		}
 		
 		$result = array();
-		return $this->_getPageTreeUids($root, $tree[$root], $result, $this->getDepth());
+		return $this->_getPageTreeUids($root, $tree[$root], $result, $depth === false ? $this->getDepth() : $depth);
 	}
 	
 	/**

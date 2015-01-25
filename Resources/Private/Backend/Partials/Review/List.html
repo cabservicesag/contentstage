@@ -1,0 +1,52 @@
+{namespace c=Tx_Contentstage_ViewHelpers}<div class="reviews">
+	<table class="typo3-dblist">
+		<thead>
+			<tr class="t3-row-header">
+				<td class="state"><f:translate key="review.title.state" /></td>
+				<td><f:translate key="review.title.id" /></td>
+				<td><f:translate key="review.title.page" /></td>
+				<f:for each="{reviewerIndices}" as="reviewerIndex">
+					<td><f:translate key="review.title.reviewPerson" arguments="{0: reviewerIndex}" /></td>
+				</f:for>
+				<td><f:translate key="review.title.autoPush" /></td>
+				<td><f:translate key="review.title.creator" /></td>
+				<td><f:translate key="review.title.created" /></td>
+			</tr>
+		</thead>
+		<tbody>
+			<f:for each="{reviews}" as="review">
+				<tr class="db_list_normal reviewRow {f:if(condition: '{activeReview.uid} == {review.uid}', then: 'activeReview')}" data-review="{review.uid}" data-page="{review.page}">
+					<td>
+						<f:link.action controller="Review" action="delete" class="icon" arguments="{review: review}" title="{f:translate(key: 'review.link.delete')}" onclick="return confirm('{f:translate(key: 'review.link.confirm')}');">
+							<span class="t3-icon t3-icon-actions t3-icon-actions-edit t3-icon-edit-delete">&nbsp;</span>
+						</f:link.action>
+						<f:link.action controller="Content" action="compare" class="icon compare" additionalParams="{id: review.page}" title="{f:translate(key: 'compare.title')}">
+							<span class="t3-icon contentstage-action contentstage-action-view">&nbsp;</span>
+						</f:link.action>
+						<span class="t3-icon contentstage-state contentstage-state-{review.state.state}" title="{f:translate(key: 'field.review.state.{review.state.state}')}">&nbsp;</span>
+					</td>
+					<td>{review.uid}</td>
+					<td>{review.pageRecord.title} [<f:translate key="review.title.levels" /> {review.levels}]</td>
+					<c:reviewFor each="{review.reviewed}" as="reviewed" required="{maximumReviewers}">
+						<td>
+							<f:if condition="{reviewed.reviewer.uid} > 0">
+								<f:then>
+									{reviewed.reviewer.realName}
+									<span class="t3-icon contentstage-state contentstage-state-{reviewed.state}">&nbsp;</span>
+								</f:then>
+								<f:else>---</f:else>
+							</f:if>
+						</td>
+					</c:reviewFor>
+					<td>
+						<f:translate key="review.autoPush.{review.autoPush -> f:format.number(decimals: 0)}" />
+					</td>
+					<td>{review.creator.realName}</td>
+					<td>
+						<f:format.date format="d-m-Y H:i">{review.created}</f:format.date>
+					</td>
+				</tr>
+			</f:for>
+		</tbody>
+	</table>
+</div>

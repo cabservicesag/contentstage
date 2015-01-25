@@ -89,6 +89,9 @@ class Tx_Contentstage_Controller_BaseController extends Tx_CabagExtbase_Controll
 		'static_tsconfig_help' => true,
 		'tt_news_cache' => true,
 		'tt_news_cache_tags' => true,
+		'tx_contentstage_domain_model_review' => true,
+		'tx_contentstage_domain_model_reviewed' => true,
+		'tx_contentstage_domain_model_state' => true,
 		'tx_extbase_cache_object' => true,
 		'tx_extbase_cache_object_tags' => true,
 		'tx_extbase_cache_reflection' => true,
@@ -129,6 +132,9 @@ class Tx_Contentstage_Controller_BaseController extends Tx_CabagExtbase_Controll
 		'cf_extbase_reflection_tags' => true,
 		'fe_session_data' => true,
 		'fe_sessions' => true,
+		'tx_contentstage_domain_model_review' => true,
+		'tx_contentstage_domain_model_reviewed' => true,
+		'tx_contentstage_domain_model_state' => true,
 		'tx_extbase_cache_object' => true,
 		'tx_extbase_cache_object_tags' => true,
 		'tx_extbase_cache_reflection' => true,
@@ -176,6 +182,27 @@ class Tx_Contentstage_Controller_BaseController extends Tx_CabagExtbase_Controll
 	 * @var Tx_Contentstage_Domain_Repository_SnapshotRepository
 	 */
 	protected $snapshotRepository;
+
+	/**
+	 * reviewRepository
+	 *
+	 * @var Tx_Contentstage_Domain_Repository_ReviewRepository
+	 */
+	protected $reviewRepository;
+
+	/**
+	 * BackendUserGroupRepository
+	 *
+	 * @var Tx_Contentstage_Domain_Repository_BackendUserGroupRepository
+	 */
+	protected $backendUserGroupRepository;
+
+	/**
+	 * BackendUserRepository
+	 *
+	 * @var Tx_Contentstage_Domain_Repository_BackendUserRepository
+	 */
+	protected $backendUserRepository;
 	
 	/**
 	 * The cache.
@@ -213,6 +240,13 @@ class Tx_Contentstage_Controller_BaseController extends Tx_CabagExtbase_Controll
 	protected $pageTS = null;
 	
 	/**
+	 * The current page id.
+	 *
+	 * @var int
+	 */
+	protected $page = 0;
+	
+	/**
 	 * The minimum depth of recursion.
 	 *
 	 * @var int
@@ -225,6 +259,40 @@ class Tx_Contentstage_Controller_BaseController extends Tx_CabagExtbase_Controll
 	 * @var int
 	 */
 	protected $maximumDepth = null;
+	
+	/**
+	 * Review configuration.
+	 *
+	 * @var array
+	 */
+	protected $reviewConfiguration = null;
+	
+	/**
+	 * Review record, if present.
+	 *
+	 * @var Tx_Contentstage_Domain_Model_Review
+	 */
+	protected $review = null;
+	
+	/**
+	 * The active backend user.
+	 *
+	 * @var Tx_Contentstage_Domain_Model_BackendUser
+	 */
+	protected $activeBackendUser = null;
+
+	/**
+	 * injectReviewRepository
+	 *
+	 * @param Tx_Contentstage_Domain_Repository_ReviewRepository $reviewRepository
+	 * @return void
+	 */
+	public function injectReviewRepository(Tx_Contentstage_Domain_Repository_ReviewRepository $reviewRepository) {
+		$this->reviewRepository = $reviewRepository;
+		$querySettings = t3lib_div::makeInstance('Tx_Extbase_Persistence_Typo3QuerySettings');
+		$querySettings->setRespectStoragePage(false);
+		$this->reviewRepository->setDefaultQuerySettings($querySettings);
+	}
 
 	/**
 	 * Injects the snapshot repository.
@@ -234,6 +302,32 @@ class Tx_Contentstage_Controller_BaseController extends Tx_CabagExtbase_Controll
 	 */
 	public function injectSnapshotRepository(Tx_Contentstage_Domain_Repository_SnapshotRepository $snapshotRepository) {
 		$this->snapshotRepository = $snapshotRepository;
+	}
+
+	/**
+	 * Injects the BackendUserGroup repository.
+	 *
+	 * @param Tx_Contentstage_Domain_Repository_BackendUserGroupRepository $backendUserGroupRepository
+	 * @return void
+	 */
+	public function injectBackendUserGroupRepository(Tx_Contentstage_Domain_Repository_BackendUserGroupRepository $backendUserGroupRepository) {
+		$this->backendUserGroupRepository = $backendUserGroupRepository;
+		$querySettings = t3lib_div::makeInstance('Tx_Extbase_Persistence_Typo3QuerySettings');
+		$querySettings->setRespectStoragePage(false);
+		$this->backendUserGroupRepository->setDefaultQuerySettings($querySettings);
+	}
+
+	/**
+	 * Injects the BackendUser repository.
+	 *
+	 * @param Tx_Contentstage_Domain_Repository_BackendUserRepository $backendUserRepository
+	 * @return void
+	 */
+	public function injectBackendUserRepository(Tx_Contentstage_Domain_Repository_BackendUserRepository $backendUserRepository) {
+		$this->backendUserRepository = $backendUserRepository;
+		$querySettings = t3lib_div::makeInstance('Tx_Extbase_Persistence_Typo3QuerySettings');
+		$querySettings->setRespectStoragePage(false);
+		$this->backendUserRepository->setDefaultQuerySettings($querySettings);
 	}
 	
 	/**
@@ -270,6 +364,9 @@ class Tx_Contentstage_Controller_BaseController extends Tx_CabagExtbase_Controll
 		
 		$this->localDB = $GLOBALS['TYPO3_DB'];
 		
+		$this->page = intval(t3lib_div::_GP('id'));
+		t3lib_BEfunc::openPageTree($this->page, false);
+		
 		$info = $this->extensionConfiguration['remote.']['db.'];
 		
 		$noPconnect = $GLOBALS['TYPO3_CONF_VARS']['SYS']['no_pconnect'];
@@ -300,6 +397,13 @@ class Tx_Contentstage_Controller_BaseController extends Tx_CabagExtbase_Controll
 		
 		$this->initializeDepth();
 		$this->initializeIgnoreTables();
+		$this->initializeReview();
+		
+		$this->activeBackendUser = $this->backendUserRepository->findByUid($GLOBALS['BE_USER']->user['uid']);
+		if ($this->activeBackendUser === null) {
+			// should never happen
+			die($this->translate('error.noBackendUser'));
+		}
 	}
 	
 	/**
@@ -314,13 +418,13 @@ class Tx_Contentstage_Controller_BaseController extends Tx_CabagExtbase_Controll
 		
 		$pageTS = $this->getPageTS();
 		
-		$this->applyTableIndexToIndex($this->ignoreSyncTables, $pageTS['doNotSync.']);
+		$this->applyTableIndexToIndex($this->ignoreSyncTables, $pageTS['doNotSync']);
 		
-		$this->applyTableIndexToIndex($this->ignoreSnapshotTables, $pageTS['doNotSnapshot.']);
+		$this->applyTableIndexToIndex($this->ignoreSnapshotTables, $pageTS['doNotSnapshot']);
 		
 		$this->snapshotRepository->setIgnoreSnapshotTables($this->ignoreSnapshotTables);
 		
-		$this->tca->initializeIgnoreFields($pageTS['doNotDisplay.']);
+		$this->tca->initializeIgnoreFields($pageTS['doNotDisplay']);
 	}
 	
 	/**
@@ -359,6 +463,11 @@ class Tx_Contentstage_Controller_BaseController extends Tx_CabagExtbase_Controll
 		$this->remoteRepository->setDepth($depth);
 	}
 	
+	/**
+	 * Initializes the logging class.
+	 *
+	 * @return void
+	 */
 	protected function initializeLog() {
 		if ($this->log === null) {
 			$this->log = $this->objectManager->create('Tx_CabagExtbase_Utility_Logging');
@@ -384,21 +493,53 @@ class Tx_Contentstage_Controller_BaseController extends Tx_CabagExtbase_Controll
 		$this->log->log($this->translate('info.init'), Tx_CabagExtbase_Utility_Logging::INFORMATION);
 	}
 	
+	/**
+	 * Initializes the review system.
+	 *
+	 * @return void
+	 */
+	protected function initializeReview() {
+		$pageTS = $this->getPageTS();
+		
+		if (empty($pageTS['review'])) {
+			return;
+		}
+		
+		$this->reviewConfiguration = is_array($pageTS['review']) ? $pageTS['review'] : array();
+		if (!isset($this->reviewConfiguration['required'])) {
+			$this->reviewConfiguration['required'] = 2;
+		}
+		$this->reviewConfiguration['required'] = max(1, intval($this->reviewConfiguration['required']));
+		
+		$this->review = $this->reviewRepository->findActive($this->page);
+		if ($this->review === null) {
+			$this->review = $this->objectManager->create('Tx_Contentstage_Domain_Model_Review');
+			
+			$this->review->setPage($this->page);
+			$this->review->setLevels($this->localRepository->getDepth());
+			$this->review->setRequired($this->reviewConfiguration['required']);
+		}
+	}
+	
+	/**
+	 * Returns the page TypoScript configuration.
+	 *
+	 * @return array The pageTS
+	 */
 	protected function getPageTS() {
 		if ($this->pageTS === null) {
-			$id = intval(t3lib_div::_GP('id'));
+			$id = $this->page;
 			if ($id <= 0) {
 				return array();
 			}
 			
 			$rootline = array();
-			$c = PHP_INT_MAX;
 			foreach ($this->localRepository->getRootline($id) as $uid => $page) {
-				$rootline[$c] = &$page;
-				$c--;
+				array_unshift($rootline, $page);
 			}
+			
 			$pageTS = t3lib_befunc::getPagesTSconfig($id, $rootline);
-			$this->pageTS = $pageTS['tx_' . strtolower($this->extensionName) . '.'];
+			$this->pageTS = Tx_Extbase_Utility_TypoScript::convertTypoScriptArrayToPlainArray($pageTS['tx_' . strtolower($this->extensionName) . '.']);
 		}
 		
 		return $this->pageTS;
@@ -515,6 +656,183 @@ class Tx_Contentstage_Controller_BaseController extends Tx_CabagExtbase_Controll
 			$info['host'] = strstr($info['host'], ':', true);
 		}
 		return $info;
+	}
+	
+	/**
+	 * Assign the review records to the view. Finds all if no reviews given.
+	 *
+	 * @param mixed $reviews The reviews to assign. Must be array or array like object.
+	 * @return void
+	 */
+	protected function assignReviews($reviews = null) {
+		if (!is_array($reviews) || !($reviews instanceof Traversable)) {
+			if ($this->activeBackendUser->isAdmin()) {
+				$reviews = $this->reviewRepository->findAll();
+			} else {
+				$mountpoints = $this->activeBackendUser->getDbMountpointsRecursive();
+				$pageUids = array();
+				
+				foreach ($mountpoints as $mountpoint) {
+					$pageUids = array_merge($pageUids, $this->localRepository->getPageTreeUids($mountpoint, -1));
+				}
+				$reviews = $this->reviewRepository->findByPage($pageUids);
+			}
+		}
+		
+		$maximumReviewers = 0;
+		foreach ($reviews as $review) {
+			$maximumReviewers = max(max($maximumReviewers, $review->getRequired()), $review->getReviewed()->count());
+		}
+		$this->view->assign('reviewerIndices', range(1, $maximumReviewers));
+		$this->view->assign('maximumReviewers', $maximumReviewers);
+		$this->view->assign('reviews', $reviews);
+		$this->view->assign('activeReview', $this->review);
+		$this->view->assign('reviewConfiguration', $this->reviewConfiguration);
+	}
+	
+	/**
+	 * Assign the possible review backend users to the view.
+	 *
+	 * @return void
+	 */
+	protected function assignReviewers() {
+		$pageTS = $this->getPageTS();
+		$backendUsers = array();
+		
+		$rootlineIndex = array();
+		foreach ($this->localRepository->getRootline($this->page) as $rootlinePage) {
+			$rootlineIndex[$rootlinePage['uid']] = $rootlinePage;
+		}
+		
+		$groupIndex = array();
+		foreach (t3lib_div::intExplode(',', $pageTS['reviewGroups'], true) as $groupUid) {
+			$group = $this->backendUserGroupRepository->findByUid($groupUid);
+			if ($group !== null) {
+				$groupIndex[$group->getUid()] = $group;
+			}
+		}
+		
+		foreach ($this->backendUserRepository->findAll() as $backendUser) {
+			$mountpointMatches = false;
+			foreach ($backendUser->getDbMountpointsRecursive() as $mountpoint) {
+				if (isset($rootlineIndex[$mountpoint])) {
+					$mountpointMatches = true;
+					break;
+				}
+			}
+			
+			$groupMatches = true;
+			if (count($groupIndex) > 0) {
+				$groupMatches = false;
+				foreach ($backendUser->getGroups() as $group) {
+					if (isset($groupIndex[$group->getUid()])) {
+						$groupMatches = true;
+						break;
+					}
+				}
+			}
+			
+			if ($mountpointMatches && $groupMatches) {
+				$backendUsers[] = $backendUser;
+			}
+		}
+		
+		usort($backendUsers, function($a, $b) {
+			return strcasecmp($a->getName(), $b->getName());
+		});
+		$this->view->assign('backendUsers', $backendUsers);
+		$this->view->assign('activeBackendUser', $this->activeBackendUser);
+	}
+	
+	/**
+	 * Assigns the depth values as an array to the view.
+	 *
+	 * @return void
+	 */
+	protected function assignDepth() {
+		$pageTS = $this->getPageTS();
+		$depthOptions = $pageTS['depthOptions'];
+		if (empty($depthOptions)) {
+			$depthOptions = '0,1,2,3,4,5,6,7,8,9,-1';
+		}
+		$result = array();
+		
+		foreach (t3lib_div::intExplode(',', $depthOptions) as $depth) {
+			if ($depth >= $this->minimumDepth && $depth <= $this->maximumDepth || ($depth == -1 && $this->maximumDepth === PHP_INT_MAX)) {
+				$result[$depth] = $depth;
+			}
+		}
+		
+		if (isset($result[0])) {
+			$result[0] = $this->translate('depth.this');
+		}
+		if (isset($result['-1'])) {
+			$result['-1'] = $this->translate('depth.infinite');
+		}
+		
+		$this->view->assign('depthOptions', $result);
+		$this->view->assign('minimumDepth', $this->minimumDepth);
+		$this->view->assign('maximumDepth', $this->maximumDepth);
+	}
+	
+	/**
+	 * Sends a mail.
+	 *
+	 * @param string $key Typoscript key under where to find the configuration.
+	 * @param mixed $recipients Either array with email => name pairs or commaseparated list of emails.
+	 * @param string $template Path to the template file.
+	 * @param array $assign Key => value pairs to be assigned.
+	 * @param array $attachements An array of file paths with attachments.
+	 *
+	 * @return boolean Whether or not the mail was sent.
+	 */
+	protected function sendMail($key, $recipients, array $assign = array(), array $attachments = array()) {
+		$pageTS = $this->getPageTS();
+		$configuration = t3lib_div::array_merge_recursive_overrule($pageTS['mails']['default'], $pageTS['mails'][$key]);
+		
+		if (
+			empty($configuration)
+			|| empty($configuration['templateFile'])
+			|| empty($configuration['from'])
+			|| empty($configuration['fromName'])
+		) {
+			return false;
+		}
+		
+		$mail = $this->objectManager->create(
+			'Tx_CabagExtbase_Utility_Mail',
+			$this->controllerContext,
+			$configuration['templateFile'],
+			$pageTS
+		)->setUseSwiftmailer(true);
+		
+		foreach ($assign as $k => $v) {
+			$mail->assign($k, $v);
+		}
+		$mail->assign('activeBackendUser', $this->activeBackendUser);
+		$mail->assign('pageUid', $this->page);
+		$mail->assign('activeReview', $this->review);
+		$mail->assign('localRootline', $this->localRepository->getRootline($this->page));
+		$mail->assign('remoteRootline', $this->remoteRepository->getRootline($this->page));
+		$mail->assign('comment', $this->request->hasArgument('comment') ? $this->request->getArgument('comment') : '');
+		
+		foreach ($attachments as $attachment) {
+			$mail->addAttachment($attachment);
+		}
+		
+		$ok = $mail->sendMail(
+			$recipients,
+			$this->translate('mails.' . $key . '.subject'),
+			$configuration['from'],
+			$configuration['fromName'],
+			$configuration['html']
+		);
+		
+		if (!$ok) {
+			$this->log->log($mail->getLastMessage(), Tx_CabagExtbase_Utility_Logging::WARNING, array('key' => $key, 'recipients' => $recipients, 'configuration' => $configuration));
+		}
+		
+		return $ok;
 	}
 }
 ?>

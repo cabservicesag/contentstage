@@ -54,48 +54,42 @@ class Tx_Contentstage_Controller_ContentController extends Tx_Contentstage_Contr
 	 * @return void
 	 */
 	public function compareAction() {
-		$id = intval(t3lib_div::_GP('id'));
-		
-		if ($id <= 0) {
+		if ($this->page <= 0) {
 			$this->log->log($this->translate('info.compare.noId'), Tx_CabagExtbase_Utility_Logging::INFORMATION);
 			$this->log->write();
 			return $this->translate('info.compare.noId');
 		}
 		
-		try {
-			$localTree = $this->localRepository->getFullPageTree();
-			$remoteTree = $this->remoteRepository->getFullPageTree();
-			if (!is_array($remoteTree[$id])) {
-				$remoteTree[$id] = array();
-			}
-			if (!is_array($localTree[$id])) {
-				$localTree[$id] = array();
-			}
-			$this->pageTree = &$localTree;
-			$this->diff->rows($remoteTree[$id], $localTree[$id]);
-			$this->compareTables($id);
-			$this->generatePidIndex();
-			
-			$this->log->log($this->translate('info.compare.done'), Tx_CabagExtbase_Utility_Logging::INFORMATION, $localTree[$id]);
-		} catch (Exception $e) {
-			$this->log->log($this->translate('error.' . $e->getCode(), array($e->getMessage())) ?: $e->getMessage(), Tx_CabagExtbase_Utility_Logging::ERROR);
-		}
+		$this->doComparison();
 
-		$this->view->assign('localRootline', $this->localRepository->getRootline($id));
-		$this->view->assign('remoteRootline', $this->remoteRepository->getRootline($id));
+		$this->view->assign('localRootline', $this->localRepository->getRootline($this->page));
+		$this->view->assign('remoteRootline', $this->remoteRepository->getRootline($this->page));
 		$this->view->assign('depth', $this->localRepository->getDepth());
 		
-		$this->view->assign('pageTree', $this->localRepository->reducePageTree($this->pageTree[$id], $this->localRepository->getDepth()));
+		$this->view->assign('pageTree', $this->localRepository->reducePageTree($this->pageTree[$this->page], $this->localRepository->getDepth()));
 		
 		$this->view->assign('pidIndex', $this->pidIndex);
 		
 		$this->view->assign('tca', $this->tca->getProcessedTca());
 		
-		$this->log->log($this->translate('info.compare.startFluid'), Tx_CabagExtbase_Utility_Logging::INFORMATION, $localTree[$id]);
+		if ($this->review !== null && $this->review->getUid() > 0 && $this->review->getLevels() === $this->localRepository->getDepth()) {
+			$changed = $this->review->calculateState(null, false, $this->diff->getMaximumSourceTstamp());
+			if ($changed) {
+				$this->log->log($this->translate('info.review.deprecated'), Tx_CabagExtbase_Utility_Logging::WARNING, $this->diff->getMaximumSourceTstamp());
+			}
+		}
+		
+		$this->assignReviews();
+		$this->assignReviewers();
+		$this->assignDepth();
+		$this->view->assign('currentPage', $this->page);
+		$this->view->assign('isPushable', $this->isPushable());
+		
+		$this->log->log($this->translate('info.compare.startFluid'), Tx_CabagExtbase_Utility_Logging::INFORMATION, $this->pageTree[$this->page]);
 		
 		$content = $this->view->render();
 		
-		$this->log->log($this->translate('info.compare.endFluid'), Tx_CabagExtbase_Utility_Logging::INFORMATION, $localTree[$id]);
+		$this->log->log($this->translate('info.compare.endFluid'), Tx_CabagExtbase_Utility_Logging::INFORMATION, $this->pageTree[$this->page]);
 		
 		$this->log->write();
 		
@@ -109,26 +103,24 @@ class Tx_Contentstage_Controller_ContentController extends Tx_Contentstage_Contr
 	 * @return void
 	 */
 	public function viewAction() {
-		$id = intval(t3lib_div::_GP('id'));
-		
-		if ($id <= 0) {
+		if ($this->page <= 0) {
 			$this->log->log($this->translate('info.compare.noId'), Tx_CabagExtbase_Utility_Logging::INFORMATION);
 			$this->log->write();
 			return $this->translate('info.compare.noId');
 		}
 		
-		$localDomain = $this->localRepository->getDomain($id);
-		$remoteDomain = $this->remoteRepository->getDomain($id);
+		$localDomain = $this->localRepository->getDomain($this->page);
+		$remoteDomain = $this->remoteRepository->getDomain($this->page);
 		
 		if ($localDomain === null) {
-			$this->log->log($this->translate('warning.view.noDomain', array('local', $id)), Tx_CabagExtbase_Utility_Logging::WARNING);
+			$this->log->log($this->translate('warning.view.noDomain', array('local', $this->page)), Tx_CabagExtbase_Utility_Logging::WARNING);
 		}
 		if ($remoteDomain === null) {
-			$this->log->log($this->translate('warning.view.noDomain', array('remote', $id)), Tx_CabagExtbase_Utility_Logging::WARNING);
+			$this->log->log($this->translate('warning.view.noDomain', array('remote', $this->page)), Tx_CabagExtbase_Utility_Logging::WARNING);
 		}
 		
-		$this->view->assign('localUrl', 'http://' . $localDomain . '/index.php?id=' . $id);
-		$this->view->assign('remoteUrl', 'http://' . $remoteDomain . '/index.php?id=' . $id);
+		$this->view->assign('localUrl', 'http://' . $localDomain . '/index.php?id=' . $this->page);
+		$this->view->assign('remoteUrl', 'http://' . $remoteDomain . '/index.php?id=' . $this->page);
 		
 		$this->log->write();
 	}
@@ -139,8 +131,21 @@ class Tx_Contentstage_Controller_ContentController extends Tx_Contentstage_Contr
 	 * @return void
 	 */
 	public function pushAction() {
-		$id = intval(t3lib_div::_GP('id'));
+		if ($this->review !== null && $this->review->getUid() > 0) {
+			$this->localRepository->setDepth($this->review->getLevels());
+			$this->remoteRepository->setDepth($this->review->getLevels());
+			
+			$this->doComparison();
 		
+			$changed = $this->review->calculateState(null, false, $this->diff->getMaximumSourceTstamp());
+			if ($changed) {
+				$this->log->log($this->translate('info.review.deprecated'), Tx_CabagExtbase_Utility_Logging::WARNING, $this->diff->getMaximumSourceTstamp());
+			}
+		}
+		if (!$this->isPushable()) {
+			$this->log->log($this->translate('info.review.noPermission'), Tx_CabagExtbase_Utility_Logging::WARNING);
+			$this->redirect('compare');
+		}
 		try {
 			$tables = $this->filterTables(array_keys($this->remoteRepository->getTables()), $this->ignoreSnapshotTables);
 			$info = $this->snapshotRepository->create(
@@ -150,17 +155,56 @@ class Tx_Contentstage_Controller_ContentController extends Tx_Contentstage_Contr
 			);
 			$this->log->log($this->translate('info.push.snapshot', array($info['file'])), Tx_CabagExtbase_Utility_Logging::OK);
 			
-			$this->pushTables($id);
+			$this->pushTables($this->page);
 			$this->log->log($this->translate('info.push.done'), Tx_CabagExtbase_Utility_Logging::OK);
 			
-			$this->remoteRepository->clearCache($id, !!$this->extensionConfiguration['clearAllCaches']);
+			$this->remoteRepository->clearCache($this->page, !!$this->extensionConfiguration['clearAllCaches']);
 			$this->log->log($this->translate('info.push.clearCache'), Tx_CabagExtbase_Utility_Logging::OK);
+			
+			if ($this->review !== null && $this->review->getUid() > 0 && $this->review->getLevels() <= $this->localRepository->getDepth()) {
+				$this->review->addChangeString($this->activeBackendUser, Tx_Contentstage_Domain_Model_State::PUSHED);
+			}
 		} catch (Exception $e) {
 			$this->log->log($this->translate('error.' . $e->getCode(), array($e->getMessage())) ?: $e->getMessage(), Tx_CabagExtbase_Utility_Logging::ERROR);
 		}
 		
 		$this->log->write();
 		$this->redirect('compare');
+	}
+	
+	/**
+	 * Returns whether or not the current page may be pushed.
+	 *
+	 * @return boolean Whether or not the current page may be pushed.
+	 */
+	protected function isPushable() {
+		return $this->reviewConfiguration === null || empty($this->reviewConfiguration['_typoScriptNodeValue']) || !empty($this->reviewConfiguration['mayPush']) || ($this->review !== null && $this->review->isPushable());
+	}
+	
+	/**
+	 * Do the comparison.
+	 *
+	 * @return void
+	 */
+	protected function doComparison() {
+		try {
+			$localTree = $this->localRepository->getFullPageTree();
+			$remoteTree = $this->remoteRepository->getFullPageTree();
+			if (!is_array($remoteTree[$this->page])) {
+				$remoteTree[$this->page] = array();
+			}
+			if (!is_array($localTree[$this->page])) {
+				$localTree[$this->page] = array();
+			}
+			$this->pageTree = &$localTree;
+			$this->diff->rows($remoteTree[$this->page], $localTree[$this->page]);
+			$this->compareTables($this->page);
+			$this->generatePidIndex();
+			
+			$this->log->log($this->translate('info.compare.done'), Tx_CabagExtbase_Utility_Logging::INFORMATION, $localTree[$this->page]);
+		} catch (Exception $e) {
+			$this->log->log($this->translate('error.' . $e->getCode(), array($e->getMessage())) ?: $e->getMessage(), Tx_CabagExtbase_Utility_Logging::ERROR);
+		}
 	}
 
 	/**

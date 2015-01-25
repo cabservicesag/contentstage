@@ -3,8 +3,36 @@
 }
 
 .push,
+.depth,
+.sliderWrap,
+.rootlineContainer,
+.typo3-dyntabmenu-divs,
+form.reviewForm,
+form.reviewedForm {
+	margin-bottom: 20px;
+}
+
+.tx_contentstage h1 {
+	line-height: 26px;
+}
+
+.tx_contentstage h2 {
+	line-height: 18px;
+}
+
+.tx_contentstage hr {
+	border-top: none;
+}
+
+.push,
 .depth {
-	padding-top: 20px;
+	float: left;
+	margin-right: 20px;
+}
+
+.formContainer,
+.clearer {
+	clear: both;
 }
 
 .treeview, .treeview ul { 
@@ -83,7 +111,6 @@
 
 
 .treeContainer {
-	margin-top: 20px;
 	margin-bottom: 20px;
 	float: left;
 	width: 500px;
@@ -92,7 +119,6 @@
 }
 
 .differencesContainer {
-	margin-top: 20px;
 	margin-bottom: 20px;
 	float: left;
 	width: 500px;
@@ -103,12 +129,17 @@
 	clear: both;
 }
 
-strong.subHasChanges {
+strong.subHasChanges,
+a.pageNode .contentstage-action-changessub {
 	display: none;
 }
 
 a.subHasChanges strong.subHasChanges {
 	display: inline;
+}
+
+a.pageNode.subHasChanges .contentstage-action-changessub {
+	display: inline-block;
 }
 
 .differencesContainer span.title .subHasChanges,
@@ -165,4 +196,240 @@ a.subHasChanges strong.subHasChanges {
 
 span.badRootline {
 	font-weight: bold;
+}
+
+.tx_contentstage span.contentstage-state {
+	background-image: url(../Icons/state.png);
+	float: right;
+	background-position: 0 -96px;
+}
+
+.tx_contentstage span.contentstage-state-reinitialized {
+	background-position: 0 -80px;
+}
+
+.tx_contentstage span.contentstage-state-partial {
+	background-position: 0 -64px;
+}
+
+.tx_contentstage span.contentstage-state-reviewed {
+	background-position: 0 -48px;
+}
+
+.tx_contentstage span.contentstage-state-pushed {
+	background-position: 0 -32px;
+}
+
+.tx_contentstage span.contentstage-state-rejected {
+	background-position: 0 -16px;
+}
+
+.tx_contentstage span.contentstage-state-deprecated {
+	background-position: 0 0;
+}
+
+.tx_contentstage .submitContainer {
+	position: relative;
+	display: inline-block;
+}
+
+.tx_contentstage .submitContainer input {
+	padding-left: 20px;
+}
+
+.tx_contentstage span.contentstage-action {
+	background-image: url(../Icons/action.png);
+}
+
+.tx_contentstage .submitContainer span.contentstage-action {
+	position: absolute;
+	top: 3px;
+	left: 3px;
+	cursor: pointer;
+}
+
+.tx_contentstage span.contentstage-action-push {
+	background-position: 0 0;
+}
+
+.tx_contentstage span.contentstage-action-accept {
+	background-position: 0 -16px;
+}
+
+.tx_contentstage span.contentstage-action-reject {
+	background-position: 0 -32px;
+}
+
+.tx_contentstage span.contentstage-action-refresh {
+	background-position: 0 -48px;
+}
+
+.tx_contentstage span.contentstage-action-view {
+	background-position: 0 -64px;
+}
+
+.tx_contentstage span.contentstage-action-changes {
+	background-position: 0 -80px;
+}
+
+.tx_contentstage span.contentstage-action-changessub {
+	background-position: 0 -96px;
+}
+
+.tx_contentstage span.contentstage-action-new {
+	background-position: 0 -112px;
+}
+
+.tx_contentstage input.accept {
+	background-image: url(../Icons/accept.png);
+}
+
+.tx_contentstage input.reject {
+	background-image: url(../Icons/reject.png);
+}
+
+.tx_contentstage table.typo3-dblist tr td {
+	padding-right: 6px;
+}
+
+.tx_contentstage .typo3-dblist .t3-row-header td.state {
+	width: 100px;
+	text-align: right;
+}
+
+.tx_contentstage .typo3-dblist tr.infoRow td,
+.tx_contentstage .typo3-dblist tr.changesRow td {
+	border: 1px solid #A2AAB8;
+}
+
+.tx_contentstage .typo3-dblist tr.changesRow td {
+	border-top: none;
+}
+
+.tx_contentstage .typo3-dblist tr.infoRow td {
+	border-bottom: none;
+}
+
+.tx_contentstage .typo3-dblist tr.infoRow td.record {
+	border-right: none;
+}
+
+.tx_contentstage .typo3-dblist tr.infoRow td.field {
+	border-left: none;
+}
+
+.tx_contentstage .typo3-dblist tr.infoRow td .t3-icon-document-open {
+	cursor: pointer;
+}
+
+.tx_contentstage .reviews {
+	max-height: 200px;
+	overflow-y: auto;
+}
+
+.tx_contentstage .reviews table.typo3-dblist {
+	width: 100%;
+	margin-top: 0;
+}
+
+.tx_contentstage .reviews table.typo3-dblist tr.reviewRow {
+	cursor: pointer;
+}
+
+.tx_contentstage_halfleft,
+.tx_contentstage_halfright {
+	width: 48%;
+	float: left;
+	clear: left;
+}
+
+.tx_contentstage_halfright {
+	float: right;
+	clear: right;
+}
+
+.tx_contentstage .sliderWrap .sliderClick {
+	padding-left: 20px;
+	min-height: 20px;
+	background: url(../Icons/down.png) 2px 2px no-repeat;
+	cursor: pointer;
+}
+
+.tx_contentstage .sliderWrap.open .sliderClick {
+	background-image: url(../Icons/up.png);
+	margin-bottom: 10px;
+}
+
+.tx_contentstage .sliderWrap .sliderClick h2 span.t3-icon {
+	margin-top: -2px;
+	float: none;
+}
+
+.tx_contentstage .sliderWrap .sliderContent {
+	display: none;
+}
+
+table.typo3-dblist tr.db_list_normal.activeReview td {
+    background-color: #DEDEDE;
+}
+
+/* iLightbox stylesheet */
+
+#ilbOverlay {
+    background-color: #000000;
+    cursor: pointer;
+    height: 100%;
+    left: 0;
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 9998;
+}
+
+#ilbCenter {
+    position: absolute;
+    z-index: 9998;
+}
+
+#ilbCenter iframe {
+	border: 0;
+}
+
+#ilbContent {
+	padding: 12px;
+	margin: 8px;
+	background-color: #ffffff;
+}
+
+#ilbClose {
+    background: url("../Icons/close.png") no-repeat scroll center center transparent;
+    display: block;
+    height: 16px;
+    outline: medium none;
+    width: 16px;
+    position: absolute;
+    top: 0px;
+    right: 0px;
+    cursor: pointer;
+    z-index: 9999;
+}
+
+#ilbCenter {
+	margin-top: 20px;
+}
+
+form.iLightbox .iLightboxContent {
+	display: none;
+}
+
+form .formRow {
+	margin-bottom: 10px;
+}
+
+form .formRow textarea {
+	width: 200px;
+}
+
+#ilbContent .formRow h2 {
+	width: 250px;
 }

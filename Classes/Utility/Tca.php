@@ -180,6 +180,7 @@ class Tx_Contentstage_Utility_Tca implements t3lib_singleton {
 			$this->tca[$table] = $defaultFields;
 			$this->tca[$table]['__name'] = $this->translate($tableData['ctrl']['title']);
 			$this->tca[$table]['__labelField'] = $tableData['ctrl']['label'];
+			$this->tca[$table]['__tstampField'] = $tableData['ctrl']['tstamp'];
 			$this->tca[$table]['__files'] = $this->tca[$table]['__folders'] = array();
 			
 			t3lib_div::loadTCA($table);

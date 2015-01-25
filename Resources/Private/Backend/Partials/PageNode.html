@@ -1,15 +1,14 @@
 <li>
 	<a data-page="{page.uid}" href="#" class="pageNode" title="{page.title} [{page.uid}]">{page.title} [{page.uid}]<f:if condition="{page._differences}">
 		<f:then>
-			<strong class="changes">
-				[<f:translate key="changes" />]
-			</strong>
+			<span class="t3-icon contentstage-action contentstage-action-changes" title="{f:translate(key: 'changes')}">&nbsp;</span>
 		</f:then>
 		<f:else>
-			<strong class="subHasChanges">
-				[<f:translate key="subHasChanges" />]
-			</strong>
+			<span class="t3-icon contentstage-action contentstage-action-changessub" title="{f:translate(key: 'subHasChanges')}">&nbsp;</span>
 		</f:else>
 	</f:if></a>
+	<f:link.action class="view" action="view" target="_blank" additionalParams="{id: page.uid}">
+		<span class="t3-icon contentstage-action contentstage-action-view" title="{f:translate(key: 'compare.title')}">&nbsp;</span>
+	</f:link.action>
 	<f:if condition="{page._children}"><ul><f:for each="{page._children}" as="child"><f:render partial="PageNode" arguments="{page: child}" /></f:for></ul></f:if>
 </li>

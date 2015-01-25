@@ -4,32 +4,151 @@
 
 <f:flashMessages />
 
-<div class="rootline">
-	<strong>
-		<f:translate key="local.rootline" />
-	</strong>
-	<f:render partial="Rootline" arguments="{rootline: localRootline}" />
+<f:if condition="{reviewConfiguration._typoScriptNodeValue}">
+	<f:if condition="{f:count(subject: reviews)} > 0">
+		<div class="sliderWrap">
+			<div class="sliderClick">
+				<h2><f:translate key="compare.sub.reviewList.title" arguments="{0: '{f:count(subject: reviews)}'}" /></h2>
+			</div>
+			<div class="sliderContent">
+				<f:render partial="Review/List" arguments="{reviews: reviews, activeReview: activeReview, maximumReviewers: maximumReviewers, reviewerIndices: reviewerIndices}" />
+			</div>
+		</div>
+	</f:if>
+	
+	<hr />
+	
+	<f:if condition="{activeReview.uid}{reviewConfiguration.editCreate}">
+		<div class="sliderWrap">
+			<div class="sliderClick">
+				<h2>
+					<f:translate key="compare.sub.activeReview.title" />
+					<f:if condition="{activeReview.uid} > 0">
+						<f:then>
+							<span class="t3-icon contentstage-state contentstage-state-{activeReview.state.state}" title="{f:translate(key: 'field.review.state.{activeReview.state.state}')}">&nbsp;</span>
+						</f:then>
+						<f:else>
+							<span class="t3-icon contentstage-action contentstage-action-new" title="{f:translate(key: 'review.create.submit')}">&nbsp;</span>
+						</f:else>
+					</f:if>
+				</h2>
+			</div>
+			<div class="sliderContent">
+				<c:form renderArgumentsAsHidden="1" class="reviewForm iLightbox" method="POST" action="{f:if(condition: '{activeReview.uid} > 0', then: 'update', else: 'create')}" controller="Review" object="{activeReview}" name="review">
+					<f:render partial="Review/Fields" arguments="{review: activeReview, activeBackendUser: activeBackendUser, backendUsers: backendUsers, depthOptions: depthOptions, depth: depth, reviewConfiguration: reviewConfiguration}" />
+					<f:if condition="{reviewConfiguration.editCreate}">
+						<div>
+							<div class="submitContainer">
+								<f:form.submit value="{f:translate(key: 'review.{f:if(condition: \'{activeReview.uid} > 0\', then: \'edit\', else: \'create\')}.submit')}" />
+								<span class="t3-icon contentstage-action contentstage-action-accept" title="{f:translate(key: 'review.{f:if(condition: \'{activeReview.uid} > 0\', then: \'edit\', else: \'create\')}.submit')}">&nbsp;</span>
+							</div>
+						</div>
+						<f:render partial="LightboxComment" />
+					</f:if>
+				</c:form>
+			</div>
+		</div>
+	</f:if>
+	
+	<f:if condition="{activeReview.reviewable}">
+		<f:then>
+			<f:if condition="{activeReview.currentReviewed.uid} > 0">
+				<f:if condition="{depth} == {activeReview.levels}">
+					<f:then>
+						<c:form renderArgumentsAsHidden="1" class="reviewedForm iLightbox" method="POST" action="reviewed" controller="Review">
+							<f:form.hidden name="review" value="{activeReview}" />
+							<div>
+								<div class="submitContainer">
+									<f:form.submit name="submitButton" value="{f:translate(key: 'review.submit.ok')}" />
+									<span class="t3-icon contentstage-action contentstage-action-accept" title="{f:translate(key: 'review.submit.ok')}">&nbsp;</span>
+								</div>
+								<div class="submitContainer">
+									<f:form.submit name="submitButton" value="{f:translate(key: 'review.submit.nok')}" />
+									<span class="t3-icon contentstage-action contentstage-action-reject" title="{f:translate(key: 'review.submit.nok')}">&nbsp;</span>
+								</div>
+								<f:form.hidden class="hiddenSubmit" name="submitButton" value="" />
+							</div>
+							<f:render partial="LightboxComment" />
+						</c:form>
+					</f:then>
+					<f:else>
+						<c:form renderArgumentsAsHidden="1" class="reviewedForm" method="GET" action="compare" controller="Content">
+							<input type="hidden" name="depth" value="{activeReview.levels}" />
+							<div>
+								<div class="submitContainer">
+									<f:form.submit name="submitButton" value="{f:translate(key: 'review.changeDepth', arguments: {0: activeReview.levels})}" />
+									<span class="t3-icon contentstage-action contentstage-action-changes" title="{f:translate(key: 'review.changeDepth', arguments: {0: activeReview.levels})}">&nbsp;</span>
+								</div>
+							</div>
+						</c:form>
+					</f:else>
+				</f:if>
+			</f:if>
+		</f:then>
+		<f:else>
+			<f:if condition="{activeReview.uid} > 0">
+				<f:if condition="{activeReview.pushable} == 0">
+					<f:if condition="{reviewConfiguration.editCreate}">
+						<c:form renderArgumentsAsHidden="1" class="reviewedForm" method="GET" action="reinitialize" controller="Review">
+							<f:form.hidden name="review" value="{activeReview}" />
+							<div>
+								<div class="submitContainer">
+									<f:form.submit name="submitButton" value="{f:translate(key: 'review.reinitialize')}" />
+									<span class="t3-icon contentstage-action contentstage-action-refresh" title="{f:translate(key: 'review.reinitialize')}">&nbsp;</span>
+								</div>
+							</div>
+						</c:form>
+					</f:if>
+				</f:if>
+			</f:if>
+		</f:else>
+	</f:if>
+	
+	<f:if condition="{activeReview.uid}{reviewConfiguration.editCreate}">
+		<hr />
+	</f:if>
+</f:if>
+
+<h2><f:translate key="compare.sub.compare.title" /></h2>
+<div class="rootlineContainer">
+	<div class="rootline">
+		<strong>
+			<f:translate key="local.rootline" />
+		</strong>
+		<f:render partial="Rootline" arguments="{rootline: localRootline}" />
+	</div>
+	
+	<div class="rootline">
+		<strong>
+			<f:translate key="remote.rootline" />
+		</strong>
+		<f:render partial="Rootline" arguments="{rootline: remoteRootline}" />
+	</div>
 </div>
 
-<div class="rootline">
-	<strong>
-		<f:translate key="remote.rootline" />
-	</strong>
-	<f:render partial="Rootline" arguments="{rootline: remoteRootline}" />
-</div>
-
-<div class="depth">
-	<f:form method="POST" action="compare">
-		<input name="depth" type="text" value="{depth}" />
-		<input type="submit" value="{f:translate(key: 'compare.update')}" />
-	</f:form>
-</div>
-
-<div class="push">
-	<form method="POST" action="{f:uri.action(action: 'push')}">
-		<input name="depth" type="hidden" value="{depth}" />
-		<input type="submit" value="{f:translate(key: 'push.doIt')}" />
-	</form>
+<div class="formContainer">
+	<div class="depth">
+		<c:form renderArgumentsAsHidden="1" method="POST" action="compare" fieldNamePrefix="">
+			<f:form.select name="depth" options="{depthOptions}" value="{depth}" />
+			<div class="submitContainer">
+				<input type="submit" value="{f:translate(key: 'compare.update')}" />
+				<span class="t3-icon contentstage-action contentstage-action-refresh" title="{f:translate(key: 'compare.update')}">&nbsp;</span>
+			</div>
+		</c:form>
+	</div>
+	
+	<f:if condition="{isPushable}">
+		<div class="push">
+			<form method="POST" action="{f:uri.action(action: 'push')}">
+				<input name="depth" type="hidden" value="{depth}" />
+				<div class="submitContainer">
+					<input type="submit" value="{f:translate(key: 'push.doIt')}" />
+					<span class="t3-icon contentstage-action contentstage-action-push" title="{f:translate(key: 'push.doIt')}">&nbsp;</span>
+				</div>
+			</form>
+		</div>
+	</f:if>
+	<div class="clearer"></div>
 </div>
 
 <div class="treeContainer">
@@ -42,33 +161,34 @@
 	</ul>
 </div>
 <script id="contentstageChangesTemplate" type="text/x-jquery-tmpl"><![CDATA[
-	<li class="field" data-page="${page}" data-table="${table}" data-record="${record}" data-field="${field}">
-		<span class="fieldTitle title">${tableName} [uid=${record}] &gt; ${fieldName}</span>
-		<span class="changes">{{html change}}</span>
-	</li>
+	<tr class="infoRow" data-page="${page}" data-table="${table}" data-record="${record}" data-field="${field}">
+		<td class="record">
+			]]><f:translate key="changes.record" /><![CDATA[ <span class="record">${tableName} [uid=${record}]</span>
+			<span class="t3-icon t3-icon-actions t3-icon-actions-document t3-icon-document-open">&nbsp;</span>
+		</td>
+		<td class="field">
+			]]><f:translate key="changes.field" /><![CDATA[ <span class="field">${fieldName}</span>
+		</td>
+	</tr>
+	<tr class="changesRow" data-page="${page}" data-table="${table}" data-record="${record}" data-field="${field}">
+		<td colspan="2">
+			{{html change}}
+		</td>
+	</tr>
 ]]></script>
 <script id="contentstagePageChangesTemplate" type="text/x-jquery-tmpl"><![CDATA[
 	{{if changes.length}}
 		<li class="page" data-page="${page}">
-			<span class="title pageTitle">{{html title}}</span>
-			<ul class="tableContainer">{{tmpl(changes) "#contentstageChangesTemplate"}}</ul>
+			<table class="typo3-dblist">
+				<tr class="t3-row-header">
+					<td colspan="2">
+						]]><f:translate key="changes.page" /><![CDATA[ <span class="title">{{html title}}</span>
+					</td>
+				</tr>
+				{{tmpl(changes) "#contentstageChangesTemplate"}}
+			</table>
 		</li>
 	{{/if}}
-]]></script>
-<script id="contentstagePageTreeTemplate" type="text/x-jquery-tmpl"><![CDATA[
-	<li>
-		<a data-page="${uid}" href="#" class="pageNode" title="${title} [${uid}]">
-			${title} [${uid}]
-			{{if jQuery.isEmptyObject(_differences)}}
-				<strong class="changes">[' + $.contentstage.translations.changes + '</strong>
-			{{else}}
-				<strong class="subHasChanges">[' + $.contentstage.translations.subHasChanges + ']</strong>
-			{{/if}}
-		</a>
-		{{if !jQuery.isEmptyObject(_children)}}
-			<ul>{{tmpl(_children) "#contentstagePageTreeTemplate"}}</ul>
-		{{/if}}
-	</li>
 ]]></script>
 <script type="text/javascript">
 <![CDATA[(function($){
@@ -77,6 +197,7 @@
 	$.contentstage.TCA = ]]><c:json value="{tca}" /><![CDATA[;
 	$.contentstage.pageTree = ]]><c:json value="{pageTree}" /><![CDATA[;
 	$.contentstage.translations = ]]><c:json value="{changes: '{f:translate(key: \'changes\')}', subHasChanges: '{f:translate(key: \'subHasChanges\')}'}" /><![CDATA[;
+	top.TYPO3.Backend.NavigationContainer.PageTree.select(]]>{currentPage}<![CDATA[);
 })(jQuery);]]>
 </script>
 
