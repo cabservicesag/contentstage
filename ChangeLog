@@ -1,3 +1,7 @@
+2013-10-04 Nils Blattner <nb@cabag.ch>
+	* version 0.3.9
+	* [BUG] explicitly select typo3-pagetree to be used as the navigation option for contentstaging
+
 2013-10-03 Nils Blattner <nb@cabag.ch>
 	* version 0.3.8
 	* [FEATURE] added all pageTS options to ext_localconf.php

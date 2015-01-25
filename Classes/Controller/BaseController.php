@@ -365,7 +365,7 @@ class Tx_Contentstage_Controller_BaseController extends Tx_CabagExtbase_Controll
 		$this->localDB = $GLOBALS['TYPO3_DB'];
 		
 		$this->page = intval(t3lib_div::_GP('id'));
-		t3lib_BEfunc::openPageTree($this->page, false);
+		//t3lib_BEfunc::openPageTree($this->page, false);
 		
 		$info = $this->extensionConfiguration['remote.']['db.'];
 		
