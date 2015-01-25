@@ -100,7 +100,7 @@ class Tx_Contentstage_Utility_Shell {
 	}
 	
 	static function findCmd($cmd) {
-		$binfolders = array(
+		$binFolders = array(
 			'/usr/bin/',
 			'/usr/local/bin/',
 			'/bin/',
@@ -116,7 +116,7 @@ class Tx_Contentstage_Utility_Shell {
 		
 		foreach ($extensions as $extension) {
 			$cwd = false;
-			reset($binfolders);
+			reset($binFolders);
 			do {
 				$which = t3lib_div::makeInstance('Tx_Contentstage_Utility_Shell');
 				$which->exec('which ' . $cwd . $cmd . $extension, '');
@@ -124,7 +124,7 @@ class Tx_Contentstage_Utility_Shell {
 				if (strlen($stdout) > 0) {
 					return trim($stdout);
 				}
-			} while (list(,$cwd) = each($binfolders));
+			} while (list(,$cwd) = each($binFolders));
 		}
 		throw new Exception('Command not found '.$cmd);
 	}

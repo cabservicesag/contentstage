@@ -1,3 +1,7 @@
+2013-04-11 Dimitri König <dk@cabag.ch>
+	* version 0.2.3
+	* fixed some bugs in shell class
+
 2013-04-03 Nils Blattner <nb@cabag.ch>
 	* version 0.2.2
 	* fixed snapshots so that they actually consider the tables to be ignored

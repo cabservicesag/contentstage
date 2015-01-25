@@ -191,11 +191,13 @@ class Tx_Contentstage_Domain_Repository_Result {
 	public function nextWithRelations() {
 		if (($row = $this->next()) !== false) {
 			$this->repository->setRelationSynced($this->table, $row['uid']);
-			foreach ($this->tca as $field => &$config) {
-				if (substr($field, 0, 2) === '__') {
-					continue;
+			if (is_array($this->tca)) {
+				foreach ($this->tca as $field => &$config) {
+					if (substr($field, 0, 2) === '__') {
+						continue;
+					}
+					$this->repository->addRelations($this->tcaObject->resolveUids($this->repository, $this->table, $field, $row[$field], $row));
 				}
-				$this->repository->addRelations($this->tcaObject->resolveUids($this->repository, $this->table, $field, $row[$field], $row));
 			}
 		}
 		
