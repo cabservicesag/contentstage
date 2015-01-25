@@ -468,7 +468,7 @@ class Tx_Contentstage_Utility_Tca implements t3lib_singleton {
 				$uid = array_pop($parts);
 				$table = (count($parts) > 0 ? implode('_', $parts) : $config['table']);
 				if (is_numeric($uid) && !empty($table)) {
-					$uidsByTable[$table][] = intval($uid);
+					$uidsByTable[$table][intval($uid)] = intval($uid);
 				} else {
 					$uidsByTable['__passthrough'][] = $itemValue;
 				}
@@ -517,7 +517,7 @@ class Tx_Contentstage_Utility_Tca implements t3lib_singleton {
 		
 		$uidsByTable = array();
 		while (($row = $resource->next()) !== false) {
-			$uidsByTable[($row['tablenames'] ?: $config['table'])][] = $row['uid_foreign'];
+			$uidsByTable[($row['tablenames'] ?: $config['table'])][$row['uid_foreign']] = $row['uid_foreign'];
 		}
 		
 		return $uidsByTable;
@@ -560,7 +560,7 @@ class Tx_Contentstage_Utility_Tca implements t3lib_singleton {
 		
 		$values = array($config['table'] => array());
 		while (($row = $resource->next()) !== false) {
-			$values[$config['table']][] = $row[($returnField ?: $labelField)];
+			$values[$config['table']][$row['uid']] = $row[($returnField ?: $labelField)];
 		}
 		
 		return $values;

@@ -415,7 +415,7 @@ class Tx_Contentstage_Domain_Repository_ContentRepository {
 			if (empty($pids)) {
 				$whereParts = array('1 <> 1');
 			} else {
-				$whereParts = array('pid IN (' . implode(',', $pids) . ')');
+				$whereParts = array(($table === 'pages' ? 'uid' : 'pid') . ' IN (' . implode(',', $pids) . ')');
 			}
 		}
 		if (!empty($where)) {
@@ -625,13 +625,14 @@ class Tx_Contentstage_Domain_Repository_ContentRepository {
 	 * Clears the cache for the given root.
 	 * Note: There must be a sys_domain record in the given rootline! (This does not work for root = 0!).
 	 *
-	 * @param mixed $root Either the root uid to clear from or "ALL".
+	 * @param int $root The root to clear from.
+	 * @param boolean $clearAll Whether to clear all caches.
 	 * @return void
 	 * @throws Exception
 	 */
-	public function clearCache($root) {
+	public function clearCache($root, $clearAll = false) {
 		$domain = $this->getDomain($root);
-		if ($root === 'ALL') {
+		if ($clearAll) {
 			$content = 'ALL';
 		} else {
 			$pids = $this->getPageTreeUids($root);
@@ -648,7 +649,8 @@ class Tx_Contentstage_Domain_Repository_ContentRepository {
 			'identifier' => $hash,
 			'crdate' => time(),
 			'content' => serialize($content),
-			'lifetime' => 10
+			'lifetime' => 10,
+			'expires' => time + 10
 		);
 		
 		foreach (t3lib_div::trimExplode(',', self::CACHE_TABLES, true) as $table) {
@@ -657,7 +659,19 @@ class Tx_Contentstage_Domain_Repository_ContentRepository {
 				break;
 			}
 		}
+		
+		if ($table === 'cf_cache_hash') {
+			unset($fields['crdate']);
+			unset($fields['lifetime']);
+		} else {
+			unset($fields['expires']);
+		}
 		$this->db->exec_INSERTquery($table, $fields);
+        
+		$sqlError = $this->db->sql_error();
+        if (!empty($sqlError)) {
+        	throw new Exception($sqlError, 1356616552);
+        }
 		
 		$url = 'http://' . $domain . '/index.php?eID=tx_contentstage&hash=' . $hash;
 		$response = file_get_contents($url);

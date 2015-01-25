@@ -50,6 +50,11 @@ class Tx_Contentstage_Eid_ClearCache {
 	protected $errors = array();
 	
 	/**
+	 * @var string The pages to be cleared or "ALL".
+	 */
+	protected $command = '';
+	
+	/**
 	 * Initialize.
 	 */
 	public function initialize() {
@@ -97,12 +102,14 @@ class Tx_Contentstage_Eid_ClearCache {
 			);
 			return;
 		}
+		
+		$expires = $table === 'cf_cache_hash' ? 'expires' : 'crdate';
 		$rows = $GLOBALS['TYPO3_DB']->exec_SELECTgetRows(
 			'*',
 			$table,
-			'crdate > ' . (time() - 10) . ' AND identifier = ' . $GLOBALS['TYPO3_DB']->fullQuoteStr($this->hash, $table),
+			($table === 'cf_cache_hash' ? 'expires < ' : '(crdate + lifetime) < ') . time() . ' AND identifier = ' . $GLOBALS['TYPO3_DB']->fullQuoteStr($this->hash, $table),
 			'',
-			'crdate DESC',
+			$expires . ' DESC',
 			1
 		);
 		
@@ -115,15 +122,14 @@ class Tx_Contentstage_Eid_ClearCache {
 		}
 		
 		$row = current($rows);
-		$content = unserialize($row['content']);
+		$this->command = $content = unserialize($row['content']);
 		
 		try {
 			if ($content === 'ALL') {
 				// fake tcemain
 				$tceMain = t3lib_div::makeInstance('t3lib_TCEmain');
-				$tceMain->BE_USER = new stdClass();
+				$tceMain->BE_USER = new Tx_Contentstage_Eid_ClearCache_FakeBEUSER();
 				$tceMain->BE_USER->user = array('username' => 'tx_contentstage_eId');
-				$tceMain->BE_USER->writelog = function () {};
 				$tceMain->admin = true;
 				
 				$tceMain->clear_cacheCmd('all');
@@ -140,8 +146,8 @@ class Tx_Contentstage_Eid_ClearCache {
 		}
 		
 		$GLOBALS['TYPO3_DB']->exec_DELETEquery(
-			self::CACHE_TABLE,
-			'identifier = ' . $GLOBALS['TYPO3_DB']->fullQuoteStr($this->hash, self::CACHE_TABLE)
+			$table,
+			'identifier = ' . $GLOBALS['TYPO3_DB']->fullQuoteStr($this->hash, $table)
 		);
 	}
 	
@@ -154,6 +160,31 @@ class Tx_Contentstage_Eid_ClearCache {
 			'errors' => $this->errors
 		));
 	}
+	
+	/**
+	 * Returns the errors (if any).
+	 *
+	 * @return array The errors.
+	 */
+	public function getErrors() {
+		return $this->errors;
+	}
+	
+	/**
+	 * Returns the cache command.
+	 *
+	 * @return string The page uid or "ALL".
+	 */
+	public function getCommand() {
+		return $this->command;
+	}
+}
+
+/**
+ * Fake BE_USER
+ */
+class Tx_Contentstage_Eid_ClearCache_FakeBEUSER {
+	public function writelog() {}
 }
 
 $clearCache = new Tx_Contentstage_Eid_ClearCache();

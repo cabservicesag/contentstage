@@ -192,6 +192,7 @@ class Tx_Contentstage_Utility_Diff {
 		$differences = array('byPid' => array());
 		$r1 = $resource1->nextResolved();
 		$r2 = $resource2->nextResolved();
+		
 		while (true) {
 			if ($r1 === false && $r2 === false) {
 				break;

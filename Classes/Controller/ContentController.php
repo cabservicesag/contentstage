@@ -152,7 +152,7 @@ class Tx_Contentstage_Controller_ContentController extends Tx_Contentstage_Contr
 			$this->pushTables($id);
 			$this->log->log($this->translate('info.push.done'), Tx_CabagExtbase_Utility_Logging::OK);
 			
-			$this->remoteRepository->clearCache($this->extensionConfiguration['clearAllCaches'] ? 'ALL' : $id);
+			$this->remoteRepository->clearCache($id, !!$this->extensionConfiguration['clearAllCaches']);
 			$this->log->log($this->translate('info.push.clearCache'), Tx_CabagExtbase_Utility_Logging::OK);
 		} catch (Exception $e) {
 			$this->log->log($this->translate('error.' . $e->getCode(), array($e->getMessage())) ?: $e->getMessage(), Tx_CabagExtbase_Utility_Logging::ERROR);

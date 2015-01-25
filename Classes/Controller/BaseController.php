@@ -238,7 +238,7 @@ class Tx_Contentstage_Controller_BaseController extends Tx_CabagExtbase_Controll
 		
 		$this->extensionConfiguration = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['contentstage']);
 		define('TX_CONTENTSTAGE_USECACHE', !empty($this->extensionConfiguration['useCache']));
-		define('TX_CONTENTSTAGE_CACHETIME', !empty($this->extensionConfiguration['cacheTime']));
+		define('TX_CONTENTSTAGE_CACHETIME', intval($this->extensionConfiguration['cacheTime']));
 		
 		$this->localDB = $GLOBALS['TYPO3_DB'];
 		

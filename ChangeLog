@@ -1,3 +1,11 @@
+2013-04-15 Nils Blattner <nb@cabag.ch>
+	* version 0.2.5
+	* fixed a bug in the eID-script that would not properly clean up temporary hashes
+
+2013-04-12 Nils Blattner <nb@cabag.ch>
+	* version 0.2.4
+	* fixed a bug that dependencies are not properly staged
+
 2013-04-11 Dimitri König <dk@cabag.ch>
 	* version 0.2.3
 	* fixed some bugs in shell class
