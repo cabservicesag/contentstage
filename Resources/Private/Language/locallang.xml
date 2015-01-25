@@ -8,6 +8,7 @@
 		<languageKey index="default" type="array">
 			<label index="changes">Changes!</label>
 			<label index="changes.page">Pages:</label>
+			<label index="changes.files">Files changed</label>
 			<label index="changes.record">Record:</label>
 			<label index="changes.field">Field:</label>
 			<label index="compare.title">Compare local and remote</label>
@@ -19,10 +20,10 @@
 			<label index="compare.fileTargetMissing">File missing at target: %1$s.</label>
 			<label index="compare.folderSourceMissing">Folder missing at source: %1$s.</label>
 			<label index="compare.folderTargetMissing">Folder missing at target: %1$s.</label>
-			<label index="compare.filesDiffer">Files differ: %1$s &lt;&gt; %2$s.</label>
-			<label index="compare.foldersDiffer">Folders differ: %1$s &lt;&gt; %2$s.</label>
+			<label index="compare.filesDiffer">Files differ: %1$s (<![CDATA[<b><a href="%11$s%1$s" target="_blank">local</a></b>]]>) (<![CDATA[<b><a href="%5$s%1$s" target="_blank">remote</a></b>]]>).</label>
+			<label index="compare.foldersDiffer">Folders differ: %1$s &lt;&gt; %7$s.</label>
 			<label index="copy.fileMissing">File missing at source: %1$s.</label>
-			<label index="copy.targetFolder">Cannot create target folder: %1$s.</label>
+			<label index="copy.targetFolder">Cannot create target folder: %3$s.</label>
 			<label index="diff.source.fieldMissing">Field missing at source [%1$s].</label>
 			<label index="diff.source.recordMissing">Record missing at source [%1$s=%2$s].</label>
 			<label index="diff.target.fieldMissing">Field missing at target [%1$s].</label>
@@ -194,6 +195,7 @@
 		<languageKey index="de" type="array">
 			<label index="changes">Änderungen!</label>
 			<label index="changes.page">Seite:</label>
+			<label index="changes.files">Geänderte Dateien</label>
 			<label index="changes.record">Datensatz:</label>
 			<label index="changes.field">Feld:</label>
 			<label index="compare.title">Lokales und entferntes System vergleichen</label>
@@ -205,10 +207,10 @@
 			<label index="compare.fileTargetMissing">Datei fehlt beim Ziel: %1$s.</label>
 			<label index="compare.folderSourceMissing">Ordner fehlt bei der Quelle: %1$s.</label>
 			<label index="compare.folderTargetMissing">Ordner fehlt beim Ziel: %1$s.</label>
-			<label index="compare.filesDiffer">Dateien unterscheiden sich: %1$s &lt;&gt; %2$s.</label>
-			<label index="compare.foldersDiffer">Ordner unterscheiden sich: %1$s &lt;&gt; %2$s.</label>
+			<label index="compare.filesDiffer">Dateien unterscheiden sich: %1s (<![CDATA[<b><a href="%11$s%1$s" target="_blank">lokal</a></b>]]>) (<![CDATA[<b><a href="%5$s%1$s" target="_blank">entfernt</a></b>]]>).</label>
+			<label index="compare.foldersDiffer">Ordner unterscheiden sich: %1$s &lt;&gt; %7$s.</label>
 			<label index="copy.fileMissing">Datei fehlt bei der Quelle: %1$s.</label>
-			<label index="copy.targetFolder">Konnte Zielordner nicht erstellen: %1$s.</label>
+			<label index="copy.targetFolder">Konnte Zielordner nicht erstellen: %3$s.</label>
 			<label index="diff.source.fieldMissing">Feld fehlt bei der Quelle [%1$s].</label>
 			<label index="diff.source.recordMissing">Datensatz fehlt bei der Quelle [%1$s=%2$s].</label>
 			<label index="diff.target.fieldMissing">Feld fehlt beim Ziel [%1$s].</label>

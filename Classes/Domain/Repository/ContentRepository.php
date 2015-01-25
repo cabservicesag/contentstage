@@ -73,6 +73,27 @@ class Tx_Contentstage_Domain_Repository_ContentRepository {
 	protected $folder = '';
 	
 	/**
+	 * The current page.
+	 *
+	 * @var int
+	 */
+	protected $currentPage = 0;
+	
+	/**
+	 * Whether or not to use https for the domain.
+	 *
+	 * @var boolean
+	 */
+	protected $useHttps = false;
+	
+	/**
+	 * The override domain.
+	 *
+	 * @var string
+	 */
+	protected $overrideDomain = '';
+	
+	/**
 	 * An array of table => array of uid => true pairs for all the resolved relations.
 	 *
 	 * @var array
@@ -122,6 +143,13 @@ class Tx_Contentstage_Domain_Repository_ContentRepository {
 	protected $cache = null;
 	
 	/**
+	 * The domain cache (per call).
+	 *
+	 * @var array The domain cache.
+	 */
+	protected $domainCache = array();
+	
+	/**
 	 * The cached full page tree.
 	 *
 	 * @var array
@@ -139,6 +167,13 @@ class Tx_Contentstage_Domain_Repository_ContentRepository {
 	 * @var Tx_Extbase_Object_ObjectManagerInterface
 	 */
 	protected $objectManager;
+	
+	/**
+	 * The file messages found.
+	 *
+	 * @var array
+	 */
+	protected $fileMessages = array();
 
 	/**
 	 * Injects the object manager
@@ -205,62 +240,137 @@ class Tx_Contentstage_Domain_Repository_ContentRepository {
 	}
 	
 	/**
+	 * Set the current page.
+	 *
+	 * @param int $currentPage The current page.
+	 * @return void
+	 */
+	public function setCurrentPage($currentPage) {
+		$this->currentPage = intval($currentPage);
+	}
+	
+	/**
+	 * Get the current page.
+	 *
+	 * @return int The current page.
+	 */
+	public function getCurrentPage() {
+		return $this->currentPage;
+	}
+	
+	/**
+	 * Set whether or not to use https.
+	 *
+	 * @param boolean $useHttps Whether or not to use https.
+	 * @return void
+	 */
+	public function setUseHttps($useHttps) {
+		$this->useHttps = !empty($useHttps);
+	}
+	
+	/**
+	 * Get whether or not to use https.
+	 *
+	 * @return boolean Whether or not to use https.
+	 */
+	public function getUseHttps() {
+		return $this->useHttps;
+	}
+	
+	/**
+	 * Set the override domain.
+	 *
+	 * @param string $overrideDomain The override domain.
+	 * @return void
+	 */
+	public function setOverrideDomain($overrideDomain) {
+		$this->overrideDomain = $overrideDomain;
+	}
+	
+	/**
+	 * Get the override domain.
+	 *
+	 * @return string The override domain.
+	 */
+	public function getOverrideDomain() {
+		return $this->overrideDomain;
+	}
+	
+	/**
 	 * Returns a handle for a given file.
 	 * Possibility to change to some sort of rsync://path or similar.
 	 *
 	 * @param string $file File relative to the $this->folder.
+	 * @param array $original An original handle to copy from.
 	 * @return string The absolute file handle.
 	 */
-	public function getFileHandle($file) {
-		return $this->folder . $file;
+	public function getFileHandle($file, $original = null) {
+		if ($original === null) {
+			$root = $this->folder;
+			$domain = $this->getDomain($this->getCurrentPage());
+		} else {
+			$root = $original['root'];
+			$domain = $original['domain'];
+		}
+		$result = array(
+			'rel' => $file,
+			'abs' => $root . $file,
+			'relDir' => dirname($file),
+			'absDir' => dirname($root . $file),
+			'domain' => $domain,
+			'root' => $root,
+		);
+		
+		return $result;
 	}
 	
 	/**
 	 * Copy given file to destination.
-	 * Possibility to change to some sort of rsync://path or similar.
+	 * Possibility to change to some sort of rsync://path or similar in the future.
 	 *
-	 * @param string $fromFile File handle to copy from.
-	 * @param string $toFile File handle to copy to.
+	 * @param array $fromFile File handle to copy from. Result of self::getFileHandle().
+	 * @param array $toFile File handle to copy to. Result of self::getFileHandle().
 	 * @return void
 	 */
 	public function copy($fromFile, $toFile) {
-		if (!file_exists($fromFile)) {
-			$this->log->log($this->translate('copy.fileMissing', array($fromFile)), Tx_CabagExtbase_Utility_Logging::WARNING);
+		if (!file_exists($fromFile['abs'])) {
+			$this->log->log($this->translate('copy.fileMissing', $fromFile), Tx_CabagExtbase_Utility_Logging::WARNING);
 			return false;
 		}
-		if (!is_dir(dirname($toFile))) {
-			$ok = mkdir(dirname($toFile), octdec($GLOBALS['TYPO3_CONF_VARS']['BE']['folderCreateMask']), true);
+		if (!is_dir(dirname($toFile['abs']))) {
+			$ok = mkdir(dirname($toFile['abs']), octdec($GLOBALS['TYPO3_CONF_VARS']['BE']['folderCreateMask']), true);
 			if (!$ok) {
-				$this->log->log($this->translate('copy.targetFolder', array(dirname($toFile))), Tx_CabagExtbase_Utility_Logging::WARNING);
+				$this->log->log($this->translate('copy.targetFolder', array(dirname($toFile['relativePath']))), Tx_CabagExtbase_Utility_Logging::WARNING);
 				return $false;
 			}
 		}
-		return copy($fromFile, $toFile);
+		return copy($fromFile['abs'], $toFile['abs']);
 	}
 	
 	/**
 	 * Compares two files and returns a message if they differ. Otherwise false.
 	 *
-	 * @param string $fromFile File handle to compare from.
-	 * @param string $toFile File handle to compare to.
+	 * @param array $fromFile File handle to compare from. Result of self::getFileHandle().
+	 * @param array $toFile File handle to compare to. Result of self::getFileHandle().
 	 * @return mixed The message or false.
 	 */
 	public function compareFiles($fromFile, $toFile) {
 		$message = false;
 		$severity = Tx_CabagExtbase_Utility_Logging::INFORMATION;
-		if (!file_exists($fromFile)) {
-			$message = $this->translate('compare.fileSourceMissing', array($fromFile));
+		if (!file_exists($fromFile['abs'])) {
+			$message = $this->translate('compare.fileSourceMissing', $fromFile);
 			$severity = Tx_CabagExtbase_Utility_Logging::WARNING;
-		} else if (!file_exists($toFile)) {
-			$message = $this->translate('compare.fileTargetMissing', array($toFile));
+		} else if (!file_exists($toFile['abs'])) {
+			$message = $this->translate('compare.fileTargetMissing', $toFile);
 			$severity = Tx_CabagExtbase_Utility_Logging::WARNING;
 		} else {
-			if (filemtime($fromFile) !== filemtime($toFile) && md5_file($fromFile) !== md5_file($toFile)) {
-				$message = $this->translate('compare.filesDiffer', array($fromFile, $toFile));
+			if (filemtime($fromFile['abs']) !== filemtime($toFile['abs']) && md5_file($fromFile['abs']) !== md5_file($toFile['abs'])) {
+				$message = $this->translate('compare.filesDiffer', array_merge(array_values($fromFile), array_values($toFile)));
 			}
 		}
 		
 		if ($message !== false) {
+			$this->addFileMessage($fromFile, $message);
 			$this->log->log($message, $severity);
 			return $message;
 		}
@@ -270,43 +380,52 @@ class Tx_Contentstage_Domain_Repository_ContentRepository {
 	/**
 	 * Compares two folders and returns a message if they differ. Otherwise false.
 	 *
-	 * @param string $fromFile Folder handle to compare from.
-	 * @param string $toFile Folder handle to compare to.
+	 * @param array $fromFile Folder handle to compare from. Result of self::getFileHandle().
+	 * @param array $toFile Folder handle to compare to. Result of self::getFileHandle().
 	 * @return mixed The message or false.
 	 */
 	public function compareFolders($fromFolder, $toFolder) {
 		$message = false;
 		$severity = Tx_CabagExtbase_Utility_Logging::INFORMATION;
-		if (!file_exists($fromFolder) || !is_dir($fromFolder)) {
-			$message = $this->translate('compare.folderSourceMissing', array($fromFolder));
+		if (!file_exists($fromFolder['abs']) || !is_dir($fromFolder['abs'])) {
+			$message = $this->translate('compare.folderSourceMissing', $fromFolder);
 			$severity = Tx_CabagExtbase_Utility_Logging::WARNING;
-		} else if (!file_exists($toFolder) || !is_dir($toFolder)) {
-			$message = $this->translate('compare.folderTargetMissing', array($toFolder));
+			$this->addFileMessage($fromFolder, $message);
+		} else if (!file_exists($toFolder['abs']) || !is_dir($toFolder['abs'])) {
+			$message = $this->translate('compare.folderTargetMissing', $toFolder);
 			$severity = Tx_CabagExtbase_Utility_Logging::WARNING;
+			$this->addFileMessage($toFolder, $message);
 		} else {
 			$contents = self::dir_diff(
-				self::scandir($fromFolder),
-				self::scandir($toFolder)
+				self::scandir($fromFolder['abs']),
+				self::scandir($toFolder['abs'])
 			);
 			$messages = array();
 			
 			foreach (array('source' => $fromFolder, 'target' => $toFolder) as $type => $folder) {
 				$label = 'compare.file' . ucfirst($type) . 'Missing';
 				foreach ($contents[$type] as $file) {
-					$messages = $this->translate($label, array($folder . '/' . $file));
+					$handle = $this->getFileHandle($folder['rel'] . '/' . $file, $folder);
+					$messages[] = $m = $this->translate($label, $handle);
+					$this->addFileMessage($handle, $m);
 				}
 			}
 			foreach ($contents['both'] as $file) {
-				$path = $fromFolder . '/' . $file;
+				$fromHandle = $this->getFileHandle($fromFolder['rel'] . '/' . $file, $fromFolder);
+				$toHandle = $this->getFileHandle($toFolder['rel'] . '/' . $file, $toFolder);
 				$m = false;
 				if (is_file($path)) {
-					$m = $this->compareFiles($path, $toFolder . '/' . $file);
+					$m = $this->compareFiles($fromHandle, $toHandle);
 				} else if (is_dir($path)) {
-					$m = $this->compareFolders($path, $toFolder . '/' . $file);
+					$m = $this->compareFolders($fromHandle, $toHandle);
 				}
 				if ($m !== false) {
 					$messages[] = $m;
 				}
+			}
+			
+			if (count($messages) > 0) {
+				$message = implode("<br />\n", $messages);
 			}
 		}
 		
@@ -520,6 +639,16 @@ class Tx_Contentstage_Domain_Repository_ContentRepository {
 	 * @return string The domain
 	 */
 	public function getDomain($page) {
+		$protocol = 'http' . ($this->getUseHttps() ? 's' : '') . '://';
+		
+		if (!empty($this->overrideDomain)) {
+			return $protocol . $this->overrideDomain . '/';
+		}
+		
+		if (isset($this->domainCache[$page])) {
+			return $this->domainCache[$page];
+		}
+		
 		$rootline = $this->getRootline($page);
 		
 		if (empty($rootline)) {
@@ -546,7 +675,9 @@ class Tx_Contentstage_Domain_Repository_ContentRepository {
 			1
 		);
 		
-		return count($rows) > 0 ? $rows[0]['domainName'] : null;
+		$this->domainCache[$page] = count($rows) > 0 ? $protocol . $rows[0]['domainName'] . '/' : null;
+		
+		return $this->domainCache[$page];
 	}
 	
 	/**
@@ -840,7 +971,7 @@ class Tx_Contentstage_Domain_Repository_ContentRepository {
         	throw new Exception($sqlError, 1356616552);
         }
 		
-		$url = (t3lib_div::getIndpEnv('TYPO3_SSL') ? 'https://' : 'http://') . $domain . '/index.php?eID=tx_contentstage&hash=' . $hash;
+		$url = $domain . 'index.php?eID=tx_contentstage&hash=' . $hash;
 		$ch = curl_init($url);
 		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
 		curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);                                                                     
@@ -925,6 +1056,39 @@ class Tx_Contentstage_Domain_Repository_ContentRepository {
 	 */
 	public function getDepth() {
 		return $this->depth;
+	}
+	
+	/**
+	 * Set the file messages.
+	 *
+	 * @param array $fileMessages The file messages.
+	 * @return void
+	 */
+	public function setFileMessages($fileMessages) {
+		$this->fileMessages = $fileMessages;
+	}
+	
+	/**
+	 * Get the file messages.
+	 *
+	 * @return int The file messages.
+	 */
+	public function getFileMessages() {
+		return $this->fileMessages;
+	}
+	
+	/**
+	 * Add a file message.
+	 *
+	 * @param array $handle The file handle.
+	 * @param string $message The file message.
+	 * @return void
+	 */
+	public function addFileMessage($handle, $fileMessage) {
+		$this->fileMessages[$handle['abs']] = array(
+			'handle' => $handle,
+			'message' => $fileMessage,
+		);
 	}
 	
 	/**

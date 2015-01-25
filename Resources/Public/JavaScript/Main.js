@@ -55,6 +55,16 @@ jQuery(function($){
 		return false;
 	});
 	
+	var fileChanges = 0,
+		$fileTable = $('<table class="typo3-dblist"><tr class="t3-row-header"><td colspan="2">' + $.contentstage.translations['changes_files'] + '</td></tr></table>');
+	$.each($.contentstage.fileMessages, function(i, v) {
+		$('<tr class="infoRow"><td>' + v['message'] + '</td></tr>').appendTo($fileTable);
+		fileChanges++;
+	});
+	if (fileChanges > 0) {
+		$fileTable.prependTo($('.differencesContainer'));
+	}
+	
 	$('ul.pageTree').find('strong.changes').parents('li').children('a.pageNode').addClass('subHasChanges');
 	$('ul.pageTree').find('.contentstage-action-changes').parents('li').children('a.pageNode').addClass('subHasChanges');
 	

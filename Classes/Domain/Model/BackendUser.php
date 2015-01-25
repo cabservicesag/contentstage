@@ -314,11 +314,12 @@ class Tx_Contentstage_Domain_Model_BackendUser extends Tx_Contentstage_Domain_Mo
 	 * @return array $dbMountpoints Array of integers.
 	 */
 	public function getDbMountpointsRecursive() {
-		$mountpoints = $this->collectRecursiveDataCached('getDbMountpoints', 'getUsergroup', function($data){
-			return t3lib_div::intExplode(',', $data, true);
-		}, function($item){
-			return $item;
-		});
+		$mountpoints = array();
+		foreach ($this->getUsergroup() as $group) {
+			foreach ($group->getDbMountpointsRecursive() as $page) {
+				$mountpoints[$page] = $page;
+			}
+		}
 		
 		foreach (t3lib_div::intExplode(',', $this->getDbMountpoints(), true) as $page) {
 			$mountpoints[$page] = $page;

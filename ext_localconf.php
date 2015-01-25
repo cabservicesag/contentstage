@@ -66,4 +66,6 @@ tx_contentstage {
 EOD;
 
 t3lib_extMgm::addPageTSConfig($pageTS);
+
+$GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['t3lib/class.t3lib_tcemain.php']['checkModifyAccessList'][] = 'EXT:contentstage/Classes/Hook/TCEMain.php:tx_Contentstage_Hook_TCEMain';
 ?>

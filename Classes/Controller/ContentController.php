@@ -72,6 +72,10 @@ class Tx_Contentstage_Controller_ContentController extends Tx_Contentstage_Contr
 		
 		$this->view->assign('tca', $this->tca->getProcessedTca());
 		
+		$fileMessages = $this->localRepository->getFileMessages();
+		$this->addFilesToSecureFiles($fileMessages);
+		$this->view->assign('fileMessages', $fileMessages);
+		
 		if ($this->review !== null && $this->review->getUid() > 0 && $this->review->getLevels() === $this->localRepository->getDepth()) {
 			$changed = $this->review->calculateState(null, false, $this->diff->getMaximumSourceTstamp());
 			if ($changed) {
@@ -98,7 +102,6 @@ class Tx_Contentstage_Controller_ContentController extends Tx_Contentstage_Contr
 	
 	/**
 	 * action view
-	 * @TODO: change to https for some cases
 	 *
 	 * @return void
 	 */
@@ -111,27 +114,19 @@ class Tx_Contentstage_Controller_ContentController extends Tx_Contentstage_Contr
 		
 		$pageTS = $this->getPageTS();
 		
-		if (!empty($pageTS['overrideDomainLocal'])) {
-			$localDomain = $pageTS['overrideDomainLocal'];
-		} else {
-			$localDomain = $this->localRepository->getDomain($this->page);
-			if ($localDomain === null) {
-				$this->log->log($this->translate('warning.view.noDomain', array('local', $this->page)), Tx_CabagExtbase_Utility_Logging::WARNING);
-			}
+		$localDomain = $this->localRepository->getDomain($this->page);
+		if ($localDomain === null) {
+			$this->log->log($this->translate('warning.view.noDomain', array('local', $this->page)), Tx_CabagExtbase_Utility_Logging::WARNING);
 		}
 		
-		if (!empty($pageTS['overrideDomainRemote'])) {
-			$remoteDomain = $pageTS['overrideDomainRemote'];
-		} else {
-			$remoteDomain = $this->remoteRepository->getDomain($this->page);
-			
-			if ($remoteDomain === null) {
-				$this->log->log($this->translate('warning.view.noDomain', array('remote', $this->page)), Tx_CabagExtbase_Utility_Logging::WARNING);
-			}
+		$remoteDomain = $this->remoteRepository->getDomain($this->page);
+		
+		if ($remoteDomain === null) {
+			$this->log->log($this->translate('warning.view.noDomain', array('remote', $this->page)), Tx_CabagExtbase_Utility_Logging::WARNING);
 		}
 		
-		$this->view->assign('localUrl', 'http' . (empty($pageTS['useHttpsLocal']) ? '' : 's') . '://' . $localDomain . '/index.php?id=' . $this->page);
-		$this->view->assign('remoteUrl', 'http' . (empty($pageTS['useHttpsRemote']) ? '' : 's') . '://' . $remoteDomain . '/index.php?id=' . $this->page);
+		$this->view->assign('localUrl', $localDomain . 'index.php?id=' . $this->page);
+		$this->view->assign('remoteUrl', $remoteDomain . 'index.php?id=' . $this->page);
 		
 		$this->log->write();
 	}
@@ -404,6 +399,23 @@ class Tx_Contentstage_Controller_ContentController extends Tx_Contentstage_Contr
 				foreach ($data['byPid'] as $pid => &$changes) {
 					$this->pidIndex[$pid][$table] = &$changes;
 					$this->pageTree[$pid]['_differences'][$table] = &$changes;
+				}
+			}
+		}
+	}
+	
+	/**
+	 * Checks if secure_files is installed and adds (local) files to secure_files.
+	 *
+	 * @param array $messages Array of path => array(handle, messages) tuples.
+	 * @return void
+	 */
+	protected function addFilesToSecureFiles($messages) {
+		if (t3lib_extMgm::isLoaded('secure_files')) {
+			$parser = $this->objectManager->get('tx_SecureFiles_Utility_Parser');
+			foreach ($messages as $message) {
+				if ($message['handle']['root'] === PATH_site) {
+					$parser->allowDownload($message['handle']['rel']);
 				}
 			}
 		}

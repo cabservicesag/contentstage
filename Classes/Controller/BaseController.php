@@ -354,6 +354,12 @@ class Tx_Contentstage_Controller_BaseController extends Tx_CabagExtbase_Controll
 	 * @return void
 	 */
 	public function initializeAction() {
+		$this->activeBackendUser = $this->backendUserRepository->findByUid($GLOBALS['BE_USER']->user['uid']);
+		if ($this->activeBackendUser === null) {
+			// should never happen
+			die($this->translate('error.noBackendUser'));
+		}
+		
 		t3lib_cache::initializeCachingFramework();
 		t3lib_cache::initContentHashCache();
 		$this->cache = $GLOBALS['typo3CacheManager']->getCache('cache_hash');
@@ -385,6 +391,7 @@ class Tx_Contentstage_Controller_BaseController extends Tx_CabagExtbase_Controll
 			'localRepository'
 		);
 		$this->localRepository->setFolder(PATH_site);
+		$this->localRepository->setCurrentPage($this->page);
 		
 		$this->remoteRepository = $this->objectManager->create(
 			'Tx_Contentstage_Domain_Repository_ContentRepository',
@@ -394,16 +401,17 @@ class Tx_Contentstage_Controller_BaseController extends Tx_CabagExtbase_Controll
 			'remoteRepository'
 		);
 		$this->remoteRepository->setFolder($this->extensionConfiguration['remote.']['folder']);
+		$this->remoteRepository->setCurrentPage($this->page);
+		
+		$pageTS = $this->getPageTS();
+		$this->localRepository->setUseHttps($pageTS['useHttpsLocal']);
+		$this->localRepository->setOverrideDomain($pageTS['overrideDomainLocal']);
+		$this->remoteRepository->setUseHttps($pageTS['useHttpsRemote']);
+		$this->remoteRepository->setOverrideDomain($pageTS['overrideDomainRemote']);
 		
 		$this->initializeDepth();
 		$this->initializeIgnoreTables();
 		$this->initializeReview();
-		
-		$this->activeBackendUser = $this->backendUserRepository->findByUid($GLOBALS['BE_USER']->user['uid']);
-		if ($this->activeBackendUser === null) {
-			// should never happen
-			die($this->translate('error.noBackendUser'));
-		}
 	}
 	
 	/**

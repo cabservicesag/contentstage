@@ -1,3 +1,16 @@
+2013-10-17 Nils Blattner <nb@cabag.ch>
+	* version 0.4.6
+	* [FEATURE] added display for files differing - issue #4075
+	* [BUG] removed extra module (was test) - issue #4124
+
+2013-10-16 Nils Blattner <nb@cabag.ch>
+	* version 0.4.5
+	* [BUG] fixed an issue with finding the mountpoints for a user
+
+2013-10-15 Nils Blattner <nb@cabag.ch>
+	* version 0.4.4
+	* [FEATURE] added special file array that tracks differing files - issue #4075
+
 2013-10-14 Nils Blattner <nb@cabag.ch>
 	* version 0.4.3
 	* [FEATURE] added pageTS option to automatically review if user sets him/herself as reviewer
