@@ -7,6 +7,21 @@ $TYPO3_CONF_VARS['FE']['eID_include']['tx_contentstage'] = 'EXT:contentstage/Cla
 
 $pageTS = <<<'EOD'
 tx_contentstage {
+	doNotSync =
+	doNotSnapshot =
+	doNotDisplay =
+	
+	depthOptions = 0,1,2,3,4,5,6,7,8,9,-1
+	defaultDepth = -1
+	minimumDepth = 0
+	maximumDepth = -1
+	
+	useHttpsLocal = 0
+	useHttpsRemote = 0
+	
+	overrideDomainLocal =
+	overrideDomainRemote =
+	
 	review = 0
 	review {
 		// the amount of backend users that are needed to review

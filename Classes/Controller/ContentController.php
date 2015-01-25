@@ -109,18 +109,29 @@ class Tx_Contentstage_Controller_ContentController extends Tx_Contentstage_Contr
 			return $this->translate('info.compare.noId');
 		}
 		
-		$localDomain = $this->localRepository->getDomain($this->page);
-		$remoteDomain = $this->remoteRepository->getDomain($this->page);
+		$pageTS = $this->getPageTS();
 		
-		if ($localDomain === null) {
-			$this->log->log($this->translate('warning.view.noDomain', array('local', $this->page)), Tx_CabagExtbase_Utility_Logging::WARNING);
-		}
-		if ($remoteDomain === null) {
-			$this->log->log($this->translate('warning.view.noDomain', array('remote', $this->page)), Tx_CabagExtbase_Utility_Logging::WARNING);
+		if (!empty($pageTS['overrideDomainLocal'])) {
+			$localDomain = $pageTS['overrideDomainLocal'];
+		} else {
+			$localDomain = $this->localRepository->getDomain($this->page);
+			if ($localDomain === null) {
+				$this->log->log($this->translate('warning.view.noDomain', array('local', $this->page)), Tx_CabagExtbase_Utility_Logging::WARNING);
+			}
 		}
 		
-		$this->view->assign('localUrl', 'http://' . $localDomain . '/index.php?id=' . $this->page);
-		$this->view->assign('remoteUrl', 'http://' . $remoteDomain . '/index.php?id=' . $this->page);
+		if (!empty($pageTS['overrideDomainRemote'])) {
+			$remoteDomain = $pageTS['overrideDomainRemote'];
+		} else {
+			$remoteDomain = $this->remoteRepository->getDomain($this->page);
+			
+			if ($remoteDomain === null) {
+				$this->log->log($this->translate('warning.view.noDomain', array('remote', $this->page)), Tx_CabagExtbase_Utility_Logging::WARNING);
+			}
+		}
+		
+		$this->view->assign('localUrl', 'http' . (empty($pageTS['useHttpsLocal']) ? '' : 's') . '://' . $localDomain . '/index.php?id=' . $this->page);
+		$this->view->assign('remoteUrl', 'http' . (empty($pageTS['useHttpsRemote']) ? '' : 's') . '://' . $remoteDomain . '/index.php?id=' . $this->page);
 		
 		$this->log->write();
 	}
