@@ -95,7 +95,7 @@ t3lib_extMgm::addLLrefForTCAdescr('tx_contentstage_domain_model_review', 'EXT:co
 t3lib_extMgm::allowTableOnStandardPages('tx_contentstage_domain_model_review');
 $TCA['tx_contentstage_domain_model_review'] = array(
 	'ctrl' => array(
-		'hideTable' => 1,
+		'hideTable' => 0,
 		'title'	=> 'LLL:EXT:contentstage/Resources/Private/Language/locallang_db.xml:tx_contentstage_domain_model_review',
 		'label' => 'crdate',
 		'label_alt' => 'pid,levels',
@@ -127,7 +127,7 @@ t3lib_extMgm::addLLrefForTCAdescr('tx_contentstage_domain_model_reviewed', 'EXT:
 t3lib_extMgm::allowTableOnStandardPages('tx_contentstage_domain_model_reviewed');
 $TCA['tx_contentstage_domain_model_reviewed'] = array(
 	'ctrl' => array(
-		'hideTable' => 1,
+		'hideTable' => 0,
 		'title'	=> 'LLL:EXT:contentstage/Resources/Private/Language/locallang_db.xml:tx_contentstage_domain_model_reviewed',
 		'label' => 'reviewed',
 		'label_alt' => 'reviewer,ok',
@@ -159,7 +159,7 @@ t3lib_extMgm::addLLrefForTCAdescr('tx_contentstage_domain_model_state', 'EXT:con
 t3lib_extMgm::allowTableOnStandardPages('tx_contentstage_domain_model_state');
 $TCA['tx_contentstage_domain_model_state'] = array(
 	'ctrl' => array(
-		'hideTable' => 1,
+		'hideTable' => 0,
 		'title'	=> 'LLL:EXT:contentstage/Resources/Private/Language/locallang_db.xml:tx_contentstage_domain_model_state',
 		'label' => 'state',
 		'label_alt' => 'crdate',

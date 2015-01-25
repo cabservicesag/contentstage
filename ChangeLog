@@ -1,3 +1,7 @@
+2014-10-21 Nils Blattner <nb@cabag.ch>
+	* version 0.8.0
+	* [FEATURE] allow the SSLVERSION to be specified by extension configuration while clearing the cache
+
 2014-10-06 Nils Blattner <nb@cabag.ch>
 	* version 0.7.9
 	* [6.2] implemented logic to detect and push FAL files

@@ -418,6 +418,7 @@ class Tx_Contentstage_Controller_BaseController extends Tx_CabagExtbase_Controll
 		);
 		$this->localRepository->setFolder(PATH_site);
 		$this->localRepository->setCurrentPage($this->page);
+		$this->localRepository->setParent($this);
 		
 		$this->remoteRepository = $this->objectManager->create(
 			'Tx_Contentstage_Domain_Repository_ContentRepository',
@@ -429,6 +430,7 @@ class Tx_Contentstage_Controller_BaseController extends Tx_CabagExtbase_Controll
 	
 		$this->remoteRepository->setFolder($this->extensionConfiguration['remote.']['folder']);
 		$this->remoteRepository->setCurrentPage($this->page);
+		$this->remoteRepository->setParent($this);
 		
 		$pageTS = $this->getPageTS();
 		$this->localRepository->setUseHttps($pageTS['useHttpsLocal']);

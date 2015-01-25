@@ -195,6 +195,13 @@ class Tx_Contentstage_Domain_Repository_ContentRepository {
 	 * @var array
 	 */
 	protected $fileStorageCache = array();
+	
+	/**
+	 * The parent controller.
+	 *
+	 * @var Tx_Contentstage_Controller_BaseController
+	 */
+	protected $parent = null;
 
 	/**
 	 * Injects the object manager
@@ -289,6 +296,25 @@ class Tx_Contentstage_Domain_Repository_ContentRepository {
 	 */
 	public function getCurrentPage() {
 		return $this->currentPage;
+	}
+	
+	/**
+	 * Set the parent.
+	 *
+	 * @param Tx_Contentstage_Controller_BaseController $parent The parent.
+	 * @return void
+	 */
+	public function setParent($parent) {
+		$this->parent = $parent;
+	}
+	
+	/**
+	 * Get the parent.
+	 *
+	 * @return Tx_Contentstage_Controller_BaseController The parent.
+	 */
+	public function getParent() {
+		return $this->parent;
 	}
 	
 	/**
@@ -1155,7 +1181,12 @@ class Tx_Contentstage_Domain_Repository_ContentRepository {
 		curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);                                                                     
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
 		curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 5);
-		curl_setopt($ch, CURLOPT_SSLVERSION, 3);
+		
+		$extensionConfiguration = $this->getParent()->getExtensionConfiguration();
+		$sslVersion = intval($extensionConfiguration['remote.']['sslVersion']);
+		if ($sslVersion === 2 || $sslVersion === 3) {
+			curl_setopt($ch, CURLOPT_SSLVERSION, $sslVersion);
+		}
 
 		$result = curl_exec($ch);
         $data = json_decode($result);

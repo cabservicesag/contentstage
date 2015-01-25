@@ -40,6 +40,9 @@ remote.db.port = 3306
 # cat=basic/db/10; type=input; label= Remote absolute TYPO3 folder (must represent the remote PATH_site).
 remote.folder = 
 
+# cat=basic/db/10; type=int; label= Use this SSL version to talk to the remote server while clearing the cache (leave empty to detect).
+remote.sslVersion = 0
+
 # cat=basic/logging/10; type=boolean; label= Enable file logging
 logging.file.enable = 1
 
