@@ -53,9 +53,8 @@ class Tx_Contentstage_Eid_ClearCache {
 	 * Initialize.
 	 */
 	public function initialize() {
-		$_GP = t3lib_div::_GP();
+		$hash = t3lib_div::_GP('hash');
 		
-		$hash = $_GP['hash'];
 		if (!preg_match('/^[a-z0-9]{32}$/i', $hash)) {
 			$this->errors[] = array(
 				'ident' => 'badHash',

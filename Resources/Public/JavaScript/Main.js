@@ -1,11 +1,11 @@
 jQuery(function($){
 	var differenceContainer = $('.differencesContainer ul.differences'), tcaLabel = function (table, field) {
-		if (!table || !$.contentstage.TCA || !$.contentstage.TCA[table]) return '';
+		if (!table || !$.contentstage.TCA || !$.contentstage.TCA[table]) return table;
 		if (!field) {
-			return $.contentstage.TCA[table]['__name'];
+			return $.contentstage.TCA[table]['__name'] ? $.contentstage.TCA[table]['__name'] : table;
 		}
-		if (!$.contentstage.TCA[table][field]) return '';
-		return $.contentstage.TCA[table][field]['__name'];
+		if (!$.contentstage.TCA[table][field]) return field;
+		return $.contentstage.TCA[table][field]['__name'] ? $.contentstage.TCA[table][field]['__name'] : field;
 	}, renderPageDifferences = function (page) {
 		var tables = $.contentstage.differences[page], dom = $('<li class="page" data-page="' + page + '"/>'), ul = $('<ul class="tableContainer" />').appendTo(dom);
 		if (!tables) return [];
@@ -32,7 +32,7 @@ jQuery(function($){
 	
 	//$('#contentstagePageTreeTemplate').tmpl($.contentstage.pageTree).appendTo($('ul.pageTree'));
 	
-	$('ul.pageTree').treeview({collapsed: true, control: '.treeContainer .control'}).find('a').click(function(){
+	$('ul.pageTree').treeview({collapsed: true}).find('a').click(function(){
 		differenceContainer.empty();
 		
 		var th = $(this), pid = th.attr('data-page'), pages = [];

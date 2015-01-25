@@ -142,7 +142,7 @@ class Tx_Contentstage_Controller_ContentController extends Tx_Contentstage_Contr
 			);
 			$this->log->log($this->translate('info.push.snapshot', array($info['file'])), Tx_CabagExtbase_Utility_Logging::OK);
 			
-			//$this->pushTables($id);
+			$this->pushTables($id);
 			$this->log->log($this->translate('info.push.done'), Tx_CabagExtbase_Utility_Logging::OK);
 			
 			$this->remoteRepository->clearCache($id);
@@ -266,6 +266,7 @@ class Tx_Contentstage_Controller_ContentController extends Tx_Contentstage_Contr
 		$this->pushTable($sysLogResource, $toRepository);
 		
 		$sysHistoryResource = $fromRepository->findResolvedSysHistory();
+		$sysHistoryResource->setTable('sys_history');
 		$this->pushTable($sysHistoryResource, $toRepository);
 	}
 	

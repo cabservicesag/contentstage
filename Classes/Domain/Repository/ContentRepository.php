@@ -452,8 +452,10 @@ class Tx_Contentstage_Domain_Repository_ContentRepository {
 		$whereParts = array();
 		
 		foreach ($this->resolvedRelations as $table => &$tableData) {
-			if (!empty($tableData)) {
-				$whereParts[] = '(sys_log.tablename = ' . $this->db->fullQuoteStr($table, 'sys_log') . ' AND sys_log.recuid IN (' . implode(',', array_keys($tableData)) . '))';
+			if (substr($table, 0, 2) !== '__' && !empty($tableData)) {
+				$uids = array_filter(array_keys($tableData), 'is_numeric');
+				$uids = empty($uids) ? array(0) : $uids;
+				$whereParts[] = '(sys_log.tablename = ' . $this->db->fullQuoteStr($table, 'sys_log') . ' AND sys_log.recuid IN (' . implode(',', $uids) . '))';
 			}
 		}
 		
@@ -630,7 +632,8 @@ class Tx_Contentstage_Domain_Repository_ContentRepository {
 		$this->db->exec_INSERTquery(self::CACHE_TABLE, $fields);
 		
 		$url = 'http://' . $domain . '/index.php?eID=tx_contentstage&hash=' . $hash;
-		$ch = curl_init($url);
+		$response = file_get_contents($url);
+		/* $ch = curl_init($url);
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE); 
 		$response = curl_exec($ch);
 		
@@ -640,12 +643,12 @@ class Tx_Contentstage_Domain_Repository_ContentRepository {
 		if (($error = curl_error($ch)) !== '') {
         	throw new Exception($error . ' [' . $url . ']', 1356616553);
 		}
-		$headerSize = curl_getinfo($ch, CURLINFO_HEADER_SIZE);
+		$headerSize = curl_getinfo($ch, CURLINFO_HEADER_SIZE); */
         $result = substr($response, $headerSize);
         $data = json_decode($result);
         
-        if (empty($data['success'])) {
-        	$errors = array_map(function ($value) { return $value['message']; }, $data['errors']);
+        if (empty($data->success)) {
+        	$errors = array_map(function ($value) { return $value->message; }, $data['errors']);
         	throw new Exception('[' . $url . ']' . implode(PHP_EOL, $errors), 1356616552);
         }
 	}
@@ -672,6 +675,7 @@ class Tx_Contentstage_Domain_Repository_ContentRepository {
 		
 		if ($noResult) {
 			$this->db->sql_free_result($resource);
+			return;
 		}
 		
 		$result = array();

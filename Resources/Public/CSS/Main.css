@@ -147,3 +147,17 @@ a.subHasChanges strong.subHasChanges {
 	float: left;
 	width: 49%;
 }
+
+.treeContainer .control a {
+	background-color: #F6F6F6;
+    background-image: -moz-linear-gradient(center top , #F6F6F6 10%, #D5D5D5 90%);
+    background-position: center bottom;
+    background-repeat: repeat-x;
+    border: 1px solid #7C7C7C;
+    border-radius: 1px 1px 1px 1px;
+    color: #434343;
+    cursor: pointer;
+    padding: 2px 4px;
+    margin-right: 10px;
+    margin-bottom: 5px;
+}
