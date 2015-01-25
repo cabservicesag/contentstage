@@ -79,6 +79,7 @@ class Tx_Contentstage_Controller_ContentController extends Tx_Contentstage_Contr
 		if ($this->review !== null && $this->review->getUid() > 0 && $this->review->getLevels() === $this->localRepository->getDepth()) {
 			$changed = $this->review->calculateState(null, false, $this->diff->getMaximumSourceTstamp());
 			if ($changed) {
+				$this->sendReviewMailAndLog('changed', $this->review);
 				$this->log->log($this->translate('info.review.deprecated'), Tx_CabagExtbase_Utility_Logging::WARNING, $this->diff->getMaximumSourceTstamp());
 			}
 		}
@@ -145,6 +146,7 @@ class Tx_Contentstage_Controller_ContentController extends Tx_Contentstage_Contr
 		
 			$changed = $this->review->calculateState(null, false, $this->diff->getMaximumSourceTstamp());
 			if ($changed) {
+				$this->sendReviewMailAndLog('changed', $this->review);
 				$this->log->log($this->translate('info.review.deprecated'), Tx_CabagExtbase_Utility_Logging::WARNING, $this->diff->getMaximumSourceTstamp());
 			}
 		}
@@ -169,6 +171,7 @@ class Tx_Contentstage_Controller_ContentController extends Tx_Contentstage_Contr
 			
 			if ($this->review !== null && $this->review->getUid() > 0 && $this->review->getLevels() <= $this->localRepository->getDepth()) {
 				$this->review->addChangeString($this->activeBackendUser, Tx_Contentstage_Domain_Model_State::PUSHED);
+				$this->sendReviewMailAndLog('pushed', $this->review);
 			}
 		} catch (Exception $e) {
 			$this->log->log($this->translate('error.' . $e->getCode(), array($e->getMessage())) ?: $e->getMessage(), Tx_CabagExtbase_Utility_Logging::ERROR);

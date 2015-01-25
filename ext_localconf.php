@@ -52,6 +52,16 @@ tx_contentstage {
 			from = info@example.com
 			fromName = example.com - Contentstage (noreply)
 			html = 0
+			sendToReviewers = 1
+			to {
+				/*
+				# allows to send additional mails to defined email addresses
+				0 {
+					name = Example info mail
+					mail = info@example.com
+				}
+				*/
+			}
 		}
 		
 		reviewChanged {
@@ -60,6 +70,10 @@ tx_contentstage {
 		
 		reviewCreated {
 			templateFile = EXT:contentstage/Resources/Private/Backend/Mails/ReviewCreated.html
+		}
+		
+		reviewPushed {
+			templateFile = EXT:contentstage/Resources/Private/Backend/Mails/ReviewPushed.html
 		}
 	}
 }

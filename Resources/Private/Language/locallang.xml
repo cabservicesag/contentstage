@@ -189,6 +189,10 @@
 			<label index="mails.reviewCreated.subject">[STAGING] A review was created</label>
 			<label index="mails.reviewCreated.intro">A review was created by %1$s [%2$s].</label>
 			<label index="mails.reviewCreated.comment">Comment by the creator:</label>
+			<label index="mails.reviewPushed.subject">[STAGING] A review was completed and the page(s) pushed</label>
+			<label index="mails.reviewPushed.intro">A review was pushed by %1$s [%2$s].</label>
+			<label index="mails.reviewPushed.comment">Comment to the push:</label>
+			
 			<label index="mails.compare">View and accept/decline changes:</label>
 			<label index="mails.view">View differences between the two systems:</label>
 		</languageKey>
@@ -376,6 +380,10 @@
 			<label index="mails.reviewCreated.subject">[STAGING] Ein Review wurde erstellt</label>
 			<label index="mails.reviewCreated.intro">Ein Review wurde von %1$s [%2$s] erstellt.</label>
 			<label index="mails.reviewCreated.comment">Kommentar des Erstellers:</label>
+			<label index="mails.reviewPushed.subject">[STAGING] Ein Review wurde abgeschlossen und die Seite(n) publiziert</label>
+			<label index="mails.reviewPushed.intro">Ein Review wurde durch %1$s [%2$s] publiziert.</label>
+			<label index="mails.reviewPushed.comment">Kommentar zur Publizierung:</label>
+			
 			<label index="mails.compare">Sehen Sie sich die Änderungen an und reviewen diese:</label>
 			<label index="mails.view">Sehen Sie sich die Änderungen der beiden Systeme an:</label>
 		</languageKey>

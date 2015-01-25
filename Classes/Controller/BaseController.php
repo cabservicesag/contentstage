@@ -354,6 +354,7 @@ class Tx_Contentstage_Controller_BaseController extends Tx_CabagExtbase_Controll
 	 * @return void
 	 */
 	public function initializeAction() {
+		$this->extensionName = 'Contentstage';
 		$this->activeBackendUser = $this->backendUserRepository->findByUid($GLOBALS['BE_USER']->user['uid']);
 		if ($this->activeBackendUser === null) {
 			// should never happen
@@ -548,7 +549,7 @@ class Tx_Contentstage_Controller_BaseController extends Tx_CabagExtbase_Controll
 			}
 			
 			$pageTS = t3lib_befunc::getPagesTSconfig($id, $rootline);
-			$this->pageTS = Tx_Extbase_Utility_TypoScript::convertTypoScriptArrayToPlainArray($pageTS['tx_' . strtolower($this->extensionName) . '.']);
+			$this->pageTS = Tx_Extbase_Utility_TypoScript::convertTypoScriptArrayToPlainArray($pageTS['tx_contentstage.']);
 		}
 		
 		return $this->pageTS;
@@ -833,6 +834,23 @@ class Tx_Contentstage_Controller_BaseController extends Tx_CabagExtbase_Controll
 			unset($recipients['']);
 		}
 		
+		$to = array();
+		if (is_array($configuration['to'])) {
+			foreach ($configuration['to'] as $toConfig) {
+				if (!empty($toConfig['mail'])) {
+					$to[$toConfig['mail']] = empty($toConfig['name']) ? $toConfig['mail'] : $toConfig['name'];
+				}
+			}
+		}
+		if (is_array($recipients)) {
+			$recipients = array_merge($to, $recipients);
+		} else if (is_string($recipients)) {
+			if (!empty($recipients)) {
+				$to[$recipients] = 1;
+			}
+			$recipients = implode(',', array_keys($to));
+		}
+		
 		$ok = $mail->sendMail(
 			$recipients,
 			$this->translate('mails.' . $key . '.subject'),
@@ -845,6 +863,37 @@ class Tx_Contentstage_Controller_BaseController extends Tx_CabagExtbase_Controll
 			$this->log->log($mail->getLastMessage(), Tx_CabagExtbase_Utility_Logging::WARNING, array('key' => $key, 'recipients' => $recipients, 'configuration' => $configuration));
 		}
 		
+		return $ok;
+	}
+	
+	/**
+	 * Sends a mail concerning a review and logs directly if the mail was sent.
+	 *
+	 * @param string $key Typoscript key under where to find the configuration.
+	 * @param Tx_Contentstage_Domain_Model_Review $review The review to send the mail for.
+	 *
+	 * @return boolean Whether or not the mail was sent.
+	 */
+	protected function sendReviewMailAndLog($key, Tx_Contentstage_Domain_Model_Review $review = null) {
+		$pageTS = $this->getPageTS();
+		$tsKey = 'review' . ucfirst($key);
+		if (empty($key) || !isset($pageTS['mails'][$tsKey]) || $review === null) {
+			$this->log->log($this->translate('info.review.mail.error'), Tx_CabagExtbase_Utility_Logging::WARNING);
+			return false;
+		}
+		
+		$configuration = t3lib_div::array_merge_recursive_overrule($pageTS['mails']['default'], $pageTS['mails'][$tsKey]);
+		$recipients = array();
+		if (!empty($configuration['sendToReviewers'])) {
+			$recipients = $review->getRecipients(!empty($this->reviewConfiguration['sendMailToCurrentUser']));
+		}
+		
+		$ok = $this->sendMail($tsKey, $recipients, array('review' => $review));
+		if ($ok) {
+			$this->log->log($this->translate('info.review.mail.success'), Tx_CabagExtbase_Utility_Logging::OK);
+		} else {
+			$this->log->log($this->translate('info.review.mail.error'), Tx_CabagExtbase_Utility_Logging::WARNING);
+		}
 		return $ok;
 	}
 }

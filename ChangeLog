@@ -1,3 +1,7 @@
+2013-10-21 Nils Blattner <nb@cabag.ch>
+	* version 0.4.9
+	* [FEATURE] added mails when a review is deprecated or pushed - issue #4157
+
 2013-10-17 Nils Blattner <nb@cabag.ch>
 	* version 0.4.8
 	* [BUG] fixed an issue when pageTS had maximumDepth = -1 - issue #4068

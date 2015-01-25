@@ -83,12 +83,7 @@ class Tx_Contentstage_Controller_ReviewController extends Tx_Contentstage_Contro
 			$changed = $review->calculateState($this->activeBackendUser);
 			$this->log->log($this->translate('info.review.' . ($ok ? 'accepted' : 'rejected')), Tx_CabagExtbase_Utility_Logging::OK, Tx_Extbase_Reflection_ObjectAccess::getGettableProperties($review));
 			if ($changed) {
-				$ok = $this->sendMail('review' . ($usedByCreate ? 'Created' : 'Changed'), $review->getRecipients(!empty($this->reviewConfiguration['sendMailToCurrentUser'])), array('review' => $review));
-				if ($ok) {
-					$this->log->log($this->translate('info.review.mail.success'), Tx_CabagExtbase_Utility_Logging::OK);
-				} else {
-					$this->log->log($this->translate('info.review.mail.error'), Tx_CabagExtbase_Utility_Logging::WARNING);
-				}
+				$this->sendReviewMailAndLog(($usedByCreate ? 'created' : 'changed'), $review);
 				
 				if ($review->getAutoPush() && $review->getState()->getState() === Tx_Contentstage_Domain_Model_State::REVIEWED) {
 					$this->redirect('push', 'Content');
@@ -119,12 +114,7 @@ class Tx_Contentstage_Controller_ReviewController extends Tx_Contentstage_Contro
 		
 		$this->log->log($this->translate('info.review.reinitialized'), Tx_CabagExtbase_Utility_Logging::OK, Tx_Extbase_Reflection_ObjectAccess::getGettableProperties($review));
 		if ($changed) {
-			$ok = $this->sendMail('reviewChanged', $review->getRecipients(!empty($this->reviewConfiguration['sendMailToCurrentUser'])), array('review' => $review));
-			if ($ok) {
-				$this->log->log($this->translate('info.review.mail.success'), Tx_CabagExtbase_Utility_Logging::OK);
-			} else {
-				$this->log->log($this->translate('info.review.mail.error'), Tx_CabagExtbase_Utility_Logging::WARNING);
-			}
+			$this->sendReviewMailAndLog('changed', $review);
 		}
 		
 		$this->redirect('compare', 'Content');
@@ -187,12 +177,7 @@ class Tx_Contentstage_Controller_ReviewController extends Tx_Contentstage_Contro
 			}
 		}
 		
-		$ok = $this->sendMail('reviewCreated', $review->getRecipients(!empty($this->reviewConfiguration['sendMailToCurrentUser'])), array('review' => $review));
-		if ($ok) {
-			$this->log->log($this->translate('info.review.mail.success'), Tx_CabagExtbase_Utility_Logging::OK);
-		} else {
-			$this->log->log($this->translate('info.review.mail.error'), Tx_CabagExtbase_Utility_Logging::WARNING);
-		}
+		$this->sendReviewMailAndLog('created', $review);
 		
 		$this->redirect('compare', 'Content');
 	}
@@ -225,12 +210,7 @@ class Tx_Contentstage_Controller_ReviewController extends Tx_Contentstage_Contro
 		
 		$this->reviewRepository->update($review);
 		
-		$ok = $this->sendMail('reviewChanged', $review->getRecipients(!empty($this->reviewConfiguration['sendMailToCurrentUser'])), array('review' => $review));
-		if ($ok) {
-			$this->log->log($this->translate('info.review.mail.success'), Tx_CabagExtbase_Utility_Logging::OK);
-		} else {
-			$this->log->log($this->translate('info.review.mail.error'), Tx_CabagExtbase_Utility_Logging::WARNING);
-		}
+		$this->sendReviewMailAndLog('changed', $review);
 		
 		$this->log->log($this->translate('review.update.success'), Tx_CabagExtbase_Utility_Logging::OK);
 		$this->redirect('compare', 'Content');
