@@ -1,4 +1,8 @@
 2013-01-30 Nils Blattner <nb@cabag.ch>
+	* version 0.1.7
+	* fixed an issue with clearcache "all" and domains
+
+2013-01-30 Nils Blattner <nb@cabag.ch>
 	* version 0.1.6
 	* fixed issue where inserts were not properly split up into packs of 100 queries
 	* removed usage of admin_get_tables

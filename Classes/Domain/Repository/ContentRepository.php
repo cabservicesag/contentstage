@@ -531,7 +531,7 @@ class Tx_Contentstage_Domain_Repository_ContentRepository {
 		}
 		$query = $this->db->INSERTmultipleRows($table, $fields, $rows) . ' ON DUPLICATE KEY UPDATE ' . $updateTerm;
 		
-		$this->db->sql_free_result($this->db->sql_query($query));
+		$this->db->sql_query($query);
 		
 		if ($error = $this->db->sql_error()) {
 			throw new Exception($error . ' [' . $query . ']', self::ERROR_INSERT);
@@ -630,17 +630,17 @@ class Tx_Contentstage_Domain_Repository_ContentRepository {
 	 * @throws Exception
 	 */
 	public function clearCache($root) {
+		$domain = $this->getDomain($root);
 		if ($root === 'ALL') {
 			$content = 'ALL';
 		} else {
 			$pids = $this->getPageTreeUids($root);
-			$domain = $this->getDomain($root);
-			
-			if (empty($pids) || $domain === null) {
-				// do nothing
-				return;
-			}
-			$content = implode(',', $pids);
+			$content = is_array($pids) ? implode(',', $pids) : '';
+		}
+		
+		if (empty($content) || $domain === null) {
+			// do nothing
+			return;
 		}
 		
 		$hash = t3lib_div::getRandomHexString(32);
