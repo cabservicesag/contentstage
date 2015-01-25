@@ -1,3 +1,8 @@
+2013-10-25 Dimitri König <dk@cabag.ch>
+	* version 0.5.2
+	* [FEATURE] Added hooks around pushing of files
+	* [FEATURE] Makes $this->log public -> accessable from other extensions
+
 2013-10-25 Nils Blattner <nb@cabag.ch>
 	* version 0.5.1
 	* [BUG] changed the way pushDependencies works so it still pushes mm-relations

@@ -216,7 +216,7 @@ class Tx_Contentstage_Controller_BaseController extends Tx_CabagExtbase_Controll
 	 *
 	 * @var Tx_CabagExtbase_Utility_Logging The logging object.
 	 */
-	protected $log = null;
+	public $log = null;
 	
 	/**
 	 * The diff object.
@@ -280,6 +280,13 @@ class Tx_Contentstage_Controller_BaseController extends Tx_CabagExtbase_Controll
 	 * @var Tx_Contentstage_Domain_Model_BackendUser
 	 */
 	protected $activeBackendUser = null;
+
+	/**
+	 * Holds all hooks for this file
+	 * 
+	 * @var array
+	 */
+	protected $hookObjectsArray = array();
 
 	/**
 	 * injectReviewRepository
@@ -413,6 +420,13 @@ class Tx_Contentstage_Controller_BaseController extends Tx_CabagExtbase_Controll
 		$this->initializeDepth();
 		$this->initializeIgnoreTables();
 		$this->initializeReview();
+
+		$hookFilename = 'contentstage/Classes/Controller/' . $this->request->getControllerName() . 'Controller.php';
+		if (is_array($GLOBALS['TYPO3_CONF_VARS']['EXTCONF'][$hookFilename][$this->request->getControllerActionName()])) {
+			foreach ($GLOBALS['TYPO3_CONF_VARS']['EXTCONF'][$hookFilename][$this->request->getControllerActionName()] as $classRef) {
+				$this->hookObjectsArray[] = &t3lib_div::getUserObj($classRef);
+			}
+		}
 	}
 	
 	/**

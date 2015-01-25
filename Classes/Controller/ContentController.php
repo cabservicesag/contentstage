@@ -375,6 +375,12 @@ class Tx_Contentstage_Controller_ContentController extends Tx_Contentstage_Contr
 	 * @return void
 	 */
 	protected function pushFiles(Tx_Contentstage_Domain_Repository_ContentRepository $fromRepository, Tx_Contentstage_Domain_Repository_ContentRepository $toRepository, array $files) {
+		foreach ($this->hookObjectsArray as $hookObj) {
+			if (method_exists($hookObj, 'beforePushFiles')) {
+				$hookObj->beforePushFiles($fromRepository, $toRepository, $files, $this);
+			}
+		}
+
 		$filesOK = 0;
 		$errors = 0;
 		foreach ($files as $file => &$ignored) {
@@ -400,6 +406,12 @@ class Tx_Contentstage_Controller_ContentController extends Tx_Contentstage_Contr
 			$errors > 0 ? Tx_CabagExtbase_Utility_Logging::WARNING : ($filesOK > 0 ? Tx_CabagExtbase_Utility_Logging::OK : Tx_CabagExtbase_Utility_Logging::INFORMATION),
 			$files
 		);
+
+		foreach ($this->hookObjectsArray as $hookObj) {
+			if (method_exists($hookObj, 'afterPushFiles')) {
+				$hookObj->afterPushFiles($fromRepository, $toRepository, $files, $filesOK, $errors, $this);
+			}
+		}
 	}
 	
 	/**
