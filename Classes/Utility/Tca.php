@@ -636,6 +636,15 @@ class Tx_Contentstage_Utility_Tca implements t3lib_singleton {
 				break;
 		}
 		
+		if ($field === 'identifier' && ($table === 'sys_file' || $table === 'sys_file_processedfile')) {
+			$storage = $repository->getFileStorage($originalRow['storage']);
+			if ($storage['driver'] === 'Local' && isset($storage['relativeBasePath'])) {
+				$path = $storage['relativeBasePath'] . '/' . $value;
+				$path = preg_replace('#/+#', '/', $path);
+				$result['__FILE'][$path] = true;
+			}
+		}
+		
 		$this->resolveSoftRefUids($repository, $table, $field, $row, $result);
 		
 		return $result;

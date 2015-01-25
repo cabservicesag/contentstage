@@ -112,7 +112,7 @@ class Tx_Contentstage_Controller_InitializeController extends Tx_Contentstage_Co
 			// do not log the active users out
 			$tables = $this->filterTables(array_keys($this->fromRepository->getTables()), $this->ignoreSnapshotTables);
 			$snapshotInfo = $this->snapshotRepository->create(
-				array_keys($tables),
+				$tables,
 				$this->fromInfo,
 				$this->fromType
 			);

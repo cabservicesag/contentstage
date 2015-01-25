@@ -83,22 +83,6 @@ tx_contentstage {
 			templateFile = EXT:contentstage/Resources/Private/Backend/Mails/ReviewPushed.html
 		}
 	}
-	
-	/*
-	folderTS {
-		fileadmin {
-			user_upload {
-				__pageTS {
-					overrideDomainLocal = stage.example.com
-					overrideDomainRemote = prod.example.com
-				}
-			}
-		}
-		__pageTS {
-			
-		}
-	}
-	*/
 }
 EOD;
 

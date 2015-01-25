@@ -86,7 +86,7 @@ class Tx_Contentstage_Domain_Repository_ReviewRepository extends Tx_Extbase_Pers
 		
 		$query->matching(
 				$query->logicalAnd(
-					$query->equals('page', $page),
+					$query->in('page', $page),
 					$query->logicalNot($query->equals('state.state', Tx_Contentstage_Domain_Model_State::PUSHED))
 				)
 			);

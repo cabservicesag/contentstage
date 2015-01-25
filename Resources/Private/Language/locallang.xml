@@ -402,24 +402,6 @@
 			
 			<label index="mails.compare">Sehen Sie sich die Änderungen an und reviewen diese:</label>
 			<label index="mails.view">Sehen Sie sich die Änderungen der beiden Systeme an:</label>
-			
-			<label index="filestage.compare.title">Lokales und entferntes System vergleichen</label>
-			<label index="filestage.compare.sub.reviewList.title">Momentan aktive Reviews (%1$s)</label>
-			<label index="filestage.compare.sub.activeReview.title">Review für diese Seite</label>
-			<label index="filestage.compare.sub.compare.title">Änderungen</label>
-			<label index="filestage.compare.update">Baumtiefe anpassen</label>
-			<label index="filestage.compare.fileSourceMissing">Datei fehlt bei der Quelle: %1$s.</label>
-			<label index="filestage.compare.fileTargetMissing">Datei fehlt beim Ziel: %1$s.</label>
-			<label index="filestage.compare.folderSourceMissing">Ordner fehlt bei der Quelle: %1$s.</label>
-			<label index="filestage.compare.folderTargetMissing">Ordner fehlt beim Ziel: %1$s.</label>
-			<label index="filestage.compare.filesDiffer">Dateien unterscheiden sich: %1s (<![CDATA[<b><a href="%11$s%1$s" target="_blank">lokal</a></b>]]>) (<![CDATA[<b><a href="%5$s%1$s" target="_blank">entfernt</a></b>]]>).</label>
-			<label index="filestage.compare.foldersDiffer">Ordner unterscheiden sich: %1$s &lt;&gt; %7$s.</label>
-			<label index="filestage.copy.fileMissing">Datei fehlt bei der Quelle: %1$s.</label>
-			<label index="filestage.copy.targetFolder">Konnte Zielordner nicht erstellen: %3$s.</label>
-			<label index="filestage.diff.source.fieldMissing">Feld fehlt bei der Quelle [%1$s].</label>
-			<label index="filestage.diff.source.recordMissing">Datensatz fehlt bei der Quelle [%1$s=%2$s].</label>
-			<label index="filestage.diff.target.fieldMissing">Feld fehlt beim Ziel [%1$s].</label>
-			<label index="filestage.diff.target.recordMissing">Datensatz fehlt beim Ziel [%1$s=%2$s].</label>
 		</languageKey>
 	</data>
 </T3locallang>

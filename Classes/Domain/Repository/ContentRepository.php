@@ -188,6 +188,13 @@ class Tx_Contentstage_Domain_Repository_ContentRepository {
 	 * @var array
 	 */
 	protected $fieldNameCache = array();
+	
+	/**
+	 * A per call cache of sys_file_storage.
+	 *
+	 * @var array
+	 */
+	protected $fileStorageCache = array();
 
 	/**
 	 * Injects the object manager
@@ -500,6 +507,29 @@ class Tx_Contentstage_Domain_Repository_ContentRepository {
 			'target' => array_keys($onlyB),
 			'both' => array_keys($both)
 		);
+	}
+	
+	/**
+	 * Returns the file storage for a given uid.
+	 *
+	 * @param int $uid The storage uid.
+	 * @return array The sys_file_storage record.
+	 */
+	public function getFileStorage($uid) {
+		$uid = intval($uid);
+		if (!isset($this->fileStorageCache[$uid])) {
+			$results = $this->_sql('SELECT * FROM sys_file_storage WHERE deleted = 0 AND uid = ' . $uid, true);
+			$this->fileStorageCache[$uid] = array();
+			if (count($results) > 0) {
+				$results[0]['configuration_parsed'] = t3lib_div::xml2array($results[0]['configuration']);
+				if ($results[0]['configuration_parsed']['data']['sDEF']['lDEF']['pathType']['vDEF'] === 'relative') {
+					$results[0]['relativeBasePath'] = $results[0]['configuration_parsed']['data']['sDEF']['lDEF']['basePath']['vDEF'];
+				}
+				
+				$this->fileStorageCache[$uid] = $results[0];
+			}
+		}
+		return $this->fileStorageCache[$uid];
 	}
 	
 	/**
@@ -1172,9 +1202,20 @@ class Tx_Contentstage_Domain_Repository_ContentRepository {
 	public function _sql($query, $result = true) {
 		$resource = $this->db->sql_query($query);
 		
-		if ($result === false) {
-			$this->db->sql_free_result($resource);
+		if ($resource === null) {
+			// mysqli 6.2
 			return;
+		}
+		
+		if ($result === false) {
+			if ($resource !== null) {
+				$this->db->sql_free_result($resource);
+			}
+			return;
+		}
+		
+		if ($resource === null) {
+			return array();
 		}
 		
 		$output = array();

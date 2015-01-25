@@ -1,3 +1,11 @@
+2014-10-06 Nils Blattner <nb@cabag.ch>
+	* version 0.7.9
+	* [6.2] implemented logic to detect and push FAL files
+
+2014-10-06 Nils Blattner <nb@cabag.ch>
+	* version 0.7.8
+	* [6.2] fixed various issues with snapshots, reviews and templates in 6.2
+
 2014-09-11 Nils Blattner <nb@cabag.ch>
 	* version 0.7.7
 	* [6.2] fixed some issues with the review process in 6.2

@@ -83,26 +83,6 @@ if (TYPO3_MODE === 'BE') {
 		)
 	);
 	
-	
-	/**
-	 * Registers a Backend Module
-	 */
-	Tx_Extbase_Utility_Extension::registerModule(
-		$_EXTKEY,
-		'file',	 // Make module a submodule of 'web'
-		'stageFile',	// Submodule key
-		'',						// Position
-		array(
-			'File' => 'compare',
-		),
-		array(
-			'access' => 'user,group',
-			'icon'   => 'EXT:' . $_EXTKEY . '/ext_icon.gif',
-			'labels' => 'LLL:EXT:' . $_EXTKEY . '/Resources/Private/Language/locallang_stageFile.xml',
-			'navigationComponentId' => '',
-		)
-	);
-	
 	/**
 	 * History/undo xclass to show publish of reviews.
 	 */
