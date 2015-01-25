@@ -1,8 +1,9 @@
 {namespace s=Tx_Contentstage_ViewHelpers}{namespace c=Tx_CabagExtbase_ViewHelpers}<f:layout name="Default" />
 <f:section name="content">
-<h1><f:translate key="content.compare.title" /></h1>
+<h1><f:translate key="compare.title" /></h1>
 
 <f:flashMessages />
+
 <div class="rootline">
 	<strong>
 		<f:translate key="local.rootline" />
@@ -17,8 +18,16 @@
 	<f:render partial="Rootline" arguments="{rootline: remoteRootline}" />
 </div>
 
+<div class="depth">
+	<f:form method="POST" action="compare">
+		<input name="depth" type="text" value="{depth}" />
+		<input type="submit" value="{f:translate(key: 'compare.update')}" />
+	</f:form>
+</div>
+
 <div class="push">
 	<form method="POST" action="{f:uri.action(action: 'push')}">
+		<input name="depth" type="hidden" value="{depth}" />
 		<input type="submit" value="{f:translate(key: 'push.doIt')}" />
 	</form>
 </div>
@@ -56,7 +65,7 @@
 				<strong class="subHasChanges">[' + $.contentstage.translations.subHasChanges + ']</strong>
 			{{/if}}
 		</a>
-		{{if jQuery.isEmptyObject(_children)}}
+		{{if !jQuery.isEmptyObject(_children)}}
 			<ul>{{tmpl(_children) "#contentstagePageTreeTemplate"}}</ul>
 		{{/if}}
 	</li>

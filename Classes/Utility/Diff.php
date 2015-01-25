@@ -99,12 +99,12 @@ class Tx_Contentstage_Utility_Diff {
 				}
 				unset($tree2Keys[$key]);
 			} else {
-				$d[$key] = '<span class="diff-r">' . $this->translate('diff.source.fieldMissing', array($key)) . '</span>';
+				$d[$key] = $this->wrap($this->translate('diff.source.fieldMissing', array($key)), true);
 			}
 		}
 		
 		foreach ($tree2Keys as $key => &$true) {
-			$d[$key] = '<span class="diff-g">' . $this->translate('diff.target.fieldMissing', array($key)) . '</span>';
+			$d[$key] = $this->wrap($this->translate('diff.target.fieldMissing', array($key)));
 		}
 		
 		$tree1['_differences'] = &$d;
@@ -161,12 +161,12 @@ class Tx_Contentstage_Utility_Diff {
 			if (isset($children2Keys[$uid])) {
 				unset($children2Keys[$uid]);
 			} else {
-				$d[$uid] = '<span class="diff-r">' . $this->translate('diff.source.recordMissing', array($keyField, $uid)) . '</span>';
+				$d[$uid] = $this->wrap($this->translate('diff.source.recordMissing', array($keyField, $uid)), true);
 			}
 		}
 		
 		foreach ($children2Keys as $uid => &$true) {
-			$d[$uid] = '<span class="diff-g">' . $this->translate('diff.target.recordMissing', array($keyField, $uid)) . '</span>';
+			$d[$uid] = $this->wrap($this->translate('diff.target.recordMissing', array($keyField, $uid)));
 		}
 		
 		$children1['_differences'] = &$d;
@@ -188,10 +188,14 @@ class Tx_Contentstage_Utility_Diff {
 	 * @param string $table The table to perform the diff for. Is only used to hide certain fields. Defaults to pages.
 	 * @return array An array with keys for each $keyField found in either (or both) of the resources. These arrays contain an array with differences for each field or a lone message if the row was missing entirely.
 	 */
-	public function &resources(Tx_Contentstage_Domain_Repository_Result &$resource1 = null, Tx_Contentstage_Domain_Repository_Result &$resource2 = null, array &$differences = array(), $keyField = 'uid', $pidField = 'pid', $table = 'pages') {
+	public function &resources(Tx_Contentstage_Domain_Repository_Result &$resource1 = null, Tx_Contentstage_Domain_Repository_Result &$resource2 = null, array &$differences = array(), $keyField = 'uid', $pidField = 'pid') {
 		$differences = array('byPid' => array());
 		$r1 = $resource1->nextResolved();
 		$r2 = $resource2->nextResolved();
+		$table = $resource1->getTable();
+		$tableTCA = $this->tca->getProcessedTca($table);
+		$fromRepository = $resource1->getRepository();
+		$toRepository = $resource2->getRepository();
 		
 		while (true) {
 			if ($r1 === false && $r2 === false) {
@@ -204,13 +208,31 @@ class Tx_Contentstage_Utility_Diff {
 			$uid = min($uid1, $uid2);
 			
 			if ($uid1 < $uid2) {
-				$differences[$uid]['_sourceMissing'] = '<span class="diff-r">' . $this->translate('diff.source.recordMissing', array($keyField, $uid)) . '</span>';
+				$differences[$uid]['_sourceMissing'] = $this->wrap($this->translate('diff.source.recordMissing', array($keyField, $uid)), true);
 				$r1Next = true;
 			} else if ($uid2 < $uid1) {
-				$differences[$uid]['_targetMissing'] = '<span class="diff-g">' . $this->translate('diff.target.recordMissing', array($keyField, $uid)) . '</span>';
+				$differences[$uid]['_targetMissing'] = $this->wrap($this->translate('diff.target.recordMissing', array($keyField, $uid)));
 				$r2Next = true;
 			} else {
 				$this->rows($r1, $r2, $differences, $keyField, $table);
+				
+				foreach (array('files', 'folders') as $type) {
+					foreach ($tableTCA['__' . $type] as $field => $true) {
+						if (!isset($differences[$uid][$field])) {
+							// no difference, let's check the files
+							$folder = $tableTCA[$field]['folder'];
+							$function = 'compare' . ucfirst($type);
+							$message = $toRepository->$function(
+								$fromRepository->getFileHandle($folder . $r1[$field]),
+								$toRepository->getFileHandle($folder . $r1[$field])
+							);
+							if ($message !== false) {
+								$differences[$uid][$field] = $this->wrap($message);
+							}
+						}
+					}
+				}
+				
 				$r1Next = $r2Next = true;
 			}
 			
@@ -248,6 +270,17 @@ class Tx_Contentstage_Utility_Diff {
 		unset($keys['_differences']);
 		
 		return $keys;
+	}
+	
+	/**
+	 * Wrap a message to be displayed.
+	 *
+	 * @param string $message The message.
+	 * @param boolean $sourceMissing Whether or not the content is missing at the source (= red).
+	 * @return string The HTML string.
+	 */
+	protected function wrap($message = '', $sourceMissing = false) {
+		return '<span class="diff-' . ($sourceMissing ? 'r' : 'g') . '">' . $message . '</span>';
 	}
 	
 	/**

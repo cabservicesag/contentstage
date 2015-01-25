@@ -83,8 +83,9 @@ class Tx_Contentstage_Controller_ContentController extends Tx_Contentstage_Contr
 
 		$this->view->assign('localRootline', $this->localRepository->getRootline($id));
 		$this->view->assign('remoteRootline', $this->remoteRepository->getRootline($id));
+		$this->view->assign('depth', $this->localRepository->getDepth());
 		
-		$this->view->assign('pageTree', $this->pageTree[$id]);
+		$this->view->assign('pageTree', $this->localRepository->reducePageTree($this->pageTree[$id], $this->localRepository->getDepth()));
 		
 		$this->view->assign('pidIndex', $this->pidIndex);
 		

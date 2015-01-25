@@ -2,7 +2,8 @@
 	display: none;
 }
 
-.push {
+.push,
+.depth {
 	padding-top: 20px;
 }
 

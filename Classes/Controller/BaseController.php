@@ -43,6 +43,7 @@ class Tx_Contentstage_Controller_BaseController extends Tx_CabagExtbase_Controll
 		'cache_md5params' => true,
 		'cache_pages' => true,
 		'cache_pagesection' => true,
+		'cache_sys_dmail_stat' => true,
 		'cache_treelist' => true,
 		'cache_typo3temp_log' => true,
 		'cachingframework_cache_hash' => true,
@@ -74,6 +75,7 @@ class Tx_Contentstage_Controller_BaseController extends Tx_CabagExtbase_Controll
 		'index_words' => true,
 		'sys_be_shortcuts' => true,
 		'sys_collection_entries' => true,
+		'sys_dmail_maillog' => true,
 		'sys_history' => true,
 		'sys_lockedrecords' => true,
 		'sys_log' => true,
@@ -82,12 +84,17 @@ class Tx_Contentstage_Controller_BaseController extends Tx_CabagExtbase_Controll
 		'sys_registry' => true,
 		'sys_ter' => true,
 		'sys_workspace' => true,
+		'sys_workspace_cache' => true,
+		'sys_workspace_cache_tags' => true,
 		'static_tsconfig_help' => true,
+		'tt_news_cache' => true,
+		'tt_news_cache_tags' => true,
 		'tx_extbase_cache_object' => true,
 		'tx_extbase_cache_object_tags' => true,
 		'tx_extbase_cache_reflection' => true,
 		'tx_extbase_cache_reflection_tags' => true,
 		'tx_impexp_presets' => true,
+		'tx_linkvalidator_link' => true,
 		'tx_scheduler_task' => true
 	);
 	
@@ -197,6 +204,27 @@ class Tx_Contentstage_Controller_BaseController extends Tx_CabagExtbase_Controll
 	 * @var Tx_Contentstage_Utility_Tca The TCA utility object.
 	 */
 	protected $tca = null;
+	
+	/**
+	 * The page ts for the current page/user.
+	 *
+	 * @var array
+	 */
+	protected $pageTS = null;
+	
+	/**
+	 * The minimum depth of recursion.
+	 *
+	 * @var int
+	 */
+	protected $minimumDepth = null;
+	
+	/**
+	 * The maximum depth of recursion.
+	 *
+	 * @var int
+	 */
+	protected $maximumDepth = null;
 
 	/**
 	 * Injects the snapshot repository.
@@ -250,28 +278,7 @@ class Tx_Contentstage_Controller_BaseController extends Tx_CabagExtbase_Controll
 		$this->remoteDB->connectDB($info['host'], $info['user'], $info['password'], $info['database']);
 		$GLOBALS['TYPO3_CONF_VARS']['SYS']['no_pconnect'] = $noPconnect;
 		
-		if ($this->log === null) {
-			$this->log = $this->objectManager->create('Tx_CabagExtbase_Utility_Logging');
-		}
-		
-		$this->log->setDefaultTag($this->extensionName)
-			->setWriteSeverity(400)
-			->addOutput($this->extensionName . 'Flash', 'flash', array(
-				'flashMessageContainer' => $this->flashMessageContainer,
-				'severity' => Tx_CabagExtbase_Utility_Logging::OK
-			));
-		
-		if ($this->extensionConfiguration['logging.']['file.']['enable']) {
-			$this->extensionConfiguration['logging.']['file.']['file'] .= '-' . date('Ymd');
-			$this->log->addOutput($this->extensionName . 'File', 'file', $this->extensionConfiguration['logging.']['file.']);
-		}
-		if ($this->extensionConfiguration['logging.']['mail.']['enable']) {
-			$this->log->addOutput($this->extensionName . 'Mail', 'mail', $this->extensionConfiguration['logging.']['mail.']);
-		}
-		if ($this->extensionConfiguration['logging.']['devLog.']['enable']) {
-			$this->log->addOutput($this->extensionName . 'DevLog', 'devlog', $this->extensionConfiguration['logging.']['devLog.']);
-		}
-		$this->log->log($this->translate('info.init'), Tx_CabagExtbase_Utility_Logging::INFORMATION);
+		$this->initializeLog();
 		
 		$this->localRepository = $this->objectManager->create(
 			'Tx_Contentstage_Domain_Repository_ContentRepository',
@@ -291,6 +298,7 @@ class Tx_Contentstage_Controller_BaseController extends Tx_CabagExtbase_Controll
 		);
 		$this->remoteRepository->setFolder($this->extensionConfiguration['remote.']['folder']);
 		
+		$this->initializeDepth();
 		$this->initializeIgnoreTables();
 	}
 	
@@ -304,26 +312,96 @@ class Tx_Contentstage_Controller_BaseController extends Tx_CabagExtbase_Controll
 		
 		$this->applyTablesToIndex($this->ignoreSnapshotTables, $this->extensionConfiguration['tables.']['doNotSnapshot']);
 		
-		$id = intval(t3lib_div::_GP('id'));
-		if ($id <= 0) {
-			return;
-		}
+		$pageTS = $this->getPageTS();
 		
-		$rootline = array();
-		$c = PHP_INT_MAX;
-		foreach ($this->localRepository->getRootline($id) as $uid => $page) {
-			$rootline[$c] = &$page;
-			$c--;
-		}
-		$pageTS = t3lib_befunc::getPagesTSconfig($id, $rootline);
+		$this->applyTableIndexToIndex($this->ignoreSyncTables, $pageTS['doNotSync.']);
 		
-		$this->applyTableIndexToIndex($this->ignoreSyncTables, $pageTS['tx_contentstage.']['doNotSync.']);
-		
-		$this->applyTableIndexToIndex($this->ignoreSnapshotTables, $pageTS['tx_contentstage.']['doNotSnapshot.']);
+		$this->applyTableIndexToIndex($this->ignoreSnapshotTables, $pageTS['doNotSnapshot.']);
 		
 		$this->snapshotRepository->setIgnoreSnapshotTables($this->ignoreSnapshotTables);
 		
-		$this->tca->initializeIgnoreFields($pageTS['tx_contentstage.']['doNotDisplay.']);
+		$this->tca->initializeIgnoreFields($pageTS['doNotDisplay.']);
+	}
+	
+	/**
+	 * Initializes the recursion depth.
+	 *
+	 * @return void
+	 */
+	protected function initializeDepth() {
+		$depth = t3lib_div::_GP('depth');
+		$sessionDepth = $GLOBALS['BE_USER']->getSessionData('tx_' . strtolower($this->extensionName) . '_depth');
+		$pageTS = $this->getPageTS();
+		
+		if (is_numeric($depth) && intval($depth) >= -1) {
+			$depth = intval($depth);
+		} else if (is_numeric($sessionDepth) && intval($sessionDepth) >= -1) {
+			$depth = intval($sessionDepth);
+		} else {
+			$depth = is_numeric($pageTS['defaultDepth']) ? intval($pageTS['defaultDepth']) : -1;
+		}
+		
+		$range = array(
+			is_numeric($pageTS['minimumDepth']) ? intval($pageTS['minimumDepth']) : 0,
+			is_numeric($pageTS['maximumDepth']) ? intval($pageTS['maximumDepth']) : PHP_INT_MAX
+		);
+		$this->maximumDepth = max(0, max($range));
+		$this->minimumDepth = max($this->maximumDepth === PHP_INT_MAX ? -1 : 0, min($range));
+		
+		if ($depth !== -1 || $this->maximumDepth !== PHP_INT_MAX) {
+			$depth = max(min($this->maximumDepth, $depth), $this->minimumDepth);
+		}
+		
+		if ($depth != $sessionDepth) {
+			$GLOBALS['BE_USER']->setAndSaveSessionData('tx_' . strtolower($this->extensionName) . '_depth', $depth);
+		}
+		$this->localRepository->setDepth($depth);
+		$this->remoteRepository->setDepth($depth);
+	}
+	
+	protected function initializeLog() {
+		if ($this->log === null) {
+			$this->log = $this->objectManager->create('Tx_CabagExtbase_Utility_Logging');
+		}
+		
+		$this->log->setDefaultTag($this->extensionName)
+			->setWriteSeverity(400)
+			->addOutput($this->extensionName . 'Flash', 'flash', array(
+				'flashMessageContainer' => $this->flashMessageContainer,
+				'severity' => Tx_CabagExtbase_Utility_Logging::OK
+			));
+		
+		
+		if ($this->extensionConfiguration['logging.']['file.']['enable']) {
+			$this->log->addOutput($this->extensionName . 'File', 'file', $this->extensionConfiguration['logging.']['file.']);
+		}
+		if ($this->extensionConfiguration['logging.']['mail.']['enable']) {
+			$this->log->addOutput($this->extensionName . 'Mail', 'mail', $this->extensionConfiguration['logging.']['mail.']);
+		}
+		if ($this->extensionConfiguration['logging.']['devLog.']['enable']) {
+			$this->log->addOutput($this->extensionName . 'DevLog', 'devlog', $this->extensionConfiguration['logging.']['devLog.']);
+		}
+		$this->log->log($this->translate('info.init'), Tx_CabagExtbase_Utility_Logging::INFORMATION);
+	}
+	
+	protected function getPageTS() {
+		if ($this->pageTS === null) {
+			$id = intval(t3lib_div::_GP('id'));
+			if ($id <= 0) {
+				return array();
+			}
+			
+			$rootline = array();
+			$c = PHP_INT_MAX;
+			foreach ($this->localRepository->getRootline($id) as $uid => $page) {
+				$rootline[$c] = &$page;
+				$c--;
+			}
+			$pageTS = t3lib_befunc::getPagesTSconfig($id, $rootline);
+			$this->pageTS = $pageTS['tx_' . strtolower($this->extensionName) . '.'];
+		}
+		
+		return $this->pageTS;
 	}
 	
 	/**

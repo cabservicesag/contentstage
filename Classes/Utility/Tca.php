@@ -180,6 +180,7 @@ class Tx_Contentstage_Utility_Tca implements t3lib_singleton {
 			$this->tca[$table] = $defaultFields;
 			$this->tca[$table]['__name'] = $this->translate($tableData['ctrl']['title']);
 			$this->tca[$table]['__labelField'] = $tableData['ctrl']['label'];
+			$this->tca[$table]['__files'] = $this->tca[$table]['__folders'] = array();
 			
 			t3lib_div::loadTCA($table);
 			foreach ($tableData['columns'] as $field => &$fieldData) {
@@ -218,12 +219,14 @@ class Tx_Contentstage_Utility_Tca implements t3lib_singleton {
 							'type' => self::FILE,
 							'folder' => preg_replace('#[/\\\\]?$#', '/', $config['uploadfolder'])
 						);
+						$this->tca[$table]['__files'][$field] = true;
 						break;
 					
 					case 'folder':
 						$processed = array(
 							'type' => self::FOLDER
 						);
+						$this->tca[$table]['__folders'][$field] = true;
 						break;
 						
 					case 'db':
@@ -247,8 +250,9 @@ class Tx_Contentstage_Utility_Tca implements t3lib_singleton {
 					if (!empty($config['fileFolder'])) {
 						$processed = array(
 							'type' => self::FILE,
-							'folder' => preg_replace('#[/\\\\]$#', '/', $config['fileFolder'])
+							'folder' => preg_replace('#[/\\\\]?$#', '/', $config['fileFolder'])
 						);
+						$this->tca[$table]['__files'][$field] = true;
 						break;
 					}
 				}

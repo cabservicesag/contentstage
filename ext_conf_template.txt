@@ -40,8 +40,8 @@ remote.folder =
 # cat=basic/logging/10; type=boolean; label= Enable file logging
 logging.file.enable = 1
 
-# cat=basic/logging/10; type=input; label= The path to the log. Can be absolute /file/path.log or relative to TYPO3 fileadmin/log/staging.log
-logging.file.file = fileadmin/log/staging.log
+# cat=basic/logging/10; type=input; label= The path to the log. Can be absolute /file/path.log or relative to TYPO3 fileadmin/log/staging.log. PHP-strftime() placeholders may be used.
+logging.file.file = fileadmin/log/%Y%m%d-staging.log
 
 # cat=basic/logging/10; type=int+; label= The severity, only messages with severity higher than this are logged (100 -> all (even debug messages), 200 -> success notices, 300 -> warnings, 400 -> errors)
 logging.file.severity = 100
@@ -49,7 +49,7 @@ logging.file.severity = 100
 # cat=basic/logging/10; type=boolean; label= Enable mail logging
 logging.mail.enable = 1
 
-# cat=basic/logging/10; type=input; label= The path to the log. Can be absolute /mail/path.log or relative to TYPO3 mailadmin/log/staging.log
+# cat=basic/logging/10; type=input; label= Mails to send log to.
 logging.mail.emails = info@example.com
 
 # cat=basic/logging/10; type=input; label= The mail subject

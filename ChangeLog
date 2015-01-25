@@ -1,3 +1,16 @@
+2013-08-14 Nils Blattner <nb@cabag.ch>
+	* version 0.3.0
+	* [FEATURE] added configuration options for the recursion depth through pageTS (and by expansion userTS)
+	* [FEATURE] added support for file/folder comparison (only compares whether files/folders exist and if the md5 sum is different)
+
+2013-08-13 Nils Blattner <nb@cabag.ch>
+	* version 0.2.9
+	* added recursion depth to compare and push actions
+
+2013-08-13 Nils Blattner <nb@cabag.ch>
+	* version 0.2.8
+	* added several tables to not be diff'd (because they do not have pid's)
+
 2013-05-02 Dimitri König <dk@cabag.ch>
 	* version 0.2.7
 	* modified findCmd in Shell - fixed WIN bug

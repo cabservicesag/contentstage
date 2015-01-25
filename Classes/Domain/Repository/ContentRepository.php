@@ -94,6 +94,13 @@ class Tx_Contentstage_Domain_Repository_ContentRepository {
 	protected $db = null;
 	
 	/**
+	 * The recursion depth to search.
+	 *
+	 * @var int
+	 */
+	protected $depth = -1;
+	
+	/**
 	 * The associated tag (for possible cachings).
 	 *
 	 * @var string
@@ -225,6 +232,126 @@ class Tx_Contentstage_Domain_Repository_ContentRepository {
 	}
 	
 	/**
+	 * Compares two files and returns a message if they differ. Otherwise false.
+	 *
+	 * @param string $fromFile File handle to compare from.
+	 * @param string $toFile File handle to compare to.
+	 * @return mixed The message or false.
+	 */
+	public function compareFiles($fromFile, $toFile) {
+		$message = false;
+		$severity = Tx_CabagExtbase_Utility_Logging::INFORMATION;
+		if (!file_exists($fromFile)) {
+			$message = $this->translate('compare.fileSourceMissing', array($fromFile));
+			$severity = Tx_CabagExtbase_Utility_Logging::WARNING;
+		} else if (!file_exists($toFile)) {
+			$message = $this->translate('compare.fileTargetMissing', array($toFile));
+			$severity = Tx_CabagExtbase_Utility_Logging::WARNING;
+		} else {
+			if (filemtime($fromFile) !== filemtime($toFile) && md5_file($fromFile) !== md5_file($toFile)) {
+				$message = $this->translate('compare.filesDiffer', array($fromFile, $toFile));
+			}
+		}
+		
+		if ($message !== false) {
+			$this->log->log($message, $severity);
+			return $message;
+		}
+		return false;
+	}
+	
+	/**
+	 * Compares two folders and returns a message if they differ. Otherwise false.
+	 *
+	 * @param string $fromFile Folder handle to compare from.
+	 * @param string $toFile Folder handle to compare to.
+	 * @return mixed The message or false.
+	 */
+	public function compareFolders($fromFolder, $toFolder) {
+		$message = false;
+		$severity = Tx_CabagExtbase_Utility_Logging::INFORMATION;
+		if (!file_exists($fromFolder) || !is_dir($fromFolder)) {
+			$message = $this->translate('compare.folderSourceMissing', array($fromFolder));
+			$severity = Tx_CabagExtbase_Utility_Logging::WARNING;
+		} else if (!file_exists($toFolder) || !is_dir($toFolder)) {
+			$message = $this->translate('compare.folderTargetMissing', array($toFolder));
+			$severity = Tx_CabagExtbase_Utility_Logging::WARNING;
+		} else {
+			$contents = self::dir_diff(
+				self::scandir($fromFolder),
+				self::scandir($toFolder)
+			);
+			$messages = array();
+			
+			foreach (array('source' => $fromFolder, 'target' => $toFolder) as $type => $folder) {
+				$label = 'compare.file' . ucfirst($type) . 'Missing';
+				foreach ($contents[$type] as $file) {
+					$messages = $this->translate($label, array($folder . '/' . $file));
+				}
+			}
+			foreach ($contents['both'] as $file) {
+				$path = $fromFolder . '/' . $file;
+				$m = false;
+				if (is_file($path)) {
+					$m = $this->compareFiles($path, $toFolder . '/' . $file);
+				} else if (is_dir($path)) {
+					$m = $this->compareFolders($path, $toFolder . '/' . $file);
+				}
+				if ($m !== false) {
+					$messages[] = $m;
+				}
+			}
+		}
+		
+		if ($message !== false) {
+			$this->log->log($message, $severity);
+			return $message;
+		}
+		return false;
+	}
+	
+	/**
+	 * scandir() alternative, faster because it does not sort.
+	 */
+	protected static function scandir($dir) {
+		$result = array();
+		if ($dh = opendir($dir)) {
+			while (($file = readdir($dh)) !== false) {
+				$result[] = $file;
+			}
+			closedir($dh);
+		}
+		return $result;
+	}
+	
+	/**
+	 * Directory diff
+	 *
+	 * @param array $a The source array.
+	 * @param array $b The target array.
+	 * @return array The elements, that are only in array $a or $b.
+	 */
+	protected static function dir_diff($a, $b) {
+		$onlyA = $onlyB = $both = array();
+		foreach($a as $val) $onlyA[$val] = 1;
+		foreach($b as $val) {
+			if (isset($onlyA[$val])) {
+				unset($onlyA[$val]);
+				$both[$val] = 1;
+			} else {
+				$onlyB[$val] = 1;
+			}
+		}
+		unset($both['.']);
+		unset($both['..']);
+		return array(
+			'source' => array_keys($onlyA),
+			'target' => array_keys($onlyB),
+			'both' => array_keys($both)
+		);
+	}
+	
+	/**
 	 * Returns the full page tree.
 	 *
 	 * @return array An array of the root pages with all subpages given with the key '_children' recursively.
@@ -283,7 +410,33 @@ class Tx_Contentstage_Domain_Repository_ContentRepository {
 			return array();
 		}
 		
-		return $this->_getPageTreeUids($root, $tree[$root]);
+		$result = array();
+		return $this->_getPageTreeUids($root, $tree[$root], $result, $this->getDepth());
+	}
+	
+	/**
+	 * Reduce the page tree to a specified depth.
+	 *
+	 * @param array @tree The tree to work on.
+	 * @param int $depth The depth to reduce to (negative to just leave it = infinite depth).
+	 * @return array The new reduced tree.
+	 */
+	public function reducePageTree($tree, $depth = -1) {
+		$reducedTree = array();
+		
+		foreach ($tree as $key => $value) {
+			if ($key === '_children') {
+				if ($depth !== 0 && count($value) > 0) {
+					foreach ($value as $child) {
+						$reducedTree[$key][] = $this->reducePageTree($child, $depth - 1);
+					}
+				}
+			} else {
+				$reducedTree[$key] = $value;
+			}
+		}
+		
+		return $reducedTree;
 	}
 	
 	/**
@@ -292,10 +445,11 @@ class Tx_Contentstage_Domain_Repository_ContentRepository {
 	 * @param int $root The page id to start from.
 	 * @param array $tree The recursive tree to work on.
 	 * @param array $result The optional array to store the pids in the recursion.
+	 * @param int $depth The optional depth to search - -1: infinite, 0: only this page, 1: only this page and its direct children etc.
 	 * @return array The array with the pids.
 	 */
-	protected function _getPageTreeUids($root = 0, array &$tree = null, array &$result = array()) {
-		$identifier = 'tx_contentstage_ContentRepository_getPageTreeUids_' . $this->tag . '_' . $root;
+	protected function _getPageTreeUids($root = 0, array &$tree = null, array &$result = array(), $depth = -1) {
+		$identifier = 'tx_contentstage_ContentRepository_getPageTreeUids_' . $this->tag . '_' . $root . '_' . $depth;
 		if (TX_CONTENTSTAGE_USECACHE && $this->cache->has($identifier)) {
 			return $this->cache->get($identifier);
 		}
@@ -309,9 +463,9 @@ class Tx_Contentstage_Domain_Repository_ContentRepository {
 			$result[$root] = $root;
 		}
 		
-		if (isset($tree['_children'])) {
+		if (isset($tree['_children']) && $depth !== 0) {
 			foreach ($tree['_children'] as &$child) {
-				$this->_getPageTreeUids(intval($child['uid']), $child, $result);
+				$this->_getPageTreeUids(intval($child['uid']), $child, $result, $depth - 1);
 			}
 		}
 		
@@ -739,6 +893,25 @@ class Tx_Contentstage_Domain_Repository_ContentRepository {
 	 */
 	public function translate($key, $arguments = null) {
 		return Tx_Extbase_Utility_Localization::translate($key, 'Contentstage', $arguments);
+	}
+	
+	/**
+	 * Set the maximum recursion depth to search for.
+	 *
+	 * @param int $depth The recursion depth.
+	 * @return void
+	 */
+	public function setDepth($depth) {
+		$this->depth = max(-1, intval($depth));
+	}
+	
+	/**
+	 * Get the maximum recursion depth to search for.
+	 *
+	 * @return int The recursion depth.
+	 */
+	public function getDepth() {
+		return $this->depth;
 	}
 }
 ?>
