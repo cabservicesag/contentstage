@@ -296,16 +296,14 @@ class Tx_Contentstage_Controller_ContentController extends Tx_Contentstage_Contr
 		$this->log->log($this->translate('info.push.dependencies'), Tx_CabagExtbase_Utility_Logging::OK);
 		$pageTS = $this->getPageTS();
 		
+		$dontPushDependencies = !empty($pageTS['pushDependencies']);
+		
 		do {
 			$relations = $fromRepository->getUnresolvedRelations();
 			$unSynced = $fromRepository->setRelationsSynced();
 			
 			$this->pushFiles($fromRepository, $toRepository, $relations['__FILE'] ?: array());
 			$this->pushFiles($fromRepository, $toRepository, $relations['__FOLDER'] ?: array());
-			
-			if (empty($pageTS['pushDependencies'])) {
-				break;
-			}
 			
 			foreach ($relations as $table => &$data) {
 				if (is_array($data) && isset($data[0])) {
@@ -319,12 +317,18 @@ class Tx_Contentstage_Controller_ContentController extends Tx_Contentstage_Contr
 					$localUids = implode(',', array_keys($data));
 					$toRepository->_sql('DELETE FROM ' . $table . ' WHERE uid_local IN (' . $localUids . ')', false);
 					$where = 'uid_local IN (' . $localUids . ')';
+				} else if ($dontPushDependencies) {
+					continue;
 				} else {
 					$where = 'uid IN (' . implode(',', array_keys($data)) . ')';
 				}
 				
 				$resource = $fromRepository->findInPageTree(0, $table, '*', $where, '', '');
 				$this->pushTable($resource, $toRepository);
+			}
+			
+			if ($dontPushDependencies) {
+				break;
 			}
 		} while ($unSynced > 0);
 		
