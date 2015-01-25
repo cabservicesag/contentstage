@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<T3locallang>
+	<meta type="array">
+		<type>module</type>
+		<description>Language labels for the Content staging extension in the FRONTEND</description>
+	</meta>
+	<data type="array">
+		<languageKey index="default" type="array">
+			<label index="language">en</label>
+			<label index="module.initialize">Initialize</label>
+			<label index="module.compare">Compare</label>
+			<label index="module.view">View differences</label>
+			<label index="module.snapshots">Snapshots</label>
+			<label index="content.compare.title">Compare local and remote</label>
+			<label index="initialize.initialize.title">Initialize Systems</label>
+			<label index="initialize.doIt">Initialize this system</label>
+			<label index="push.doIt">Push all data in the current page tree to the remote system.</label>
+			<label index="local.rootline">Local rootline: </label>
+			<label index="remote.rootline">Remote rootline: </label>
+			<label index="changes">Changes!</label>
+			<label index="subHasChanges">Contained page has changes!</label>
+			<label index="error.1354723058">Error while generating snapshot - File cannot be written: %1$s</label>
+			<label index="error.1354723059">Error while generating snapshot - Dump not successfull: %1$s</label>
+			<label index="error.1354723060">Error while reverting snapshot - Dump file does not exist: %1$s</label>
+			<label index="error.1354723061">Error while reverting snapshot - Dump could not be loaded into the database: %1$s</label>
+			<label index="error.1354790965">Error while altering table: %1$s</label>
+			<label index="error.1355144402">Error while selecting data: %1$s</label>
+			<label index="error.1354799704">Error while inserting data: %1$s</label>
+			<label index="error.1356616552">Error while clearing the cache: %1$s</label>
+			<label index="error.1356616553">Error while calling the clear cache command: %1$s</label>
+			<label index="error.1356616554">Curl error: %1$s</label>
+			<label index="fatal.remoteFolder">The remote folder (%1$s) does not exist!</label>
+			<label index="warning.view.noDomain">No domain record found for id. [%1$s => %2$s]</label>
+			<label index="info.init.backup">Backup generated for initialization. [%1$s]</label>
+			<label index="info.init.dumped">Dump generated for initialization. [%1$s]</label>
+			<label index="info.init.reverted">Dump read into database for initialization. [%1$s]</label>
+			<label index="info.init.raised">Auto increment raised to %1$s for all tables.</label>
+			<label index="snapshot.title">Snapshots</label>
+			<label index="snapshot.newLocal">New local Snapshot</label>
+			<label index="snapshot.newRemote">New remote Snapshot</label>
+			<label index="snapshot.delete">Delete this snapshot</label>
+			<label index="snapshot.revertLocal">Revert the local system to this snapshot (ONLY DB!)</label>
+			<label index="snapshot.revertRemote">Revert the remote system to this snapshot (ONLY DB!)</label>
+			<label index="info.snapshot.done">Created snapshot file %1$s.</label>
+			<label index="info.snapshot.removed">Removed snapshot file %1$s.</label>
+			<label index="info.snapshot.reverted">Dump read into database. [%1$s]</label>
+			<label index="info.push.table">Pushed table %1$s [%2$s row(s)].</label>
+			<label index="info.push.done">All data successfully pushed to remote.</label>
+			<label index="info.push.snapshot">Created snapshot file %1$s.</label>
+			<label index="info.push.dependencies">Resolving and synchronizing dependencies.</label>
+			<label index="info.push.files">Copied %1$s file(s). [OK: %2$s Error(s): %3$s]</label>
+			<label index="info.push.file">Copying from '%1$s' to '%2$s'.</label>
+			<label index="info.push.clearCache">Cleared the remote cache.</label>
+			<label index="info.compare.done">Compare done</label>
+			<label index="info.compare.startFluid">Starting fluid rendering.</label>
+			<label index="info.compare.endFluid">Fluid rendering done.</label>
+			<label index="info.compare.noId">No page id selected, please select one.</label>
+			<label index="info.init">Logging initialized.</label>
+			<label index="copy.fileMissing">File missing at source: %1$s.</label>
+			<label index="copy.targetFolder">Cannot create target folder: %1$s.</label>
+			<label index="pageTree.rebuild">Rebuilding page tree information start (%1$s).</label>
+			<label index="pageTree.rebuilt">Rebuilding page tree information done (%1$s).</label>
+			<label index="diff.source.recordMissing">Record missing at source [%1$s=%2$s].</label>
+			<label index="diff.target.recordMissing">Record missing at target [%1$s=%2$s].</label>
+			<label index="diff.source.fieldMissing">Field missing at source [%1$s].</label>
+			<label index="diff.target.fieldMissing">Field missing at target [%1$s].</label>
+			<label index="field.pid">Page id</label>
+			<label index="field.t3ver_oid">TYPO3 version original id</label>
+			<label index="field.t3ver_id">TYPO3 version id</label>
+			<label index="field.t3ver_wsid">TYPO3 version workspace id</label>
+			<label index="field.t3ver_label">TYPO3 version label</label>
+			<label index="field.t3ver_state">TYPO3 version state</label>
+			<label index="field.t3ver_stage">TYPO3 version stage</label>
+			<label index="field.t3ver_count">TYPO3 version count</label>
+			<label index="field.t3ver_tstamp">TYPO3 version last modified time</label>
+			<label index="field.t3ver_move_id">TYPO3 version move id</label>
+			<label index="field.t3_origuid">TYPO3 original id</label>
+			<label index="field.tstamp">Last modified</label>
+			<label index="field.crdate">Creation date</label>
+			<label index="field.cruser_id">Creation user</label>
+			<label index="field.hidden">Hidden</label>
+			<label index="field.sorting">Sorting</label>
+			<label index="field.sys_language_uid">System language id</label>
+			<label index="field.l18n_parent">Translation parent record</label>
+			<label index="field.l18n_diffsource">Translation difference</label>
+		</languageKey>
+	</data>
+</T3locallang>

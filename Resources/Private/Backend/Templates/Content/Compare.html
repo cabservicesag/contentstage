@@ -1,0 +1,80 @@
+{namespace s=Tx_Contentstage_ViewHelpers}{namespace c=Tx_CabagExtbase_ViewHelpers}<f:layout name="Default" />
+<f:section name="content">
+<h1><f:translate key="content.compare.title" /></h1>
+
+<f:flashMessages />
+<div class="rootline">
+	<strong>
+		<f:translate key="local.rootline" />
+	</strong>
+	<f:render partial="Rootline" arguments="{rootline: localRootline}" />
+</div>
+
+<div class="rootline">
+	<strong>
+		<f:translate key="remote.rootline" />
+	</strong>
+	<f:render partial="Rootline" arguments="{rootline: remoteRootline}" />
+</div>
+
+<div class="push">
+	<form method="POST" action="{f:uri.action(action: 'push')}">
+		<input type="submit" value="{f:translate(key: 'push.doIt')}" />
+	</form>
+</div>
+
+<div class="treeContainer">
+	<div class="control">
+		<a title="Collapse the entire tree below" href="#"><img src="../images/minus.gif" /> Collapse All</a>
+		<a title="Expand the entire tree below" href="#"><img src="../images/plus.gif" /> Expand All</a>
+		<a title="Toggle the tree below, opening closed branches, closing open branches" href="#">Toggle All</a>
+	</div>
+	<ul class="pageTree">
+		<f:render partial="PageNode" arguments="{page: pageTree}" />
+	</ul>
+</div>
+<div class="differencesContainer">
+	<ul class="differences">
+	</ul>
+</div>
+<script id="contentstageChangesTemplate" type="text/x-jquery-tmpl"><![CDATA[
+	<li class="field" data-page="${page}" data-table="${table}" data-record="${record}" data-field="${field}">
+		<span class="fieldTitle title">${tableName} [uid=${record}] &gt; ${fieldName}</span>
+		<span class="changes">{{html change}}</span>
+	</li>
+]]></script>
+<script id="contentstagePageChangesTemplate" type="text/x-jquery-tmpl"><![CDATA[
+	{{if changes.length}}
+		<li class="page" data-page="${page}">
+			<span class="title pageTitle">{{html title}}</span>
+			<ul class="tableContainer">{{tmpl(changes) "#contentstageChangesTemplate"}}</ul>
+		</li>
+	{{/if}}
+]]></script>
+<script id="contentstagePageTreeTemplate" type="text/x-jquery-tmpl"><![CDATA[
+	<li>
+		<a data-page="${uid}" href="#" class="pageNode" title="${title} [${uid}]">
+			${title} [${uid}]
+			{{if jQuery.isEmptyObject(_differences)}}
+				<strong class="changes">[' + $.contentstage.translations.changes + '</strong>
+			{{else}}
+				<strong class="subHasChanges">[' + $.contentstage.translations.subHasChanges + ']</strong>
+			{{/if}}
+		</a>
+		{{if jQuery.isEmptyObject(_children)}}
+			<ul>{{tmpl(_children) "#contentstagePageTreeTemplate"}}</ul>
+		{{/if}}
+	</li>
+]]></script>
+<script type="text/javascript">
+<![CDATA[(function($){
+	$.contentstage = {};
+	$.contentstage.differences = ]]><c:json value="{pidIndex}" /><![CDATA[;
+	$.contentstage.TCA = ]]><c:json value="{tca}" /><![CDATA[;
+	$.contentstage.pageTree = ]]><c:json value="{pageTree}" /><![CDATA[;
+	$.contentstage.translations = ]]><c:json value="{changes: '{f:translate(key: \'changes\')}', subHasChanges: '{f:translate(key: \'subHasChanges\')}'}" /><![CDATA[;
+})(jQuery);]]>
+</script>
+
+<div class="clear"></div>
+</f:section>

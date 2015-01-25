@@ -1,0 +1,15 @@
+<li>
+	<a data-page="{page.uid}" href="#" class="pageNode" title="{page.title} [{page.uid}]">{page.title} [{page.uid}]<f:if condition="{page._differences}">
+		<f:then>
+			<strong class="changes">
+				[<f:translate key="changes" />]
+			</strong>
+		</f:then>
+		<f:else>
+			<strong class="subHasChanges">
+				[<f:translate key="subHasChanges" />]
+			</strong>
+		</f:else>
+	</f:if></a>
+	<f:if condition="{page._children}"><ul><f:for each="{page._children}" as="child"><f:render partial="PageNode" arguments="{page: child}" /></f:for></ul></f:if>
+</li>

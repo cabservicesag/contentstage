@@ -1,0 +1,16 @@
+<f:layout name="Default" />
+<f:section name="content">
+<f:flashMessages />
+<div class="viewDifferences">
+	<div class="header">
+		<div class="localUrl url">{localUrl}</div>
+		<div class="remoteUrl url">{remoteUrl}</div>
+	</div>
+</div>
+<script type="text/javascript"><![CDATA[
+	(function($){
+		var localUrl = ']]>{localUrl}<![CDATA[', remoteUrl = ']]>{remoteUrl}<![CDATA[', diff = $('.viewDifferences'), iframe1 = $('<iframe/>').attr('width', '49%').attr('height', '100%').attr('src', localUrl).appendTo(diff), iframe2 = iframe1.clone().attr('src', remoteUrl).appendTo(diff);
+		diff.parent().css({height: '100%'});
+	})(jQuery);
+]]></script>
+</f:section>

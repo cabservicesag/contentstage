@@ -1,0 +1,11 @@
+# Module configuration
+module.tx_contentstage {
+	persistence {
+		storagePid = {$module.tx_contentstage.persistence.storagePid}
+	}
+	view {
+		templateRootPath = {$module.tx_contentstage.view.templateRootPath}
+		partialRootPath = {$module.tx_contentstage.view.partialRootPath}
+		layoutRootPath = {$module.tx_contentstage.view.layoutRootPath}
+	}
+}
