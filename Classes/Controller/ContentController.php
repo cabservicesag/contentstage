@@ -141,8 +141,9 @@ class Tx_Contentstage_Controller_ContentController extends Tx_Contentstage_Contr
 		$id = intval(t3lib_div::_GP('id'));
 		
 		try {
+			$tables = $this->filterTables(array_keys($this->remoteRepository->getTables()), $this->ignoreSnapshotTables);
 			$info = $this->snapshotRepository->create(
-				array_keys($this->remoteRepository->getTables()),
+				$tables,
 				$this->extensionConfiguration['remote.']['db.'],
 				Tx_Contentstage_Domain_Repository_ContentRepository::TYPE_REMOTE
 			);

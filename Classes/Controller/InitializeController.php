@@ -84,8 +84,9 @@ class Tx_Contentstage_Controller_InitializeController extends Tx_Contentstage_Co
 		$threshold = $this->extensionConfiguration['autoIncrementThreshold'];
 		
 		try {
+			$tables = $this->filterTables(array_keys($this->toRepository->getTables()), $this->ignoreSnapshotTables);
 			$backupInfo = $this->snapshotRepository->create(
-				array_keys($this->toRepository->getTables()),
+				$tables,
 				$this->toInfo,
 				$this->toType
 			);
@@ -93,8 +94,7 @@ class Tx_Contentstage_Controller_InitializeController extends Tx_Contentstage_Co
 			$this->log->log($this->translate('info.init.backup', array($backupInfo['file'])), Tx_CabagExtbase_Utility_Logging::OK);
 			
 			// do not log the active users out
-			$tables = $this->fromRepository->getTables();
-			unset($tables['be_sessions']);
+			$tables = $this->filterTables(array_keys($this->fromRepository->getTables()), $this->ignoreSnapshotTables);
 			$snapshotInfo = $this->snapshotRepository->create(
 				array_keys($tables),
 				$this->fromInfo,

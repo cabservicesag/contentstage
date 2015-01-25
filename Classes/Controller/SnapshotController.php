@@ -59,7 +59,8 @@ class Tx_Contentstage_Controller_SnapshotController extends Tx_Contentstage_Cont
 		}
 		
 		try {
-			$info = $this->snapshotRepository->create(array_keys($repository->getTables()), $info, $type);
+			$tables = $this->filterTables(array_keys($repository->getTables()), $this->ignoreSnapshotTables);
+			$info = $this->snapshotRepository->create($tables, $info, $type);
 			$this->log->log($this->translate('info.snapshot.done', array(basename($info['file']))), Tx_CabagExtbase_Utility_Logging::OK);
 		} catch (Exception $e) {
 			$this->log->log($this->translate('error.' . $e->getCode(), array($e->getMessage())) ?: $e->getMessage(), Tx_CabagExtbase_Utility_Logging::ERROR);
@@ -99,7 +100,8 @@ class Tx_Contentstage_Controller_SnapshotController extends Tx_Contentstage_Cont
 		}
 		
 		try {
-			$newInfo = $this->snapshotRepository->create(array_keys($repository->getTables()), $info, $type);
+			$tables = $this->filterTables(array_keys($repository->getTables()), $this->ignoreSnapshotTables);
+			$newInfo = $this->snapshotRepository->create($tables, $info, $type);
 			$this->log->log($this->translate('info.snapshot.done', array(basename($newInfo['file']))), Tx_CabagExtbase_Utility_Logging::OK);
 			$revertInfo = $this->snapshotRepository->revert($snapshot, $info);
 			$this->log->log($this->translate('info.snapshot.reverted', array(basename($revertInfo['file']), $type)), Tx_CabagExtbase_Utility_Logging::OK);

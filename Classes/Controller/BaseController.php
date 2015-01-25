@@ -357,6 +357,23 @@ class Tx_Contentstage_Controller_BaseController extends Tx_CabagExtbase_Controll
 	}
 	
 	/**
+	 * Filters a given array of tables with the ignore tables.
+	 *
+	 * @param array $tables The tables to filter.
+	 * @param array $ignoreTables The index of 'tablename' => true pairs to be ignored.
+	 * @return array The $tables minus the $ignoreTables
+	 */
+	protected function filterTables(array $tables, array $ignoreTables) {
+		$result = array();
+		foreach ($tables as $table) {
+			if (!isset($ignoreTables[$table]) || !$ignoreTables[$table]) {
+				$result[] = $table;
+			}
+		}
+		return $result;
+	}
+	
+	/**
 	 * Returns the extension configuration.
 	 *
 	 * @return array The extension config.
