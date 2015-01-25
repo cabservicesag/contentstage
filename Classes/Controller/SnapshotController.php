@@ -110,6 +110,8 @@ class Tx_Contentstage_Controller_SnapshotController extends Tx_Contentstage_Cont
 		}
 		
 		try {
+			$info = $this->snapshotRepository->create(array_keys($repository->getTables()), $info, $type);
+			$this->log->log($this->translate('info.snapshot.done', array($info['file'])), Tx_CabagExtbase_Utility_Logging::OK);
 			$info = $this->snapshotRepository->revert($snapshot, $info);
 			$this->log->log($this->translate('info.snapshot.reverted', array($info['file'])), Tx_CabagExtbase_Utility_Logging::OK);
 		} catch (Exception $e) {

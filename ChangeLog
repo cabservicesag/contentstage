@@ -1,3 +1,8 @@
+2013-02-05 Nils Blattner <nb@cabag.ch>
+	* version 0.1.8
+	* fixed an issue when the remote page tree does not exist
+	* now a snapshot of the current state is created before reverting to a given snapshot
+
 2013-01-30 Nils Blattner <nb@cabag.ch>
 	* version 0.1.7
 	* fixed an issue with clearcache "all" and domains

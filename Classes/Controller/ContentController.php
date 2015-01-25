@@ -66,7 +66,7 @@ class Tx_Contentstage_Controller_ContentController extends Tx_Contentstage_Contr
 			$localTree = $this->localRepository->getFullPageTree();
 			$remoteTree = $this->remoteRepository->getFullPageTree();
 			$this->pageTree = &$localTree;
-			$this->diff->rows($remoteTree[$id], $localTree[$id]);
+			$this->diff->rows($remoteTree[$id] ?: array(), $localTree[$id] ?: array());
 			$this->compareTables($id);
 			$this->generatePidIndex();
 			

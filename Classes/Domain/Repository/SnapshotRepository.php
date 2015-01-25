@@ -119,7 +119,7 @@ class Tx_Contentstage_Domain_Repository_SnapshotRepository {
 	 */
 	public function revert($file, $login) {
 		$debug = array();
-		if (substr($file, 0, 1) !== '/') {
+		if (substr($file, 0, 1) !== '/' && !preg_match('#[A-Z]:[/\\\\]#', $file)) {
 			$file = PATH_site . dirname(self::DUMPFILE) . '/' . $file;
 		}
 		$debug['file'] = $filename = $file;
