@@ -132,6 +132,7 @@ class Tx_Contentstage_Controller_ContentController extends Tx_Contentstage_Contr
 	 * @return void
 	 */
 	public function pushAction() {
+		ini_set('memory_limit', '1G');
 		$id = intval(t3lib_div::_GP('id'));
 		
 		try {

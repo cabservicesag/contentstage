@@ -73,7 +73,7 @@ class Tx_Contentstage_Controller_SnapshotController extends Tx_Contentstage_Cont
 			$info = $this->snapshotRepository->create(array_keys($repository->getTables()), $info, $type);
 			$this->log->log($this->translate('info.snapshot.done', array($info['file'])), Tx_CabagExtbase_Utility_Logging::OK);
 		} catch (Exception $e) {
-			$this->log->log($this->translate('error.' . $e->getCode(), array($e->getMessage())), Tx_CabagExtbase_Utility_Logging::ERROR);
+			$this->log->log($this->translate('error.' . $e->getCode(), array($e->getMessage())) ?: $e->getMessage(), Tx_CabagExtbase_Utility_Logging::ERROR);
 		}
 		
 		$this->log->write();
@@ -113,7 +113,7 @@ class Tx_Contentstage_Controller_SnapshotController extends Tx_Contentstage_Cont
 			$info = $this->snapshotRepository->revert($snapshot, $info);
 			$this->log->log($this->translate('info.snapshot.reverted', array($info['file'])), Tx_CabagExtbase_Utility_Logging::OK);
 		} catch (Exception $e) {
-			$this->log->log($this->translate('error.' . $e->getCode(), array($e->getMessage())), Tx_CabagExtbase_Utility_Logging::ERROR);
+			$this->log->log($this->translate('error.' . $e->getCode(), array($e->getMessage())) ?: $e->getMessage(), Tx_CabagExtbase_Utility_Logging::ERROR);
 		}
 		
 		$this->log->write();

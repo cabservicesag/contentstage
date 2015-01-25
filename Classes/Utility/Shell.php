@@ -45,8 +45,14 @@ class Tx_Contentstage_Utility_Shell {
 		$this->stdout = '';
 		$this->stderr = '';
 		
+		$prefix = 'export LC_ALL=de_CH.UTF-8; export LANG=de_CH.UTF-8; cd '.$cwd.' ; ';
+		if (TYPO3_OS == 'WIN') {
+			$prefix = '';
+			$cmd = preg_replace('/\\\\\s*\r?\n/', ' ', $cmd);
+		}
+		
 		if(empty($stdoutfile)){
-			$this->cmd = 'export LC_ALL=de_CH.UTF-8; export LANG=de_CH.UTF-8; cd '.$cwd.'; '.$cmd.' 2>'.$this->stderrfile;
+			$this->cmd = $prefix . $cmd . ' 2>' . $this->stderrfile;
 			if(function_exists('shell_exec')) {
 				$this->stdout = shell_exec($this->cmd);
 			} else {
@@ -59,7 +65,7 @@ class Tx_Contentstage_Utility_Shell {
 			} else {
 				$stdoutfilemode = '>';
 			}
-			$this->cmd = 'export LC_ALL=de_CH.UTF-8; export LANG=de_CH.UTF-8; cd '.$cwd.'; '.$cmd.' 2>'.$this->stderrfile.' '.$stdoutfilemode.$stdoutfile;
+			$this->cmd = $prefix . $cmd . ' 2>' . $this->stderrfile . ' ' . $stdoutfilemode . $stdoutfile;
 			if(function_exists('shell_exec')) {
 				shell_exec($this->cmd);
 			} else {
@@ -100,16 +106,26 @@ class Tx_Contentstage_Utility_Shell {
 			'/bin/',
 			'/Applications/xampp/xamppfiles/bin/'
 			);
+		$binFolders = array_merge($binFolders, t3lib_div::trimExplode(',', $GLOBALS['TYPO3_CONF_VARS']['SYS']['binPath']));
 		
-		$cwd = false;
-		do {
-			$which = t3lib_div::makeInstance('Tx_Contentstage_Utility_Shell');
-			$which->exec('which '.$cwd.$cmd, '');
-			$stdout = $which->getStdout();
-			if(strlen($stdout) > 0){
-				return trim($stdout);
-			}
-		} while (list(,$cwd) = each($binfolders));
+		$extensions = array('');
+		
+		if (TYPO3_OS == 'WIN') {
+			$extensions[] = '.exe';
+		}
+		
+		foreach ($extensions as $extension) {
+			$cwd = false;
+			reset($binfolders);
+			do {
+				$which = t3lib_div::makeInstance('Tx_Contentstage_Utility_Shell');
+				$which->exec('which ' . $cwd . $cmd . $extension, '');
+				$stdout = $which->getStdout();
+				if (strlen($stdout) > 0) {
+					return trim($stdout);
+				}
+			} while (list(,$cwd) = each($binfolders));
+		}
 		throw new Exception('Command not found '.$cmd);
 	}
 }
