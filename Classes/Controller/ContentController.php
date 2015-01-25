@@ -294,6 +294,7 @@ class Tx_Contentstage_Controller_ContentController extends Tx_Contentstage_Contr
 	 */
 	protected function pushDependencies(Tx_Contentstage_Domain_Repository_ContentRepository $fromRepository, Tx_Contentstage_Domain_Repository_ContentRepository $toRepository) {
 		$this->log->log($this->translate('info.push.dependencies'), Tx_CabagExtbase_Utility_Logging::OK);
+		$pageTS = $this->getPageTS();
 		
 		do {
 			$relations = $fromRepository->getUnresolvedRelations();
@@ -301,6 +302,10 @@ class Tx_Contentstage_Controller_ContentController extends Tx_Contentstage_Contr
 			
 			$this->pushFiles($fromRepository, $toRepository, $relations['__FILE'] ?: array());
 			$this->pushFiles($fromRepository, $toRepository, $relations['__FOLDER'] ?: array());
+			
+			if (empty($pageTS['pushDependencies'])) {
+				break;
+			}
 			
 			foreach ($relations as $table => &$data) {
 				if (is_array($data) && isset($data[0])) {

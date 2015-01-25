@@ -1,6 +1,6 @@
-2013-10-21 Nils Blattner <nb@cabag.ch>
-	* version 0.4.9
-	* [FEATURE] added mails when a review is deprecated or pushed - issue #4157
+2013-10-24 Nils Blattner <nb@cabag.ch>
+	* version 0.5.0
+	* [FEATURE] added new pageTS option pushDependencies (default 1), if set to 0, dependencies will not be pushed
 
 2013-10-17 Nils Blattner <nb@cabag.ch>
 	* version 0.4.8
@@ -11,6 +11,10 @@
 	* [BUG] added new sql field page to reviews and removed mapping of pid to page - issue #4066
 	* After DB update following SQL must be executed: UPDATE tx_contentstage_domain_model_review SET page = pid, pid = 0
 	* Removed Hook
+2013-10-21 Nils Blattner <nb@cabag.ch>
+	* version 0.4.9
+	* [FEATURE] added mails when a review is deprecated or pushed - issue #4157
+
 
 2013-10-17 Nils Blattner <nb@cabag.ch>
 	* version 0.4.6
