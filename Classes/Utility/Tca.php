@@ -265,7 +265,9 @@ class Tx_Contentstage_Utility_Tca implements t3lib_singleton {
 		}
 		
 		foreach ($GLOBALS['TCA'] as $table => &$tableData) {
-			if (is_array($tableData['columns'])) {
+			if ($table === 'sys_log' || $table === 'sys_history') {
+				//ignore tca for these tables
+			} else if (is_array($tableData['columns'])) {
 				$this->tca[$table] = $this->tca['__default'];
 				$this->tca[$table]['__name'] = $this->translate($tableData['ctrl']['title']);
 				$this->tca[$table]['__labelField'] = $tableData['ctrl']['label'];
@@ -673,7 +675,7 @@ class Tx_Contentstage_Utility_Tca implements t3lib_singleton {
 			return $repository->_getDb()->fullQuoteStr($value, 'sys_refindex');
 		};
 		
-		$query = 'SELECT * FROM sys_refindex WHERE tablename = ' . $e($table) . ' AND recuid = ' . intval($row['uid']) . ' AND deleted = 0';
+		$query = 'SELECT * FROM sys_refindex WHERE (softref_key != \'typolink_tag\' OR ref_table = \'sys_file\' OR ref_table = \'sys_file_reference\') AND tablename = ' . $e($table) . ' AND recuid = ' . intval($row['uid']) . ' AND deleted = 0';
 		if (is_string($field)) {
 			$query .= ' AND field = ' . $e($field);
 		}

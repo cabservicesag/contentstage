@@ -82,6 +82,7 @@
 			<label index="info.push.file">Copying from '%1$s' to '%2$s'.</label>
 			<label index="info.push.files">Copied %1$s file(s). [OK: %2$s Error(s): %3$s]</label>
 			<label index="info.push.snapshot">Created snapshot file %1$s.</label>
+			<label index="info.push.noSnapshot">No snapshot created, because it was deactivated in the configuration.</label>
 			<label index="info.push.table">Pushed table %1$s [%2$s row(s)].</label>
 			<label index="info.push.noPermission">You have no permission to push this page and there is no valid review!</label>
 			<label index="info.snapshot.done">Created snapshot file %1$s.</label>
@@ -281,6 +282,7 @@
 			<label index="info.push.file">Kopiere von '%1$s' nach '%2$s'.</label>
 			<label index="info.push.files">%1$s Datei(en) kopiert. [OK: %2$s Fehler: %3$s]</label>
 			<label index="info.push.snapshot">Snapshot-Datei erstellt %1$s.</label>
+			<label index="info.push.noSnapshot">Es wurde keine Snapshot-Datei erstellt, da dies in der Konfiguration deaktiviert ist.</label>
 			<label index="info.push.table">Tabelle %1$s kopiert [%2$s Zeile(n)].</label>
 			<label index="info.push.noPermission">Sie haben keine Berechtigung diese Seite zu pushen und es gibt kein gültiges Review!</label>
 			<label index="info.snapshot.done">Snapshot-Datei erstellt %1$s.</label>

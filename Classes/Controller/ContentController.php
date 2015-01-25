@@ -157,14 +157,18 @@ class Tx_Contentstage_Controller_ContentController extends Tx_Contentstage_Contr
 			$this->redirect('compare');
 		}
 		try {
-			$tables = $this->filterTables(array_keys($this->remoteRepository->getTables()), $this->ignoreSnapshotTables, true);
-			$info = $this->snapshotRepository->create(
-				$tables,
-				$this->extensionConfiguration['remote.']['db.'],
-				Tx_Contentstage_Domain_Repository_ContentRepository::TYPE_REMOTE
-			);
-			$this->log->log($this->translate('info.push.snapshot', array($info['file'])), Tx_CabagExtbase_Utility_Logging::OK);
-			
+			$pageTS = $this->getPageTS();
+			if (empty($pageTS['doNotSnapshotOnPush'])) {
+				$tables = $this->filterTables(array_keys($this->remoteRepository->getTables()), $this->ignoreSnapshotTables, true);
+				$info = $this->snapshotRepository->create(
+					$tables,
+					$this->extensionConfiguration['remote.']['db.'],
+					Tx_Contentstage_Domain_Repository_ContentRepository::TYPE_REMOTE
+				);
+				$this->log->log($this->translate('info.push.snapshot', array($info['file'])), Tx_CabagExtbase_Utility_Logging::OK);
+			} else {
+				$this->log->log($this->translate('info.push.noSnapshot'), Tx_CabagExtbase_Utility_Logging::OK);
+			}
 			$this->pushTables($this->page);
 			$this->log->log($this->translate('info.push.done'), Tx_CabagExtbase_Utility_Logging::OK);
 			

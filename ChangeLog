@@ -1,7 +1,9 @@
-2014-12-08 Nils Blattner <nb@cabag.ch>
-	* version 0.8.1
-	* [BUG] fixed an issue when a TCE entry does not contain any columns data
-	* [6.2] only call t3lib_div::loadTCA() for pre 6.2 versions
+2015-01-19 Nils Blattner <nb@cabag.ch>
+	* version 0.8.2
+	* [FEATURE] added pageTS option doNotSnapshotOnPush to disable the snapshot, that is created after data is pushed to the remote server
+	* [FEATURE] updated TCA utility to ignore typolink references, except for files (problematic if pages are references => contentstage goes and pushes other pages aswell)
+	* [6.2] updated TCA utility to ignore sys_log and sys_history TCA (sys_log and _history should be pushed at the end every time and not treated as normal tables)
+	* [TASK] added comments to all pageTS options
 
 2014-10-21 Nils Blattner <nb@cabag.ch>
 	* version 0.8.0
@@ -32,7 +34,12 @@
 	* [TASK] removed closing ?> in all PHP files
 
 2014-08-07 Nils Blattner <nb@cabag.ch>
-	* version 0.7.4
+	* version 0.7.42014-12-08 Nils Blattner <nb@cabag.ch>
+	* version 0.8.1
+	* [BUG] fixed an issue when a TCE entry does not contain any columns data
+	* [6.2] only call t3lib_div::loadTCA() for pre 6.2 versions
+
+
 	* [6.2] added table cf_cache_rootline to compare ignore
 	* [6.2] added table cf_cache_rootline_tags to auto ignore
 	* [6.2] added table cf_extbase_datamapfactory_datamap to auto ignore
