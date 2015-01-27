@@ -238,6 +238,19 @@ class Tx_Contentstage_Utility_Tca implements t3lib_singleton {
 	}
 	
 	/**
+	 * Returns whether the TCA is existing/valid for this table.
+	 *
+	 * @param string $table Check for this table if the tca exists.
+	 * @param string $field If set, the field is checked aswell for validity.
+	 * @return boolean true if a valid processed TCA exists, false otherwise.
+	 */
+	public function &isValidTca($table, $field = null) {
+		$this->processTca();
+		
+		return is_string($table) && is_array($this->tca) && isset($this->tca[$table]) && is_array($this->tca[$table]) && (!is_string($field) || (isset($this->tca[$table][$field]) && is_array($this->tca[$table][$field])));
+	}
+	
+	/**
 	 * Process the TCA.
 	 *
 	 * @return void

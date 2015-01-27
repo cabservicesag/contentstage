@@ -252,7 +252,7 @@ class Tx_Contentstage_Controller_ContentController extends Tx_Contentstage_Contr
 			if (
 				substr($table, -3) === '_mm' || 
 				$this->ignoreSyncTables[$table] || 
-				!is_array($this->tca->getProcessedTca($table))
+				!$this->tca->isValidTca($table)
 			) {
 				continue;
 			}
@@ -295,7 +295,7 @@ class Tx_Contentstage_Controller_ContentController extends Tx_Contentstage_Contr
 			if (
 				substr($table, -3) === '_mm' || 
 				$this->ignoreSyncTables[$table] || 
-				!is_array($this->tca->getProcessedTca($table))
+				!$this->tca->isValidTca($table)
 			) {
 				$this->log->log('ignored: ' . $table, Tx_CabagExtbase_Utility_Logging::INFORMATION);
 				continue;
@@ -318,6 +318,7 @@ class Tx_Contentstage_Controller_ContentController extends Tx_Contentstage_Contr
 	protected function pushDependencies(Tx_Contentstage_Domain_Repository_ContentRepository $fromRepository, Tx_Contentstage_Domain_Repository_ContentRepository $toRepository) {
 		$this->log->log($this->translate('info.push.dependencies'), Tx_CabagExtbase_Utility_Logging::OK);
 		$pageTS = $this->getPageTS();
+		$tables = $fromRepository->getTables();
 		
 		$dontPushDependencies = empty($pageTS['pushDependencies']);
 		
@@ -341,6 +342,12 @@ class Tx_Contentstage_Controller_ContentController extends Tx_Contentstage_Contr
 					$toRepository->_sql('DELETE FROM ' . $table . ' WHERE uid_local IN (' . $localUids . ')', false);
 					$where = 'uid_local IN (' . $localUids . ')';
 				} else if ($dontPushDependencies) {
+					continue;
+				} else if (
+					$this->ignoreSyncTables[$table] || 
+					!$this->tca->isValidTca($table) ||
+					!isset($tables[$table])
+				) {
 					continue;
 				} else {
 					$where = 'uid IN (' . implode(',', array_keys($data)) . ')';

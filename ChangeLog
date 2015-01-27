@@ -1,3 +1,7 @@
+2015-01-27 Nils Blattner <nb@cabag.ch>
+	* version 0.8.3
+	* [FEATURE] added better checks to make sure no table is ever pushed that does not exist or where no valid TCA is present
+
 2015-01-19 Nils Blattner <nb@cabag.ch>
 	* version 0.8.2
 	* [FEATURE] added pageTS option doNotSnapshotOnPush to disable the snapshot, that is created after data is pushed to the remote server

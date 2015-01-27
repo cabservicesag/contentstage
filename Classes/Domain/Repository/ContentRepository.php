@@ -547,6 +547,7 @@ class Tx_Contentstage_Domain_Repository_ContentRepository {
 			$results = $this->_sql('SELECT * FROM sys_file_storage WHERE deleted = 0 AND uid = ' . $uid, true);
 			$this->fileStorageCache[$uid] = array();
 			if (count($results) > 0) {
+				
 				$results[0]['configuration_parsed'] = t3lib_div::xml2array($results[0]['configuration']);
 				if ($results[0]['configuration_parsed']['data']['sDEF']['lDEF']['pathType']['vDEF'] === 'relative') {
 					$results[0]['relativeBasePath'] = $results[0]['configuration_parsed']['data']['sDEF']['lDEF']['basePath']['vDEF'];
