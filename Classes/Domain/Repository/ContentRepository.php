@@ -202,6 +202,13 @@ class Tx_Contentstage_Domain_Repository_ContentRepository {
 	 * @var Tx_Contentstage_Controller_BaseController
 	 */
 	protected $parent = null;
+	
+	/**
+	 * The table cache.
+	 *
+	 * @var array The table cache.
+	 */
+	protected $tableCache = null;
 
 	/**
 	 * Injects the object manager
@@ -785,7 +792,10 @@ class Tx_Contentstage_Domain_Repository_ContentRepository {
 	 * @return array An array of tableName => SHOW TABLE STATUS row pairs.
 	 */
 	public function getTables() {
-		return $this->_sql('SHOW TABLE STATUS FROM `' . $this->database . '`', 'Name');
+		if ($this->tableCache === null) {
+			$this->tableCache = $this->_sql('SHOW TABLE STATUS FROM `' . $this->database . '`', 'Name');
+		}
+		return $this->tableCache;
 	}
 	
 	/**
@@ -801,6 +811,15 @@ class Tx_Contentstage_Domain_Repository_ContentRepository {
 	 * @return Tx_Contentstage_Domain_Repository_Result The result object.
 	 */
 	public function findInPageTree($root = 0, $table, $fields = '*', $where = '', $groupBy = '', $orderBy = 'uid ASC', $limit = '') {
+		list($actualTable) = t3lib_div::trimExplode(' ', $table);
+		$tables = $this->getTables();
+		if (!isset($tables[$actualTable]) || (substr($table, -3) !== '_mm' && !$this->tcaObject->isValidTca($table))) {
+			$result = $this->objectManager->create('Tx_Contentstage_Domain_Repository_EmptyResult');
+			$result->setRepository($this);
+			$result->setTable($table);
+			return $result;
+		}
+		
 		$result = $this->objectManager->create('Tx_Contentstage_Domain_Repository_Result');
 		$result->setRepository($this);
 		$result->setTable($table);
