@@ -1051,13 +1051,35 @@ class Tx_Contentstage_Domain_Repository_ContentRepository {
 		if (empty($rows)) {
 			return;
 		}
-		$query = $this->db->INSERTmultipleRows($table, $fields, $rows) . ' ON DUPLICATE KEY UPDATE ' . $updateTerm;
+		$query = $this->INSERTmultipleRows($table, $fields, $rows) . ' ON DUPLICATE KEY UPDATE ' . $updateTerm;
 		
 		$this->db->sql_query($query);
 		
 		if ($error = $this->db->sql_error()) {
 			throw new Exception($error . ' [' . $query . ']', self::ERROR_INSERT);
 		}
+	}
+
+	/**
+	 * Creates an INSERT SQL-statement for $table with multiple rows. Drop in replacement for the same function from core database connections, because this does not allow NULL.
+	 *
+	 * @param string $table Table name
+	 * @param array $fields Field names
+	 * @param array $rows Table rows. Each row should be an array with field values mapping to $fields
+	 * @param boolean $no_quote_fields See fullQuoteArray()
+	 * @return string|NULL Full SQL query for INSERT, NULL if $rows is empty
+	 */
+	protected function INSERTmultipleRows($table, array $fields, array $rows, $no_quote_fields = FALSE) {
+		// Build query
+		$query = 'INSERT INTO ' . $table . ' (' . implode(', ', $fields) . ') VALUES ';
+		$rowSQL = array();
+		foreach ($rows as $row) {
+			// Quote and escape values
+			$row = $this->db->fullQuoteArray($row, $table, $no_quote_fields, TRUE);
+			$rowSQL[] = '(' . implode(', ', $row) . ')';
+		}
+		$query .= implode(', ', $rowSQL);
+		return $query;
 	}
 	
 	/**

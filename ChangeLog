@@ -1,3 +1,7 @@
+2015-02-04 Nils Blattner <nb@cabag.ch>
+	* version 0.8.5
+	* [BUG] added a drop in replacement for INSERTmultipleRows(), because the TYPO3 core behaves inconsistently (does not allow NULL values as opposed to INSERTquery())
+
 2015-01-27 Nils Blattner <nb@cabag.ch>
 	* version 0.8.4
 	* [FEATURE] added even better checks to make sure no table is ever pushed that does not exist or where no valid TCA is present
