@@ -444,3 +444,54 @@ form .formRow textarea {
 #ilbContent .formRow h2 {
 	width: 250px;
 }
+
+/* CompareJS Styles */
+#compare-container {
+	overflow: hidden;
+}
+
+#compare-container .compare-box {
+	border: 1px solid #e5e5e5;
+	height: auto;
+	padding: 0 20px 20px 20px;
+	
+	overflow: hidden;
+}
+
+#compare-container .compare-box > .compare-table {
+	width: 100%;
+}
+
+#compare-container .compare-box > .compare-table tr {
+	border-bottom: 1px solid #E5E5E5;
+	
+	line-height: 30px;
+}
+
+#compare-container > .compare-page-title,
+#compare-container .compare-box > .compare-page-title {
+	display: block;
+	cursor: pointer;
+	margin: 20px 0 0 0px;
+	padding: 0 0 0 20px;
+	border-left: 1px solid #E5E5E5;
+	border-right: 1px solid #E5E5E5;
+	border-top: 1px solid #E5E5E5;
+	line-height: 25px;
+}
+
+#compare-container > .compare-page-title + span,
+#compare-container .compare-box > .compare-page-title + span {
+	background-image: url('../Icons/action.png');
+	background-repeat: no-repeat;
+}
+
+#compare-container > .compare-page-title + span.changes-rootlevel,
+#compare-container .compare-box > .compare-page-title + span.changes-rootlevel {
+	background-position: 0 80px;
+}
+
+#compare-container > .compare-page-title + span.changes-recursivelevel,
+#compare-container .compare-box > .compare-page-title + span.changes-recursivelevel {
+	background-position: 0 96px;
+}

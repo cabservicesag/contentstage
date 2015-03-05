@@ -1,3 +1,10 @@
+2015-03-05 Tizian Schmidlin <st@cabag.ch>
+	* version 0.8.6
+	* added Compare.js
+	* added compare container to Compare.html
+	* added container CSS definition in Main.css
+	* added Compare.js to Loader.js
+
 2015-02-04 Nils Blattner <nb@cabag.ch>
 	* version 0.8.5
 	* [BUG] added a drop in replacement for INSERTmultipleRows(), because the TYPO3 core behaves inconsistently (does not allow NULL values as opposed to INSERTquery())
