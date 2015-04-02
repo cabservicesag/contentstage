@@ -127,3 +127,5 @@ tx_contentstage {
 EOD;
 
 t3lib_extMgm::addPageTSConfig($pageTS);
+
+$TYPO3_CONF_VARS['EXTCONF']['extbase']['typeConverters'][] = 'Tx_Contentstage_Property_TypeConverter_DbrecordConverter';

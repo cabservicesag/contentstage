@@ -395,6 +395,8 @@ class Tx_Contentstage_Controller_BaseController extends Tx_CabagExtbase_Controll
 		define('TX_CONTENTSTAGE_USECACHE', !empty($this->extensionConfiguration['useCache']));
 		define('TX_CONTENTSTAGE_CACHETIME', intval($this->extensionConfiguration['cacheTime']));
 		
+		$this->settings['publishRecords'] = $this->extensionConfiguration['global.']['disablePublishRecord'] ? '' : 'Extended';
+		
 		$this->localDB = $GLOBALS['TYPO3_DB'];
 		
 		$this->initializePage();
@@ -858,7 +860,7 @@ class Tx_Contentstage_Controller_BaseController extends Tx_CabagExtbase_Controll
 		) {
 			return false;
 		}
-		
+				
 		$mail = $this->objectManager->create(
 			'Tx_CabagExtbase_Utility_Mail',
 			$this->controllerContext,

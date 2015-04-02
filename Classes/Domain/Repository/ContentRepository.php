@@ -913,6 +913,74 @@ class Tx_Contentstage_Domain_Repository_ContentRepository {
 	}
 	
 	/**
+	 * @param Tx_Contentstage_Domain_Model_Review 	$review the review to take the records from
+	 * @param string $table The table to query (CAN ONLY BE A SINGLE TABLE!).
+	 * @param string $fields The fields to get (* by default).
+	 * @param string $where The where condition (empty by default).
+	 * @param string $groupBy Group the query IMPORTANT: not used in this version.
+	 * @param string $orderBy Order to use on the query (uid ASC by default).
+	 * @param string $limit Limit the query.
+	 * @param string $idFields The ID fields of the table.
+	 * @return Tx_Contentstage_Domain_Repository_Result The result object.
+	 */
+	public function findReviewRecords(Tx_Contentstage_Domain_Model_Review $review, $table, $fields = '*', $where = '', $groupBy = '', $orderBy = 'uid ASC', $limit = '') {
+		list($actualTable) = t3lib_div::trimExplode(' ', $table);
+		
+		// this is only needed in this scope but could be calculated hundreds of times, so static makes sense here
+		static $tables;
+		if(empty($tables) && !is_array($tables)) {
+			foreach($review->getDbrecord() as $dbrecord) {
+				$dbecordTables[$dbrecord->getTablename()] = true;
+			}
+			// assign at the end
+			$tables = $dbecordTables;
+		}
+		
+		if (!isset($tables[$actualTable]) && !isset($tables[$table]) || (substr($table, -3) !== '_mm' && !$this->tcaObject->isValidTca($table))) {
+			$result = $this->objectManager->create('Tx_Contentstage_Domain_Repository_EmptyResult');
+			$result->setRepository($this);
+			$result->setTable($table);
+			return $result;
+		}
+		
+		$result = $this->objectManager->create('Tx_Contentstage_Domain_Repository_Result');
+		$result->setRepository($this);
+		$result->setTable($table);
+		
+		$uids = array();
+		
+		foreach($review->getDbrecord() as $record) {
+			$uids[] = $record->getRecorduid();
+		}
+				
+		if (empty($uids)) {
+			$whereParts = array('1 <> 1');
+		} else {
+			$whereParts = array('uid IN (' . implode(',', $uids) . ')');
+		}
+		
+		
+		if (!empty($where)) {
+			$whereParts[] = '(' . $where . ')';
+		}
+		
+		$query = $this->db->SELECTquery($fields, $table, implode(' AND ', $whereParts), $groupBy, $orderBy, $limit);
+		
+		// this slows the process down imensely!
+		//$this->log->log($query, Tx_CabagExtbase_Utility_Logging::INFORMATION);
+		
+		$resource = $this->db->sql_query($query);
+		
+		if (!$resource || $this->db->sql_error()) {
+			throw new Exception($this->db->sql_error() . ' [Query: ' . $this->db->SELECTquery($fields, $table, implode(' AND ', $whereParts), $groupBy, $orderBy, $limit) . ']', self::ERROR_GET);
+		}
+		
+		$result->setResource($resource);
+		$result->setQuery($query);
+		return $result;
+	}
+	
+	/**
 	 * Maps the table name to the fields for use in SQL.
 	 *
 	 * @param string $table The table to map to the fields.
@@ -1027,7 +1095,7 @@ class Tx_Contentstage_Domain_Repository_ContentRepository {
 				$updateTerm = implode(',', $update);
 			}
 			
-			if ($c % 100) {
+			if ($c % 100 === 0) {
 				$this->_insert($table, $buffer, $fields, $updateTerm);
 				$buffer = array();
 			}

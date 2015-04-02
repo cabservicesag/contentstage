@@ -78,3 +78,6 @@ compression.disable = 0
 
 # cat=basic/logging/10; type=int+; label= The severity, only messages with severity higher than this are logged (100 -> all (even debug messages), 200 -> success notices, 300 -> warnings, 400 -> errors)
 logging.devLog.severity = 100
+
+# cat=basic/logging/10; type=boolean; label= Disable records publishing: By default, you could publish single records from a page or the whole page. If you don't want to allow users to push single records, activate this.
+global.disablePublishRecord = 0

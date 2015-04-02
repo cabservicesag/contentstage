@@ -139,6 +139,7 @@ class Tx_Contentstage_Controller_ReviewController extends Tx_Contentstage_Contro
 	 * @return void
 	 */
 	public function createAction(Tx_Contentstage_Domain_Model_Review $review, array $reviewers = array()) {
+		
 		$this->checkPermission();
 		if (!is_array($reviewers) || count($reviewers) != $this->review->getRequired()) {
 			$this->flashMessageContainer->add($this->translate('review.create.error.badReviewers', array($this->review->getRequired(), count($reviewers))), '', t3lib_FlashMessage::ERROR);
@@ -157,11 +158,19 @@ class Tx_Contentstage_Controller_ReviewController extends Tx_Contentstage_Contro
 		$review->setCreated(new DateTime());
 		$review->setCreator($this->activeBackendUser);
 		$this->reviewRepository->add($review);
-		$this->persistenceManager->persistAll();
 		$review->addChangeString($this->activeBackendUser);
 		
 		foreach ($reviewed as $reviewedObject) {
 			$review->addReviewed($reviewedObject);
+		}
+		$this->persistenceManager->persistAll();
+		
+		// at the moment, it is not possible to inject a storage object at creation, so we have to cheat a bit
+		$tempData = t3lib_div::_GP('tx_contentstage_web_contentstagestage_temp');
+		if(!empty($tempData['review']['dbrecord']) && count($tempData['review']['dbrecord']) > 0) {
+			$converter = $this->objectManager->get('Tx_Contentstage_Property_TypeConverter_DbrecordConverter');
+			
+			$review->setDbrecord($converter->convertFrom($tempData['review']['dbrecord'], 'Tx_Extbase_Persistence_ObjectStorage<Tx_Contentstage_Domain_Model_Dbrecord>'));
 		}
 		
 		$this->reviewRepository->update($review);
@@ -181,6 +190,11 @@ class Tx_Contentstage_Controller_ReviewController extends Tx_Contentstage_Contro
 		
 		$this->redirect('compare', 'Content');
 	}
+	
+	/**
+	 * Create specialized review
+	 *
+	 */
 
 	/**
 	 * action edit
@@ -206,6 +220,14 @@ class Tx_Contentstage_Controller_ReviewController extends Tx_Contentstage_Contro
 		} catch (Exception $e) {
 			$this->log->log($this->translate('error.' . $e->getCode(), array($e->getMessage())) ?: $e->getMessage(), Tx_CabagExtbase_Utility_Logging::ERROR);
 			$this->redirect('compare', 'Content');
+		}
+		
+		// at the moment, it is not possible to inject a storage object at creation, so we have to cheat a bit
+		$tempData = t3lib_div::_GP('tx_contentstage_web_contentstagestage_temp');
+		if(!$review->getPushPageChanges() && !empty($tempData['review']['dbrecord']) && count($tempData['review']['dbrecord']) > 0) {
+			$converter = $this->objectManager->get('Tx_Contentstage_Property_TypeConverter_DbrecordConverter');
+			
+			$review->setDbrecord($converter->convertFrom($tempData['review']['dbrecord'], 'Tx_Extbase_Persistence_ObjectStorage<Tx_Contentstage_Domain_Model_Dbrecord>'));
 		}
 		
 		$this->reviewRepository->update($review);
@@ -247,9 +269,7 @@ class Tx_Contentstage_Controller_ReviewController extends Tx_Contentstage_Contro
 	 */
 	protected function mapReviewers($reviewers, &$reviewed = array()) {
 		$users = array();
-		$newReviewed = array();
-		reset($reviewed);
-		
+		$newReviewed = $this->objectManager->create('Tx_Extbase_Persistence_ObjectStorage');
 		foreach ($reviewers as $reviewer) {
 			$user = $this->backendUserRepository->findByUid(intval($reviewer));
 			if ($user === null) {
@@ -260,11 +280,11 @@ class Tx_Contentstage_Controller_ReviewController extends Tx_Contentstage_Contro
 			}
 			$users[$user->getUid()] = true;
 			$reviewedObject = current($reviewed);
-			next($reviewed);
+			//next($reviewed);
 			if (!is_object($reviewedObject) || !($reviewedObject instanceof Tx_Contentstage_Domain_Model_Reviewed)) {
 				$reviewedObject = $this->objectManager->create('Tx_Contentstage_Domain_Model_Reviewed');
 				$reviewedObject->setReviewer($user);
-				$newReviewed[] = $reviewedObject;
+				$newReviewed->attach($reviewedObject);
 				$this->reviewedRepository->add($reviewedObject);
 			} else {
 				if ($reviewedObject->getReviewer() === null || $reviewedObject->getUid() !== $user->getUid()) {
@@ -272,7 +292,7 @@ class Tx_Contentstage_Controller_ReviewController extends Tx_Contentstage_Contro
 				}
 				$reviewedObject->setReviewer($user);
 				$this->reviewedRepository->update($reviewedObject);
-				$newReviewed[] = $reviewedObject;
+				$newReviewed->attach($reviewedObject);
 			}
 		}
 		$reviewed = $newReviewed;

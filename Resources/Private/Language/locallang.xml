@@ -117,6 +117,7 @@
 			<label index="pageTree.rebuild">Rebuilding page tree information start (%1$s).</label>
 			<label index="pageTree.rebuilt">Rebuilding page tree information done (%1$s).</label>
 			<label index="push.doIt">Push these changes</label>
+			<label index="push.doItForRecords">Push these selected changes</label>
 			<label index="remote.rootline">Remote rootline: </label>
 			<label index="snapshot.delete">Delete this snapshot</label>
 			<label index="snapshot.newLocal">New local Snapshot</label>
@@ -154,6 +155,7 @@
 			<label index="review.title.page">Page title</label>
 			<label index="review.title.reviewPerson">Review person %1$s</label>
 			<label index="review.title.autoPush">Push after review</label>
+			<label index="review.title.pushPageChanges">Publish page record changes</label>
 			<label index="review.title.creator">Created by</label>
 			<label index="review.title.created">Created</label>
 			<label index="review.title.levels">Depth:</label>
@@ -183,6 +185,7 @@
 			<label index="field.review.pageTitle">Page title</label>
 			<label index="field.review.depth">Recursion depth</label>
 			<label index="field.review.autoPush">Automatically push after successfull review</label>
+			<label index="field.review.pushPageChanges">Publish page record changes</label>
 			<label index="field.review.state">Current review state</label>
 			<label index="field.review.state.fresh">New review record</label>
 			<label index="field.review.state.reinitialized">Review record reinitialized</label>
@@ -317,6 +320,7 @@
 			<label index="pageTree.rebuild">Seitenbauminformationen - Neugenerieren start (%1$s).</label>
 			<label index="pageTree.rebuilt">Seitenbauminformationen - Neugenerieren erledigt (%1$s).</label>
 			<label index="push.doIt">Alle Änderungen aufs Zielsystem kopieren</label>
+			<label index="push.doItForRecords">Alle ausgewählten Änderungen aufs Zielsystem kopieren</label>
 			<label index="remote.rootline">Entfernte Rootline: </label>
 			<label index="snapshot.delete">Diesen Snapshot löschen</label>
 			<label index="snapshot.newLocal">Neuen lokalen Snapshot</label>
@@ -354,6 +358,7 @@
 			<label index="review.title.page">Seitentitel</label>
 			<label index="review.title.reviewPerson">Review Person %1$s</label>
 			<label index="review.title.autoPush">Sofort publizieren</label>
+			<label index="review.title.pushPageChanges">Änderungen am Seiten Record ebenfalls publizieren</label>
 			<label index="review.title.creator">Erstellt von</label>
 			<label index="review.title.created">Erstellt am</label>
 			<label index="review.title.levels">Tiefe:</label>
@@ -362,6 +367,8 @@
 			<label index="review.link.confirm">Sind sie sicher, dass Sie dieses Review löschen möchten?</label>
 			<label index="review.autoPush.0">Nein</label>
 			<label index="review.autoPush.1">Ja</label>
+			<label index="review.pushPageChanges.0">Nein</label>
+			<label index="review.pushPageChanges.1">Ja</label>
 			<label index="review.create.submit">Review erstellen</label>
 			<label index="review.edit.submit">Änderungen speichern</label>
 			<label index="review.create.error.badReviewers">Nicht genug Reviewer (%1$s benötigt, %2$s geliefert)!</label>
@@ -383,6 +390,7 @@
 			<label index="field.review.pageTitle">Seitentitel</label>
 			<label index="field.review.depth">Baumtiefe</label>
 			<label index="field.review.autoPush">Automatisch publizieren</label>
+			<label index="field.review.pushPageChanges">Änderungen am Seiten Record ebenfalls publizieren</label>
 			<label index="field.review.state">Momentaner Review-Status</label>
 			<label index="field.review.state.fresh">Neuer Review-Eintrag</label>
 			<label index="field.review.state.reinitialized">Review-Eintrag wurde reinitializiert</label>

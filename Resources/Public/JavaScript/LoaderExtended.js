@@ -11,4 +11,4 @@ loadJs('jquery.treeview.js');
 loadJs('jquery.tmpl.min.js');
 loadJs('iLightbox.js');
 loadJs('Main.js');
-loadJs('Compare.js');
+loadJs('CompareExtended.js');

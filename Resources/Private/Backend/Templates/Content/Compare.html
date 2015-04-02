@@ -148,13 +148,22 @@
 			</form>
 		</div>
 	</f:if>
+	<f:if condition="{isPushable}">
+		<f:if condition="{settings.publishRecords}">
+			<div class="push" style="margin-right:0px;">
+				<form method="POST" action="{f:uri.action(action: 'push')}">
+					<input name="depth" type="hidden" value="{depth}" />
+					<div class="submitContainer">
+						<input type="submit" value="{f:translate(key: 'push.doItForRecords')}" />
+						<span class="t3-icon contentstage-action contentstage-action-push" title="{f:translate(key: 'push.doItForRecords')}">&nbsp;</span>
+					</div>
+					<div id="contentstageRecordsToPublish-forAdmin" style="display:none;"></div>
+				</form>
+			</div>
+		</f:if>
+	</f:if>
+	
 	<div class="clearer"></div>
-</div>
-
-<div class="treeContainer">
-	<ul class="pageTree">
-		<f:render partial="PageNode" arguments="{page: pageTree}" />
-	</ul>
 </div>
 <div class="differencesContainer">
 	<ul class="differences">

@@ -49,6 +49,11 @@ class Tx_Contentstage_Controller_ContentController extends Tx_Contentstage_Contr
 	protected $pageTree = array();
 	
 	/**
+	 * @var Tx_Extbase_Persistence_ManagerInterface
+	 */
+	protected $persistenceManager;
+	
+	/**
 	 * action compare
 	 *
 	 * @return void
@@ -155,6 +160,15 @@ class Tx_Contentstage_Controller_ContentController extends Tx_Contentstage_Contr
 		if (!$this->isPushable()) {
 			$this->log->log($this->translate('info.review.noPermission'), Tx_CabagExtbase_Utility_Logging::WARNING);
 			$this->redirect('compare');
+		} else {
+			// check if by any change there would be some posted records
+			$tempData = t3lib_div::_GP('tx_contentstage_web_contentstagestage_temp');
+			if(!empty($tempData['review']['dbrecord']) && count($tempData['review']['dbrecord']) > 0) {
+				$converter = $this->objectManager->get('Tx_Contentstage_Property_TypeConverter_DbrecordConverter');
+				
+				$this->review->setDbrecord($converter->convertFrom($tempData['review']['dbrecord'], 'Tx_Extbase_Persistence_ObjectStorage<Tx_Contentstage_Domain_Model_Dbrecord>'));
+				$this->review->setPushPageChanges(false);
+			}
 		}
 		try {
 			$pageTS = $this->getPageTS();
@@ -171,7 +185,7 @@ class Tx_Contentstage_Controller_ContentController extends Tx_Contentstage_Contr
 			}
 			$this->pushTables($this->page);
 			$this->log->log($this->translate('info.push.done'), Tx_CabagExtbase_Utility_Logging::OK);
-			
+			// TODO: remove the exception that is thrown when the cache could not be cleared or at least catch it
 			$this->remoteRepository->clearCache($this->page, !!$this->extensionConfiguration['clearAllCaches']);
 			$this->log->log($this->translate('info.push.clearCache'), Tx_CabagExtbase_Utility_Logging::OK);
 			
@@ -181,6 +195,11 @@ class Tx_Contentstage_Controller_ContentController extends Tx_Contentstage_Contr
 				// reset the domain/page tree cache to allow the values to be rebuilt
 				$this->remoteRepository->clearApplicationCaches();
 				$this->sendReviewMailAndLog('pushed', $this->review);
+				// once everything is done, persist everything
+				if(!is_object($this->persistenceManager)) {
+					$this->persistenceManager = $this->objectManager->get('\\TYPO3\\CMS\\Extbase\\Persistence\\Generic\\PersistenceManager');
+				}
+				$this->persistenceManager->persistAll();
 			}
 		} catch (Exception $e) {
 			$this->log->log($this->translate('error.' . $e->getCode(), array($e->getMessage())) ?: $e->getMessage(), Tx_CabagExtbase_Utility_Logging::ERROR);
@@ -291,6 +310,7 @@ class Tx_Contentstage_Controller_ContentController extends Tx_Contentstage_Contr
 	 */
 	protected function _pushTables(Tx_Contentstage_Domain_Repository_ContentRepository $fromRepository, Tx_Contentstage_Domain_Repository_ContentRepository $toRepository, $root = 0) {
 		$tables = $fromRepository->getTables();
+		
 		foreach ($tables as $table => &$data) {
 			if (
 				substr($table, -3) === '_mm' || 
@@ -300,8 +320,13 @@ class Tx_Contentstage_Controller_ContentController extends Tx_Contentstage_Contr
 				$this->log->log('ignored: ' . $table, Tx_CabagExtbase_Utility_Logging::INFORMATION);
 				continue;
 			}
-			
-			$resource = $fromRepository->findInPageTree($root, $table);
+			// check if the page changes should be pushed
+			if($this->review->getPushPageChanges()) {
+				// usual case, push everything from a page and it's dependicies
+				$resource = $fromRepository->findInPageTree($root, $table);
+			} else {
+				$resource = $fromRepository->findReviewRecords($this->review, $table);				
+			}
 			$this->pushTable($resource, $toRepository);
 		}
 		

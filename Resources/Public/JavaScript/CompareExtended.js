@@ -151,6 +151,44 @@
 						var fields = records[record];
 
 						var appendTo = cmpTableBody;
+						// If the record type is something different from pages, you must display it in a subtable
+						if(tcaKey != 'pages') {
+							var recordHeading = $('<div style="margin-top:0px; position:relative;" />')
+								.addClass('compare-page-title')
+								.addClass('t3-row-header')
+								.append(
+									$('<strong />').text(this.getTableConfiguration(tcaKey)['__name'] + ": " + record)
+								)
+								.click(this.toggleNodeEvent);
+							
+							var cmpRecordTbl = $('<table />')
+								.addClass('compare-table')
+								.append(
+									$('<thead />')
+										.append('<tr />', [
+											$('<th width="30%"/>').text('Feld'),
+											$('<th width="35%" />').text('Lokaler Stand'),
+											$('<th width="35%" />').text('Remote Stand')
+										]));
+							appendTo.append(
+								$('<tr />')
+									.append(
+										$('<td colspan="3" id="compare-container" style="padding-left:30px; padding-bottom:10px; padding-top: 10px;"/>')
+										.append([
+												$('<input type="checkbox" name="tx_contentstagecompare[reviewRecord][]" value="' + tcaKey + '|' + record + '" style="margin-left:-30px; position:absolute; margin-top:6px;" class="recordCheckbox" id="check-'+tcaKey + '-' + record+'"/>')
+													.click(this.gatherRecordsEvent)
+													.attr('checked', (this.isChecked(tcaKey, record))),
+												recordHeading,
+												$('<div />')
+												.append(cmpRecordTbl)
+												.addClass('compare-box')
+												.css({'display':'none'})
+										])
+									)
+								);
+															
+							appendTo = cmpRecordTbl;
+						} // END Subtable condition
 						
 						// Iterate over fields of current different record
 						for (var field in fields) {
@@ -300,9 +338,11 @@
 		 */
 		this.gatherRecordsEvent = function() {
 			$('#contentstageRecordsToPublish').empty();
+			$('#contentstageRecordsToPublish-forAdmin').empty();
 			$('.recordCheckbox').each(function() {
 				if(this.checked) {
 					$('#contentstageRecordsToPublish').append('<input type="hidden" name="' + recordCheckBoxName + '" value="' + $(this).val() + '" />');
+					$('#contentstageRecordsToPublish-forAdmin').append('<input type="hidden" name="' + recordCheckBoxName + '" value="' + $(this).val() + '" />');
 				}
 			});
 			//$('#contentstageRecordsToPublish').append(val(JSON.stringify(recordsToStage));
@@ -327,8 +367,6 @@
 			// Generate PageTree
 			var startNode = $('#compare-container');
 			this.walkTree($.contentstage.pageTree, startNode, true);
-			// Hide this field here
-			$('input[name=tx_contentstage_web_contentstagestage\\[review\\]\\[pushPageChanges\\]]').parent().parent().hide();
 		};
 		
 		// Startup CompareJS

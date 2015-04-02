@@ -155,6 +155,39 @@ $TCA['tx_contentstage_domain_model_reviewed'] = array(
 	),
 );
 
+
+t3lib_extMgm::addLLrefForTCAdescr('tx_contentstage_domain_model_dbrecord', 'EXT:contentstage/Resources/Private/Language/tx_contentstage_domain_model_dbrecord.xml');
+t3lib_extMgm::allowTableOnStandardPages('tx_contentstage_domain_model_dbrecord');
+$TCA['tx_contentstage_domain_model_dbrecord'] = array(
+	'ctrl' => array(
+		'hideTable' => 0,
+		'title'	=> 'LLL:EXT:contentstage/Resources/Private/Language/locallang_db.xml:tx_contentstage_domain_model_dbrecord',
+		'label' => 'dbrecord',
+		'label_alt' => 'tablename,recorduid',
+		'label_alt_force' => 1,
+		'tstamp' => 'tstamp',
+		'crdate' => 'crdate',
+		'cruser_id' => 'cruser_id',
+		'dividers2tabs' => TRUE,
+		'sortby' => 'sorting',
+		'versioningWS' => 2,
+		'versioning_followPages' => TRUE,
+		'origUid' => 't3_origuid',
+		'languageField' => 'sys_language_uid',
+		'transOrigPointerField' => 'l10n_parent',
+		'transOrigDiffSourceField' => 'l10n_diffsource',
+		'delete' => 'deleted',
+		'enablecolumns' => array(
+			'disabled' => 'hidden',
+			'starttime' => 'starttime',
+			'endtime' => 'endtime',
+		),
+		'searchFields' => 'tablename,recorduid',
+		'dynamicConfigFile' => t3lib_extMgm::extPath($_EXTKEY) . 'Configuration/TCA/Dbrecord.php',
+		'iconfile' => t3lib_extMgm::extRelPath($_EXTKEY) . 'Resources/Public/Icons/tx_contentstage_domain_model_dbrecord.gif'
+	),
+);
+
 t3lib_extMgm::addLLrefForTCAdescr('tx_contentstage_domain_model_state', 'EXT:contentstage/Resources/Private/Language/locallang_csh_tx_contentstage_domain_model_state.xml');
 t3lib_extMgm::allowTableOnStandardPages('tx_contentstage_domain_model_state');
 $TCA['tx_contentstage_domain_model_state'] = array(

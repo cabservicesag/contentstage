@@ -13,10 +13,12 @@
 							</td>
 						</tr>
 						<f:render partial="Field/Check" arguments="{label: 'review.autoPush', field: 'autoPush'}" />
+						<f:render partial="Field/Check" arguments="{label: 'review.pushPageChanges', field: 'pushPageChanges'}" />
 					</f:then>
 					<f:else>
 						<f:render partial="Field/ReadOnly" arguments="{label: 'review.depth', value: review.levels}" />
 						<f:render partial="Field/ReadOnly" arguments="{label: 'review.autoPush', value: '{f:if(condition: review.autoPush, then: \'{f:translate(key: \\\'review.autoPush.1\\\')}\', else: \'{f:translate(key: \\\'review.autoPush.0\\\')}\')}'}" />
+						<f:render partial="Field/ReadOnly" arguments="{label: 'review.pushPageChanges', value: '{f:if(condition: review.pushPageChanges, then: \'{f:translate(key: \\\'review.pushPageChanges.1\\\')}\', else: \'{f:translate(key: \\\'review.pushPageChanges.0\\\')}\')}'}" />
 					</f:else>
 				</f:if>
 				<f:for each="{review.reviewerIndices}" as="index">
@@ -83,3 +85,16 @@
 </div>
 <f:form.hidden property="page" />
 <f:form.hidden property="required" />
+<div id="contentstageRecordsToPublish">
+<f:comment>
+<f:form.hidden property="dbrecord.0" />
+</f:comment>
+<f:comment>
+	This is a temporary workaround until the db record can be added properly to the record.
+</f:comment>
+<div id="dbrecords-current-review">
+	<f:for each="{review.dbrecord}" as="dbrecord">
+		<input type="hidden" name="tx_contentstage_web_contentstagestage_temp[review][dbrecord][]" value="{dbrecord.tablename}|{dbrecord.recorduid}" id="hidden-{dbrecord.tablename}-{dbrecord.recorduid}" />
+	</f:for>
+</div>
+</div>

@@ -1,4 +1,46 @@
+2015-04-02 Tizian Schmidlin <st@cabag.ch>
+	* version 0.9.5
+	* implemented admin single record pusing
+
+2015-03-18 Tizian Schmidlin <st@cabag.ch>
+	* version 0.9.4
+	* created CompareExtended.js
+	* created LoaderExtended.js
+	* added option to disable records publishing
+	* version 0.9.3
+	* finished implementation of record publishing
+
+2015-03-13 Tizian Schmidlin <st@cabag.ch>
+	* version 0.9.2
+	* little performance tweek when writing to database in ContentRepository
+	* version 0.9.1
+	* added record publishing. If anything breaks while I'm not here, save the state and go back to 0.9.0
+	* version 0.9.0
+	* friday the 13th special edition
+	* fixed some bugs in many classes
+	* fixed some design issues in Compare.js (now all the tables have the same cell width)
+	* fixed the broken TCA for reviewed table
+
+2015-03-12 Tizian Schmidlin <st@cabag.ch>
+	* version 0.8.9
+	* added Dbrecord model
+	* integrated Dbrecord to Review
+	* added checkboxes for records to the new accordeon tree
+	* integrated Dbrecord creation and update to ReviewController
+	* added pushPageChanges to review model
+	* added database fields for dbrecord to review table
+	* added push_page_changes to review table
+	* added dbrecord table
+	* Created DbrecordConverter
+
+2015-03-06 Tizian Schmidlin <st@cabag.ch>
+	* version 0.8.8
+	* finished integration of accordeon for records
+	* removed old page tree
+
 2015-03-05 Tizian Schmidlin <st@cabag.ch>
+	* version 0.8.7
+	* worke on Compare.js improvement
 	* version 0.8.6
 	* added Compare.js
 	* added compare container to Compare.html

@@ -30,6 +30,64 @@
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  *
  */
-class Tx_Contentstage_Domain_Repository_StateRepository extends Tx_Extbase_Persistence_Repository {
+class Tx_Contentstage_Domain_Model_Dbrecord extends Tx_Extbase_DomainObject_AbstractEntity {
 
+	/**
+	 * The table the record comes from
+	 *
+	 * @var string
+	 */
+	protected $tablename;
+
+	/**
+	 * Teh record uid
+	 *
+	 * @var int
+	 */
+	protected $recorduid = FALSE;
+
+	/**
+	 * The review.
+	 *
+	 * @var Tx_Contentstage_Domain_Model_Review
+	 */
+	protected $review;
+
+	/**
+	 * Returns the tablename
+	 *
+	 * @return string $tablename
+	 */
+	public function getTablename() {
+		return $this->tablename;
+	}
+
+	/**
+	 * Sets the tablename
+	 *
+	 * @param string $tablename
+	 * @return void
+	 */
+	public function setTablename($tablename) {
+		$this->tablename = $tablename;
+	}
+
+	/**
+	 * Returns the recorduid
+	 *
+	 * @return int $recorduid
+	 */
+	public function getRecorduid() {
+		return $this->recorduid;
+	}
+
+	/**
+	 * Sets the recorduid
+	 *
+	 * @param int $recorduid
+	 * @return void
+	 */
+	public function setRecorduid($recorduid) {
+		$this->recorduid = $recorduid;
+	}
 }

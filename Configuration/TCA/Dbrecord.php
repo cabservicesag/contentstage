@@ -3,8 +3,8 @@ if (!defined ('TYPO3_MODE')) {
 	die ('Access denied.');
 }
 
-$TCA['tx_contentstage_domain_model_reviewed'] = array(
-	'ctrl' => $TCA['tx_contentstage_domain_model_reviewed']['ctrl'],
+$TCA['tx_contentstage_domain_model_dbrecord'] = array(
+	'ctrl' => $TCA['tx_contentstage_domain_model_dbrecord']['ctrl'],
 	'interface' => array(
 		'showRecordFieldList' => 'sys_language_uid, l10n_parent, l10n_diffsource, hidden, reviewed, ok, reviewer',
 	),
@@ -93,37 +93,20 @@ $TCA['tx_contentstage_domain_model_reviewed'] = array(
 				),
 			),
 		),
-		'reviewed' => array(
-			'exclude' => 0,
-			'label' => 'LLL:EXT:contentstage/Resources/Private/Language/locallang_db.xml:tx_contentstage_domain_model_reviewed.reviewed',
-			'config' => array(
-				'type' => 'input',
-				'size' => 10,
-				'eval' => 'datetime',
-				'checkbox' => 1,
-				'default' => 0
-			),
-		),
-		'ok' => array(
+		'tablename' => array(
 			'exclude' => 0,
 			'label' => 'LLL:EXT:contentstage/Resources/Private/Language/locallang_db.xml:tx_contentstage_domain_model_reviewed.ok',
 			'config' => array(
-				'type' => 'check',
-				'default' => 0
+				'type' => 'input',
+				'size' => 13,
 			),
 		),
-		'reviewer' => array(
+		'recorduid' => array(
 			'exclude' => 0,
 			'label' => 'LLL:EXT:contentstage/Resources/Private/Language/locallang_db.xml:tx_contentstage_domain_model_reviewed.reviewer',
 			'config' => array(
-				'foreign_table' => 'be_users',
-				'minitems' => 1,
-				'type' => 'select',
-				'suppress_icons' => 1,
-				'foreign_table_where' => 'ORDER BY be_users.username',
-				'items' => array(
-					array('', 0)
-				),
+				'type' => 'input',
+				'size' => 13,
 			),
 		),
 		'review' => array(

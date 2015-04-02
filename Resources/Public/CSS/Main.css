@@ -495,3 +495,7 @@ form .formRow textarea {
 #compare-container .compare-box > .compare-page-title + span.changes-recursivelevel {
 	background-position: 0 96px;
 }
+
+.compare-table th {
+	text-align:left;
+}

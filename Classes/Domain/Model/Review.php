@@ -120,7 +120,21 @@ class Tx_Contentstage_Domain_Model_Review extends Tx_Extbase_DomainObject_Abstra
 	 * @var boolean
 	 */
 	protected $autoPush = false;
-
+	
+	/**
+	 * Wether the changes on the current page record should be pushed or not
+	 *
+	 * @var boolean
+	 */
+	protected $pushPageChanges = true;
+	
+	/**
+	 * Collection of all dbrecord to be pushed in this review
+	 *
+	 * @var Tx_Extbase_Persistence_ObjectStorage<Tx_Contentstage_Domain_Model_Dbrecord>
+	 */
+	protected $dbrecord = false;
+	
 	/**
 	 * __construct
 	 *
@@ -145,6 +159,8 @@ class Tx_Contentstage_Domain_Model_Review extends Tx_Extbase_DomainObject_Abstra
 		$this->reviewed = new Tx_Extbase_Persistence_ObjectStorage();
 		
 		$this->changes = new Tx_Extbase_Persistence_ObjectStorage();
+		
+		$this->dbrecord = new Tx_Extbase_Persistence_ObjectStorage();
 	}
 
 	/**
@@ -412,6 +428,7 @@ class Tx_Contentstage_Domain_Model_Review extends Tx_Extbase_DomainObject_Abstra
 		$persistenceManager->persistAll();
 		$this->addChange($state);
 		$reviewRepository->update($this);
+		$persistenceManager->persistAll();
 	}
 
 	/**
@@ -495,6 +512,64 @@ class Tx_Contentstage_Domain_Model_Review extends Tx_Extbase_DomainObject_Abstra
 	 */
 	public function setAutoPush($autoPush) {
 		$this->autoPush = $autoPush;
+	}
+	
+	/**
+	 * Returns wether the changes on the current page record should be pushed or not
+	 *
+	 * @return boolean $pushPageChanges
+	 */
+	public function getPushPageChanges() {
+		return $this->pushPageChanges;
+	}
+
+	/**
+	 * Sets wether the changes on the current page record should be pushed or not
+	 *
+	 * @param boolean $pushPageChanges
+	 * @return void
+	 */
+	public function setPushPageChanges($pushPageChanges) {
+		$this->pushPageChanges = $pushPageChanges;
+	}
+	
+	/**
+	 * Adds a Dbrecord
+	 *
+	 * @param Tx_Contentstage_Domain_Model_Dbrecord $dbrecord
+	 * @return void
+	 */
+	public function addDbrecord(Tx_Contentstage_Domain_Model_Dbrecord $dbrecord) {
+		$this->dbrecord->attach($dbrecord);
+	}
+
+	/**
+	 * Removes a Dbrecord
+	 *
+	 * @param Tx_Contentstage_Domain_Model_Dbrecord $dbrecord The Reviewed to be removed
+	 * @return void
+	 */
+	public function removeDbrecord(Tx_Contentstage_Domain_Model_Dbrecord $dbrecord) {
+		$this->dbrecord->detach($dbrecord);
+	}
+
+	/**
+	 * Returns the dbrecord
+	 *
+	 * @return Tx_Extbase_Persistence_ObjectStorage<Tx_Contentstage_Domain_Model_Dbrecord>
+	 */
+	public function getDbrecord() {
+		return $this->dbrecord;
+	}
+
+	/**
+	 * Sets the dbrecord
+	 *
+	 * @param Tx_Extbase_Persistence_ObjectStorage<Tx_Contentstage_Domain_Model_Dbrecord> $dbrecord
+	 * @return void
+	 */
+	public function setDbrecord(Tx_Extbase_Persistence_ObjectStorage $dbrecord) {
+		$this->dbrecord = $dbrecord;
 	}
 	
 	/**

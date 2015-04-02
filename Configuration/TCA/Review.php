@@ -161,6 +161,23 @@ $TCA['tx_contentstage_domain_model_review'] = array(
 				),
 			),
 		),
+		'dbrecord' => array(
+			'exclude' => 0,
+			'label' => 'LLL:EXT:contentstage/Resources/Private/Language/locallang_db.xml:tx_contentstage_domain_model_dbrecord.dbrecord',
+			'config' => array(
+				'type' => 'inline',
+				'foreign_table' => 'tx_contentstage_domain_model_dbrecord',
+				'foreign_field' => 'review',
+				'maxitems' => 9999,
+				'appearance' => array(
+					'collapseAll' => 0,
+					'levelLinksPosition' => 'top',
+					'showSynchronizationLink' => 1,
+					'showPossibleLocalizationRecords' => 1,
+					'showAllLocalizationLink' => 1
+				),
+			),
+		),
 		'cruser_id' => array(
 			'exclude' => 0,
 			'readOnly' => true,
@@ -210,6 +227,13 @@ $TCA['tx_contentstage_domain_model_review'] = array(
 		'auto_push' => array(
 			'exclude' => 1,
 			'label' => 'LLL:EXT:contentstage/Resources/Private/Language/locallang_db.xml:tx_contentstage_domain_model_review.auto_push',
+			'config' => array(
+				'type' => 'check',
+			),
+		),
+		'push_page_changes' => array(
+			'exclude' => 1,
+			'label' => 'LLL:EXT:contentstage/Resources/Private/Language/locallang_db.xml:tx_contentstage_domain_model_review.push_page_changes',
 			'config' => array(
 				'type' => 'check',
 			),
