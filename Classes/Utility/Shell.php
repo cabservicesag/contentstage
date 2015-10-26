@@ -106,7 +106,7 @@ class Tx_Contentstage_Utility_Shell {
 			'/usr/local/bin/',
 			'/bin/',
 			'/Applications/xampp/xamppfiles/bin/'
-			);
+		);
 		$binFolders = array_merge($binFolders, t3lib_div::trimExplode(',', $GLOBALS['TYPO3_CONF_VARS']['SYS']['binPath']));
 		
 		$extensions = array('');
@@ -116,11 +116,14 @@ class Tx_Contentstage_Utility_Shell {
 		}
 		
 		foreach ($extensions as $extension) {
-			$cwd = false;
 			reset($binFolders);
 			foreach ($binFolders as $cwd) {
 				$which = t3lib_div::makeInstance('Tx_Contentstage_Utility_Shell');
-				$which->exec('which ' . $cwd . $cmd . $extension, '');
+				if (TYPO3_OS == 'WIN') {
+					$which->exec('WHERE ' . (($cwd === '') ? $cwd : $cwd . ':') . $cmd . $extension, '');
+				} else {
+					$which->exec('which ' . $cwd . $cmd . $extension, '');
+				}
 				$stdout = $which->getStdout();
 				if (strlen($stdout) > 0) {
 					return trim($stdout);

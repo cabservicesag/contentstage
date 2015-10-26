@@ -558,7 +558,7 @@ class Tx_Contentstage_Utility_Tca implements t3lib_singleton {
 			return false;
 		}
 		
-		return !isset($this->ignoreFields[$_table][$field]) || empty($this->ignoreFields[$_table][$field]);
+		return !isset($this->ignoreFields[$table][$field]) || empty($this->ignoreFields[$table][$field]);
 	}
 	
 	/**
